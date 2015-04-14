@@ -5717,7 +5717,7 @@ timeRecorder.filter('minsToHours', function ($filter) { return function (input) 
 /// <reference path="Client/_services.ts" />
 /// <reference path="Client/_controllers.ts" />
 /// <reference path="client/directives.ts" />
-;angular.module('time-recorder').run(['$templateCache', function($templateCache) {
+;angular.module('tl-time-recorder').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('Client/Views/config.html',
