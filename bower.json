@@ -1,0 +1,70 @@
+{
+  "name": "triarc-time-recorder",
+  "version": "0.0.0",
+  "authors": [
+    "Marco Bachmann <mb@triarc-labs.com>"
+  ],
+  "main": "Scripts/time-recorder.js",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "triarc",
+  "homepage": "www.triarc-labs.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "typescript": {
+    "definition": "time-recorder.d.ts"
+  },
+  "resolutions": {
+    "angular": "~1.3.0"
+  },
+  "endpoint": "https://github.com/triarc/time-recorder.git",
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "angular": "1.3.15",
+    "angular-sanitize": "1.3.15",
+    "angular-touch": "1.3.15",
+    "angular-animate": "1.3.15",
+    "angular-block-ui": "~0.1.1",
+    "angular-ui-select": "~0.8.3",
+    "angular-ui-router": "~0.2.13",
+    "angular-ui-utils": "0.2.3",
+    "angular-cookies": "1.3.15",
+    "toastr": "~2.1.0",
+    "moment": "~2.9.0",
+    "angular-dynamic-locale": "~0.1.21",
+    "jQuery.dotdotdot": "~1.6.16",
+    "ng-sortable": "~1.1.4",
+    "angular-translate-storage-cookie": "~2.4.2",
+    "angular-translate-loader-static-files": "~2.4.2",
+    "ng-debounce": "~0.1.5",
+    "oclazyload": "~0.3.9",
+    "ngDialog": "~0.3.4",
+    "angular-bootstrap-calendar": "~0.8.1",
+    "angular-load": "~0.2.0",
+    "ng-group": "~0.9.0",
+    "linqjs": "~3.0.4-beta",
+    "angular-bootstrap": "~0.12.1",
+    "angular-tree-control": "~0.2.9",
+    "slimScroll": "~1.3.3",
+    "ngInfiniteScroll": "~1.2.0",
+    "cirrus-tlAuth": "~0.0.5",
+    "cirrus-tlLocalization": "~0.0.5",
+    "cirrus-tlModal": "~0.0.5",
+    "cirrus-tlDataServices": "~0.0.5",
+    "cirrus-tlKeyPresses": "~0.0.5",
+    "cirrus-tlDisablers": "~0.0.5",
+    "cirrus-tlLayout": "~0.0.5",
+    "cirrus-tlUtils": "~0.0.5",
+    "cirrus-tlArray": "~0.0.6",
+    "cirrus-tlScroll": "~0.0.5",
+    "cirrus-tlValidate": "~0.0.5",
+    "cirrus-tlText": "~0.0.5",
+    "cirrus-tlPageLock": "~0.0.5"
+  }
+}
