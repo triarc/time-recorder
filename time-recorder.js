@@ -1661,7 +1661,7 @@ timeRecorder.config([
 timeRecorder.config([
     "$stateProvider",
     "$urlRouterProvider",
-    "timerecorderRoute",
+    "timerecorderRouteProvider",
     function ($stateProvider, $urlRouterProvider, route) {
         $stateProvider.state("tr", {
             url: "/time",
