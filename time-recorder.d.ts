@@ -968,21 +968,31 @@ declare module Data {
         $orderBy?: string;
         $filter?: string;
     }
+    interface TimeBookingGetParams {
+        id: number;
+    }
     interface TimeBookingGetAvailableEntryTypesEnumerableParams {
         $skip?: number;
         $top?: number;
         $orderBy?: string;
         $filter?: string;
     }
+    interface TimeBookingDeleteParams {
+        id: number;
+    }
     interface ITimeBookingResource {
         searchMultipleRequest(params: TimeBookingSearchEnumerableParams, data: ITimeBookingSearchParams): Triarc.Data.DataRequest<Data.ITimeBookingCm[]>;
         searchMultiple(params: TimeBookingSearchEnumerableParams, data: ITimeBookingSearchParams): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingCm[]>>;
         saveRequest(data: ITimeBookingCm): Triarc.Data.DataRequest<Data.ITimeBookingCm>;
         save(data: ITimeBookingCm): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingCm>>;
+        getRequest(params: TimeBookingGetParams): Triarc.Data.DataRequest<Data.ITimeBookingCm>;
+        get(params: TimeBookingGetParams): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingCm>>;
         getAvailableEntryTypesMultipleRequest(params: TimeBookingGetAvailableEntryTypesEnumerableParams): Triarc.Data.DataRequest<Data.ITimeEntryTypeVm[]>;
         getAvailableEntryTypesMultiple(params: TimeBookingGetAvailableEntryTypesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeEntryTypeVm[]>>;
         getMetaDataRequest(): Triarc.Data.DataRequest<Data.ITimeBookingMetaDataVm>;
         getMetaData(): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingMetaDataVm>>;
+        deleteRequest(params: TimeBookingDeleteParams): Triarc.Data.DataRequest<boolean>;
+        delete(params: TimeBookingDeleteParams): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
         newTimeBookingCm(): ITimeBookingCm;
         newTimeEntryTypeVm(): ITimeEntryTypeVm;
         newTimeBookingMetaDataVm(): ITimeBookingMetaDataVm;
@@ -997,10 +1007,14 @@ declare module Data {
         searchMultiple(params: any, data: any): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm[]>>;
         saveRequest(data: any): Triarc.Data.DataRequest<ITimeBookingCm>;
         save(data: any): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm>>;
+        getRequest(params: any): Triarc.Data.DataRequest<ITimeBookingCm>;
+        get(params: any): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm>>;
         getAvailableEntryTypesMultipleRequest(params: any): Triarc.Data.DataRequest<ITimeEntryTypeVm[]>;
         getAvailableEntryTypesMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<ITimeEntryTypeVm[]>>;
         getMetaDataRequest(): Triarc.Data.DataRequest<ITimeBookingMetaDataVm>;
         getMetaData(): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingMetaDataVm>>;
+        deleteRequest(params: any): Triarc.Data.DataRequest<boolean>;
+        delete(params: any): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
         newTimeBookingCm(): ITimeBookingCm;
         newTimeEntryTypeVm(): ITimeEntryTypeVm;
         newTimeBookingMetaDataVm(): ITimeBookingMetaDataVm;
@@ -1227,6 +1241,44 @@ declare module TimeRecorder.Web {
         logout: () => void;
         hasClaim(claim: string): ng.IPromise<boolean>;
         private containsClaim(col, claim);
+    }
+}
+declare module TimeRecorder.Web {
+    interface IMetaDataVm {
+        id: number;
+    }
+    class TimeBookingService {
+        private $proxy;
+        private $q;
+        static $inject: string[];
+        static serviceId: string;
+        metaData: Data.ITimeBookingMetaDataVm;
+        constructor($proxy: Data.ProxyContainer, $q: ng.IQService);
+        calendarSettings: {
+            fromIsOpen: boolean;
+            toIsOpen: boolean;
+            datepickerOptions: {
+                currentText: string;
+                clearText: string;
+                closeText: string;
+            };
+            dateFormat: string;
+            minDate: DateConstructor;
+        };
+        getMetaData(forceReload: boolean): ng.IPromise<Data.ITimeBookingMetaDataVm>;
+        getMetaDataVm<T extends IMetaDataVm>(id: number, data: T[]): T;
+        getStateById(id: number): Data.ETimeBookingState;
+        getPersonNameById(id: number): string;
+        getProjectNameById(id: number): string;
+        getTypeNameById(id: number): string;
+        getStateNameById(id: number): string;
+        getStateColor(state: Data.ETimeBookingState): string;
+        getIsEditable(entry: Data.ITimeBookingCm): boolean;
+        getDetail(id: number): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingCm>>;
+        search(data: Data.ITimeBookingSearchParams): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingCm[]>>;
+        save(data: Data.ITimeBookingCm): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingCm>>;
+        remove(id: number): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
+        openCalendar(event: any, key: string): void;
     }
 }
 declare module TimeRecorder.Web {
@@ -1707,84 +1759,42 @@ declare module TimeRecorder.Web {
     }
 }
 declare module TimeRecorder.Web {
-    interface IMetaDataVm {
-        id: number;
-    }
-    class TimebookingController {
+    class TimeBookingController {
         private authentication;
+        service: TimeBookingService;
         private $state;
-        private person;
-        private location;
-        private $proxy;
-        private notification;
         static controllerId: string;
         static $inject: string[];
-        metaData: Data.ITimeBookingMetaDataVm;
         searchResult: Data.ITimeBookingCm[];
-        timeBooking: Data.ITimeBookingCm;
-        fromFilter: Date;
-        toFilter: Date;
-        stateFilter: number;
-        personFilter: string;
-        typeFilter: number;
-        datepickerOptions: {};
-        dateFormat: string;
-        minDate: Date;
-        calendarIsOpen: {
-            from: boolean;
-            to: boolean;
-        };
-        constructor(authentication: AuthenticationService, $state: any, person: PersonService, location: LocationService, $proxy: Data.ProxyContainer, notification: NotificationServce);
+        fromValue: Date;
+        toValue: Date;
+        stateValue: number;
+        personValue: string;
+        typeValue: number;
+        constructor(authentication: AuthenticationService, service: TimeBookingService, $state: any);
         private init();
-        getState(): Data.ETimeBookingState;
-        getMetaDataVm<T extends IMetaDataVm>(id: number, data: T[]): T;
-        getPersonNameById(id: number): string;
-        getProjectNameById(id: number): string;
-        getTypeNameById(id: number): string;
-        getStateNameById(id: number): string;
-        getStateColor(state: Data.ETimeBookingState): string;
-        getIsEditable(entry: Data.ITimeBookingCm): boolean;
-        search(): void;
-        openCalendar(event: any, key: string): void;
+        search(): ng.IPromise<void>;
     }
 }
 declare module TimeRecorder.Web {
-    class TimeBookingEditController {
+    class TimeBookingFormController {
+        service: TimeBookingService;
         private authentication;
         private $state;
-        private person;
-        private location;
-        private $proxy;
-        private notification;
+        private $stateParams;
         static controllerId: string;
         static $inject: string[];
-        metaData: Data.ITimeBookingMetaDataVm;
-        searchResult: Data.ITimeBookingCm[];
-        timeBooking: Data.ITimeBookingCm;
-        fromFilter: Date;
-        toFilter: Date;
-        stateFilter: number;
-        personFilter: string;
-        typeFilter: number;
-        datepickerOptions: {};
-        dateFormat: string;
-        minDate: Date;
-        calendarIsOpen: {
-            from: boolean;
-            to: boolean;
-        };
-        constructor(authentication: AuthenticationService, $state: any, person: PersonService, location: LocationService, $proxy: Data.ProxyContainer, notification: NotificationServce);
+        idValue: number;
+        personValue: number;
+        projectValue: number;
+        typeValue: number;
+        fromValue: Date;
+        toValue: Date;
+        constructor(service: TimeBookingService, authentication: AuthenticationService, $state: any, $stateParams: any);
         private init();
-        getState(): Data.ETimeBookingState;
-        getMetaDataVm<T extends IMetaDataVm>(id: number, data: T[]): T;
-        getPersonNameById(id: number): string;
-        getProjectNameById(id: number): string;
-        getTypeNameById(id: number): string;
-        getStateNameById(id: number): string;
-        getStateColor(state: Data.ETimeBookingState): string;
-        getIsEditable(entry: Data.ITimeBookingCm): boolean;
-        search(): void;
-        openCalendar(event: any, key: string): void;
+        isNew(): boolean;
+        remove(): void;
+        save(): void;
     }
 }
 declare module TimeRecorder.Web {
@@ -2126,12 +2136,5 @@ declare module TimeRecorder.Web {
     interface IMultiselectItem {
         getId: () => number;
         getValue: () => string;
-    }
-}
-declare var mod: ng.IModule;
-declare var mod: ng.IModule;
-declare var mod: ng.IModule;
-declare module DispoClient {
-    interface IWindowHeightScope extends ng.IScope {
     }
 }
