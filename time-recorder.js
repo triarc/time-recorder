@@ -1660,76 +1660,98 @@ timeRecorder.config([
         //  url: "/home",
         //  templateUrl: "Client/Views/home.html"
         //});
+        $stateProvider.state("tr", {
+            url: "/time",
+            template: "<ui-view></ui-view>"
+        });
         $stateProvider.state("home", {
             url: "/home",
+            parent: "tr",
             templateUrl: "Client/Views/home.html"
         });
         $stateProvider.state("login", {
             url: "/login",
+            parent: "tr",
             templateUrl: "Client/Views/Login.html",
         });
         $stateProvider.state("main", {
             url: "/main",
+            parent: "tr",
             templateUrl: "Client/Views/main.html",
         });
         $stateProvider.state("start", {
             url: "/start",
+            parent: "tr",
             templateUrl: "Client/Views/start.html",
         });
         $stateProvider.state("users", {
             url: "/users",
+            parent: "tr",
             templateUrl: "Client/Views/users.html",
         });
         $stateProvider.state("persons", {
             url: "/persons",
+            parent: "tr",
             templateUrl: "Client/Views/persons.html",
         });
         $stateProvider.state("locations", {
             url: "/locations",
+            parent: "tr",
             templateUrl: "Client/Views/locations.html",
         });
         $stateProvider.state("roles", {
             url: "/roles",
+            parent: "tr",
             templateUrl: "Client/Views/roles.html",
         });
         $stateProvider.state("downloads", {
             url: "/downloads",
-            templateUrl: "Client/Views/downloads.html",
+            parent: "tr",
+            templateUrl: "Client/Views/downloads.html"
         });
         $stateProvider.state("personalMessages", {
             url: "/personalMessages",
+            parent: "tr",
             templateUrl: "Client/Views/personalMessages.html",
         });
         $stateProvider.state("globalMessages", {
             url: "/globalMessages",
+            parent: "tr",
             templateUrl: "Client/Views/globalMessages.html",
         });
         $stateProvider.state("config", {
             url: "/config",
+            parent: "tr",
             templateUrl: "Client/Views/config.html",
         });
         $stateProvider.state("entries", {
             url: "/bookings",
+            parent: "tr",
             templateUrl: "Client/Views/entries.html",
         });
         $stateProvider.state("projects", {
             url: "/projects",
+            parent: "tr",
             templateUrl: "Client/Views/projects.html",
         });
         $stateProvider.state("timebookings", {
             url: "/timebookings",
+            parent: "tr",
             templateUrl: "Client/Views/timebookings.html",
         });
         $stateProvider.state("timebookingsAdd", {
             url: "/timebookings/add",
+            parent: "tr",
             templateUrl: "Client/Views/timebookings.form.html",
         });
         $stateProvider.state("timebookingsEdit", {
             url: "/timebookings/edit/:id",
+            parent: "tr",
             templateUrl: "Client/Views/timebookings.form.html",
         });
         $stateProvider.state("timesheet", {
             url: "/timesheet",
+            parent: "tr",
             templateUrl: "Client/Views/timesheet/timesheet.html",
             onEnter: function () {
                 var timeout = setTimeout(function () {
