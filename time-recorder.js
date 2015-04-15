@@ -1624,11 +1624,13 @@ var timeRecorder = angular.module("tl-time-recorder", [
     "tlScroll",
     "tlLayout"
 ]);
-var TimeRecorder;
-(function (TimeRecorder) {
-    TimeRecorder.parentConstantKey = "timerecorderRouteParent";
-})(TimeRecorder || (TimeRecorder = {}));
-timeRecorder.constant(TimeRecorder.parentConstantKey, null);
+timeRecorder.provider("timerecorderRoute", function () {
+    var self = {
+        parent: null,
+        $get: function () { return self; },
+    };
+    return self;
+});
 timeRecorder.config([
     "$compileProvider",
     function ($compileProvider) {
@@ -1659,11 +1661,11 @@ timeRecorder.config([
 timeRecorder.config([
     "$stateProvider",
     "$urlRouterProvider",
-    TimeRecorder.parentConstantKey,
-    function ($stateProvider, $urlRouterProvider, routeParent) {
+    "timerecorderRoute",
+    function ($stateProvider, $urlRouterProvider, route) {
         $stateProvider.state("tr", {
             url: "/time",
-            parent: routeParent,
+            parent: route.parent,
             template: "<ui-view></ui-view>"
         });
         $stateProvider.state("tr.home", {
