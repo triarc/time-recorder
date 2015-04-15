@@ -1217,9 +1217,6 @@ declare module Data {
     }
 }
 declare var timeRecorder: ng.IModule;
-declare module TimeRecorder {
-    var parentConstantKey: string;
-}
 interface IToSelectScope extends ng.IScope {
     model: TimeRecorder.Web.ToSelectOption[];
     source: TimeRecorder.Web.ToSelectOption[];
