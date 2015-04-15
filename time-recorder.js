@@ -1655,103 +1655,76 @@ timeRecorder.config([
     "$stateProvider",
     "$urlRouterProvider",
     function ($stateProvider, $urlRouterProvider) {
-        //$stateProvider
-        //  .state("home", {
-        //  url: "/home",
-        //  templateUrl: "Client/Views/home.html"
-        //});
         $stateProvider.state("tr", {
             url: "/time",
             template: "<ui-view></ui-view>"
         });
-        $stateProvider.state("home", {
+        $stateProvider.state("tr.home", {
             url: "/home",
-            parent: "tr",
             templateUrl: "Client/Views/home.html"
         });
-        $stateProvider.state("login", {
+        $stateProvider.state("tr.login", {
             url: "/login",
-            parent: "tr",
             templateUrl: "Client/Views/Login.html",
         });
-        $stateProvider.state("main", {
-            url: "/main",
-            parent: "tr",
-            templateUrl: "Client/Views/main.html",
-        });
-        $stateProvider.state("start", {
+        $stateProvider.state("tr.start", {
             url: "/start",
-            parent: "tr",
             templateUrl: "Client/Views/start.html",
         });
-        $stateProvider.state("users", {
+        $stateProvider.state("tr.users", {
             url: "/users",
-            parent: "tr",
             templateUrl: "Client/Views/users.html",
         });
-        $stateProvider.state("persons", {
+        $stateProvider.state("tr.persons", {
             url: "/persons",
-            parent: "tr",
             templateUrl: "Client/Views/persons.html",
         });
-        $stateProvider.state("locations", {
+        $stateProvider.state("tr.locations", {
             url: "/locations",
-            parent: "tr",
             templateUrl: "Client/Views/locations.html",
         });
-        $stateProvider.state("roles", {
+        $stateProvider.state("tr.roles", {
             url: "/roles",
-            parent: "tr",
             templateUrl: "Client/Views/roles.html",
         });
-        $stateProvider.state("downloads", {
+        $stateProvider.state("tr.downloads", {
             url: "/downloads",
-            parent: "tr",
             templateUrl: "Client/Views/downloads.html"
         });
-        $stateProvider.state("personalMessages", {
+        $stateProvider.state("tr.personalMessages", {
             url: "/personalMessages",
-            parent: "tr",
             templateUrl: "Client/Views/personalMessages.html",
         });
-        $stateProvider.state("globalMessages", {
+        $stateProvider.state("tr.globalMessages", {
             url: "/globalMessages",
-            parent: "tr",
             templateUrl: "Client/Views/globalMessages.html",
         });
-        $stateProvider.state("config", {
+        $stateProvider.state("tr.config", {
             url: "/config",
-            parent: "tr",
             templateUrl: "Client/Views/config.html",
         });
-        $stateProvider.state("entries", {
+        $stateProvider.state("tr.entries", {
             url: "/bookings",
-            parent: "tr",
             templateUrl: "Client/Views/entries.html",
         });
-        $stateProvider.state("projects", {
+        $stateProvider.state("tr.projects", {
             url: "/projects",
-            parent: "tr",
             templateUrl: "Client/Views/projects.html",
         });
-        $stateProvider.state("timebookings", {
+        $stateProvider.state("tr.timebookings", {
             url: "/timebookings",
-            parent: "tr",
             templateUrl: "Client/Views/timebookings.html",
         });
-        $stateProvider.state("timebookingsAdd", {
+        $stateProvider.state("tr.timebookingsAdd", {
             url: "/timebookings/add",
-            parent: "tr",
             templateUrl: "Client/Views/timebookings.form.html",
         });
-        $stateProvider.state("timebookingsEdit", {
+        $stateProvider.state("tr.timebookingsEdit", {
             url: "/timebookings/edit/:id",
-            parent: "tr",
             templateUrl: "Client/Views/timebookings.form.html",
         });
-        $stateProvider.state("timesheet", {
+        $stateProvider.state("tr.timesheet", {
             url: "/timesheet",
-            parent: "tr",
             templateUrl: "Client/Views/timesheet/timesheet.html",
             onEnter: function () {
                 var timeout = setTimeout(function () {
@@ -2781,9 +2754,9 @@ var TimeRecorder;
                     if (hasClaim)
                         _this.init();
                     else
-                        _this.$state.transitionTo("login");
+                        _this.$state.transitionTo("tr.login");
                 }, function () {
-                    _this.$state.transitionTo("login");
+                    _this.$state.transitionTo("tr.login");
                 });
             }
             UserController.prototype.init = function () {
@@ -2948,9 +2921,9 @@ var TimeRecorder;
                     if (hasClaim)
                         _this.init();
                     else
-                        _this.$state.transitionTo("login");
+                        _this.$state.transitionTo("tr.login");
                 }, function () {
-                    _this.$state.transitionTo("login");
+                    _this.$state.transitionTo("tr.login");
                 });
             }
             RoleController.prototype.init = function () {
@@ -3144,9 +3117,9 @@ var TimeRecorder;
                     if (hasClaim)
                         _this.init();
                     else
-                        _this.$state.transitionTo("login");
+                        _this.$state.transitionTo("tr.login");
                 }, function () {
-                    _this.$state.transitionTo("login");
+                    _this.$state.transitionTo("tr.login");
                 });
             }
             LocationController.prototype.init = function () {
@@ -3241,9 +3214,9 @@ var TimeRecorder;
                     if (hasClaim)
                         _this.init();
                     else
-                        _this.$state.transitionTo("login");
+                        _this.$state.transitionTo("tr.login");
                 }, function () {
-                    _this.$state.transitionTo("login");
+                    _this.$state.transitionTo("tr.login");
                 });
             }
             PersonController.prototype.init = function () {
@@ -3555,9 +3528,9 @@ var TimeRecorder;
                     if (hasClaim)
                         _this.init();
                     else
-                        _this.$state.transitionTo("login");
+                        _this.$state.transitionTo("tr.login");
                 }, function () {
-                    _this.$state.transitionTo("login");
+                    _this.$state.transitionTo("tr.login");
                 });
             }
             MessageController.prototype.init = function () {
@@ -3657,9 +3630,9 @@ var TimeRecorder;
                     if (hasClaim)
                         _this.init();
                     else
-                        _this.$state.transitionTo("login");
+                        _this.$state.transitionTo("tr.login");
                 }, function () {
-                    _this.$state.transitionTo("login");
+                    _this.$state.transitionTo("tr.login");
                 });
                 this.init();
             }
@@ -3704,9 +3677,9 @@ var TimeRecorder;
                     if (hasClaim)
                         _this.init();
                     else
-                        _this.$state.transitionTo("login");
+                        _this.$state.transitionTo("tr.login");
                 }, function () {
-                    _this.$state.transitionTo("login");
+                    _this.$state.transitionTo("tr.login");
                 });
             }
             ConfigController.prototype.init = function () {
@@ -3818,9 +3791,9 @@ var TimeRecorder;
                     if (hasClaim)
                         _this.init();
                     else
-                        _this.$state.transitionTo("login");
+                        _this.$state.transitionTo("tr.login");
                 }, function () {
-                    _this.$state.transitionTo("login");
+                    _this.$state.transitionTo("tr.login");
                 });
             }
             EntryController.prototype.init = function () {
@@ -4004,9 +3977,9 @@ var TimeRecorder;
                     if (hasClaim)
                         _this.init();
                     else
-                        _this.$state.transitionTo("login");
+                        _this.$state.transitionTo("tr.login");
                 }, function () {
-                    _this.$state.transitionTo("login");
+                    _this.$state.transitionTo("tr.login");
                 });
             }
             // init view
@@ -4062,9 +4035,9 @@ var TimeRecorder;
                     if (hasClaim)
                         _this.init();
                     else
-                        _this.$state.transitionTo("login");
+                        _this.$state.transitionTo("tr.login");
                 }, function () {
-                    _this.$state.transitionTo("login");
+                    _this.$state.transitionTo("tr.login");
                 });
             }
             // init view
@@ -4095,7 +4068,7 @@ var TimeRecorder;
                 var _this = this;
                 this.service.remove(this.idValue).then(function (response) {
                     if (response)
-                        _this.$state.transitionTo("timebookings");
+                        _this.$state.transitionTo("tr.timebookings");
                 }, function () {
                 });
             };
@@ -4120,7 +4093,7 @@ var TimeRecorder;
                 // save & redirect
                 this.service.save(data).then(function (response) {
                     if (_this.isNew() && response.data.id != null)
-                        _this.$state.transitionTo("timebookingsEdit", { id: response.data.id });
+                        _this.$state.transitionTo("tr.timebookingsEdit", { id: response.data.id });
                 }, function () {
                 });
             };
@@ -5570,11 +5543,6 @@ timeRecorder.filter('minsToHours', function ($filter) { return function (input) 
 
   $templateCache.put('Client/Views/login.html',
     "<h2>Login</h2><hr><div class=\"col-md-4 form-horizontal\"><div class=\"form-group\"><label class=\"col-md-4 control-label\" for=\"email\">Benutzername</label><div class=\"col-md-8\"><input class=\"form-control\" ng-enter=\"app.login();\" id=\"email\" type=\"text\" ng-model=\"app.userName\"></div></div><div class=\"form-group\"><label class=\"col-md-4 control-label\" for=\"password\">Passwort</label><div class=\"col-md-8\"><input class=\"form-control\" ng-enter=\"app.login()\" id=\"password\" type=\"password\" ng-model=\"app.password\"></div></div><div class=\"form-group\"><div class=\"col-md-offset-4 col-md-8\"><div class=\"checkbox\"><input type=\"checkbox\" id=\"rememberme\" ng-model=\"app.rememberMe\"><label for=\"rememberme\">Remember me</label></div></div></div><div class=\"form-group\"><div class=\"col-md-offset-4 col-md-8\"><div class=\"btn btn-default\" ng-click=\"app.login()\">Log in</div></div></div></div>"
-  );
-
-
-  $templateCache.put('Client/Views/main.html',
-    "<div>asdf</div>"
   );
 
 
