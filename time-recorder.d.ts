@@ -1,10 +1,4 @@
-declare module Data {
-    class Config {
-        static WebApiUrl: string;
-        static ApplicationUrl: string;
-    }
-}
-declare module Data {
+declare module TimeRecorder.Web.Data {
     interface IVersionVm {
         key: number;
         version: number;
@@ -13,12 +7,283 @@ declare module Data {
         isBeta: boolean;
         platform: string;
     }
-    interface ILocationVm {
-        key: number;
-        locationId: string;
-        name: string;
+    interface IEmployeeCm {
+        employeeId: string;
+        externalId: string;
+        profileId?: number;
         userId: string;
         userName: string;
+        emergencyPin: string;
+        bookingLock?: Date;
+        claimConfigurations: Data.IFeatureConfigurationVm[];
+        mainAddressId?: number;
+        lastName: string;
+        firstName: string;
+        email: string;
+        telephone: string;
+        id: number;
+        timestamp: Date;
+    }
+    interface IPersonVm {
+        id: number;
+        employeeId: string;
+        firstName: string;
+        lastName: string;
+        profileId?: number;
+        userId: string;
+        userName: string;
+        emergencyPin: string;
+        externalId: string;
+        bookingLock?: Date;
+        claimConfigurations: Data.IFeatureConfigurationVm[];
+    }
+    interface IFeatureConfigurationVm {
+        configurationJson: string;
+        featureClaim: Data.IFeatureClaimVm;
+    }
+    interface IFeatureClaimVm {
+        claim: string;
+        description: string;
+        id: number;
+        name: string;
+        fields: Data.IFeatureClaimFieldVm[];
+    }
+    interface IFeatureClaimFieldVm {
+        name: string;
+        fieldType: EFieldType;
+    }
+    interface IAddressCm {
+        id: number;
+        city: string;
+        country: string;
+        countryCode: string;
+        street: string;
+        streetNumber: string;
+        zipCode: string;
+        name: string;
+        timestamp: number;
+    }
+    interface ITimesheetCm {
+        timesheetEmployees: Data.ITimesheetEmployeeCm[];
+        thresholds: Data.ITimesheetThresholdCm[];
+        timeEntryTypeCms: Data.ITimesheetTimeEntryTypeCm[];
+    }
+    interface ITimesheetSearchCriteria {
+        projectId: number;
+        from: Date;
+        to: Date;
+    }
+    interface ITimesheetEmployeeCm {
+        id: number;
+        firstName: string;
+        lastName: string;
+        timeEntries: Data.ITimesheetTimeEntryCm[];
+    }
+    interface ITimesheetThresholdCm {
+        fromMins?: number;
+        toMins?: number;
+        colorCode: string;
+        type: EThresholdType;
+    }
+    interface ITimesheetTimeEntryTypeCm {
+        id: number;
+        name: string;
+        abbreviation: string;
+    }
+    interface ITimesheetTimeEntryCm {
+        plannedMins: number;
+        doneMins: number;
+        date: Date;
+        availabilityTimeEntries: Data.ITimesheetAvailabilityTimeEntryCm[];
+    }
+    interface ITimesheetAvailabilityTimeEntryCm {
+        entryTypeId: number;
+        mins: number;
+    }
+    interface ITimeBookingCm {
+        id?: number;
+        personId: number;
+        projectId?: number;
+        start: Date;
+        stop?: Date;
+        timeEntryTypeId: number;
+        state: ETimeBookingState;
+    }
+    interface ITimeEntryTypeVm {
+        id: number;
+        name: string;
+    }
+    interface ITimeBookingMetaDataVm {
+        persons: Data.ITimeBookingPersonVm[];
+        projects: Data.ITimeBookingProjectVm[];
+        types: Data.ITimeBookingTypeVm[];
+        states: Data.ITimeBookingStateVm[];
+    }
+    interface ITimeBookingSearchParams {
+        person: string;
+        from?: Date;
+        to?: Date;
+        timeEntryTypeId?: number;
+        state?: ETimeBookingState;
+    }
+    interface ITimeBookingPersonVm {
+        id: number;
+        firstName: string;
+        lastName: string;
+    }
+    interface ITimeBookingProjectVm {
+        id: number;
+        name: string;
+    }
+    interface ITimeBookingTypeVm {
+        id: number;
+        name: string;
+    }
+    interface ITimeBookingStateVm {
+        id: number;
+        name: string;
+    }
+    interface IKeyVaulePair {
+        key: string;
+        value: string;
+    }
+    interface IGlobalMessageVm {
+        message: string;
+        title: string;
+        date?: Date;
+        id: number;
+        hasImage: boolean;
+        image: Data.IPostedImage;
+    }
+    interface IPostedImage {
+        type: string;
+        name: string;
+        size: number;
+        bytes: string;
+    }
+    interface IPersonCm {
+        mainAddressId?: number;
+        lastName: string;
+        firstName: string;
+        email: string;
+        telephone: string;
+        id: number;
+        timestamp: Date;
+    }
+    interface IClientCm {
+        id: number;
+        name: string;
+        mainContactId: number;
+        mainAddressId: number;
+        timestamp: number;
+    }
+    interface IContactCm {
+        clientId?: number;
+        mainAddressId?: number;
+        lastName: string;
+        firstName: string;
+        email: string;
+        telephone: string;
+        id: number;
+        timestamp: Date;
+    }
+    interface IProjectPersonVm {
+        personId: number;
+        name: string;
+    }
+    interface IProjectLocationVm {
+        locationId: number;
+        name: string;
+    }
+    interface IProjectCm {
+        id: number;
+        name: string;
+        description: string;
+        bookable: boolean;
+        parentId?: number;
+    }
+    interface IProjectVm {
+        id: number;
+        name: string;
+        description: string;
+        bookable: boolean;
+        explicit: boolean;
+        planningUnit: boolean;
+        hasChildren: boolean;
+        persons: Data.IProjectPersonVm[];
+        locations: Data.IProjectLocationVm[];
+        children: Data.IProjectVm[];
+        parent: Data.IProjectVm;
+    }
+    interface IExpenseCm {
+        id?: number;
+        value?: number;
+        timestamp?: Date;
+        description: string;
+        expenseTypeId: number;
+        employeeId: number;
+        visaEmployeeId?: number;
+        visaTimestamp?: Date;
+    }
+    interface IExpenseTypeCm {
+        id: number;
+        name: string;
+        description: string;
+        validFrom: Date;
+        validTo: Date;
+        default?: number;
+        fixed: boolean;
+        needAmount: boolean;
+    }
+    interface IExpensesSearchCm {
+        skip?: number;
+        take?: number;
+        employeeId?: number;
+    }
+    interface IConfigVm {
+        id: number;
+        timeOut: number;
+        imageId?: number;
+    }
+    interface ISaveConfigVm {
+        timeOut: number;
+        saveImage: boolean;
+        bytes: string;
+        fileName: string;
+        fileType: string;
+    }
+    interface IProfileConfigVm {
+        name: string;
+        description: string;
+        id: number;
+        userCount: number;
+        featureConfigurations: Data.IFeatureConfigurationVm[];
+    }
+    interface IExternalWorkReportCm {
+        id: number;
+        from: Date;
+        to: Date;
+        signatureImage: string;
+        signatureTimestamp?: Date;
+        projectCompleted: boolean;
+        projectId: number;
+        signedClientId?: number;
+    }
+    interface ISaldo {
+        saldoType: ESaldoType;
+        flexTimeHours: number;
+        flexTimeMinutes: number;
+        overTimeHours?: number;
+        overTimeMinutes?: number;
+        vacationDays: number;
+    }
+    interface IWorkObjectViewModel {
+        id: string;
+        name: string;
+        parentId: string;
+        reportable: boolean;
+        explicit: boolean;
+        badgeIds: string[];
     }
     interface IAppUser {
         profileId: string;
@@ -89,18 +354,12 @@ declare module Data {
     interface IRegisterExternalBindingModel {
         userName: string;
     }
-    interface IPersonVm {
-        id: number;
-        employeeId: string;
-        firstName: string;
-        lastName: string;
-        profileId?: number;
+    interface ILocationVm {
+        key: number;
+        locationId: string;
+        name: string;
         userId: string;
         userName: string;
-        emergencyPin: string;
-        externalId: string;
-        bookingLock?: Date;
-        claimConfigurations: Data.IFeatureConfigurationVm[];
     }
     interface IAppConfig {
         bookingTimeout: number;
@@ -108,69 +367,6 @@ declare module Data {
     interface IUserLoginInfoViewModel {
         loginProvider: string;
         providerKey: string;
-    }
-    interface IFeatureConfigurationVm {
-        configurationJson: string;
-        featureClaim: Data.IFeatureClaimVm;
-    }
-    interface IFeatureClaimVm {
-        claim: string;
-        description: string;
-        id: number;
-        name: string;
-        fields: Data.IFeatureClaimFieldVm[];
-    }
-    interface IFeatureClaimFieldVm {
-        name: string;
-        fieldType: EFieldType;
-    }
-    interface IKeyVaulePair {
-        key: string;
-        value: string;
-    }
-    interface ITimesheetCm {
-        timesheetEmployees: Data.ITimesheetEmployeeCm[];
-        thresholds: Data.ITimesheetThresholdCm[];
-        timeEntryTypeCms: Data.ITimesheetTimeEntryTypeCm[];
-    }
-    interface ITimesheetSearchCriteria {
-        projectId: number;
-        from: Date;
-        to: Date;
-    }
-    interface ITimesheetEmployeeCm {
-        id: number;
-        firstName: string;
-        lastName: string;
-        timeEntries: Data.ITimesheetTimeEntryCm[];
-    }
-    interface ITimesheetThresholdCm {
-        fromMins?: number;
-        toMins?: number;
-        colorCode: string;
-        type: EThresholdType;
-    }
-    interface ITimesheetTimeEntryTypeCm {
-        id: number;
-        name: string;
-        abbreviation: string;
-    }
-    interface ITimesheetTimeEntryCm {
-        plannedMins: number;
-        doneMins: number;
-        date: Date;
-        availabilityTimeEntries: Data.ITimesheetAvailabilityTimeEntryCm[];
-    }
-    interface ITimesheetAvailabilityTimeEntryCm {
-        entryTypeId: number;
-        mins: number;
-    }
-    interface IProfileConfigVm {
-        name: string;
-        description: string;
-        id: number;
-        userCount: number;
-        featureConfigurations: Data.IFeatureConfigurationVm[];
     }
     interface IMessage {
         id: number;
@@ -198,91 +394,6 @@ declare module Data {
     interface IMessageRecipient {
         name: string;
         messageRead: boolean;
-    }
-    interface IWorkObjectViewModel {
-        id: string;
-        name: string;
-        parentId: string;
-        reportable: boolean;
-        explicit: boolean;
-        badgeIds: string[];
-    }
-    interface IConfigVm {
-        id: number;
-        timeOut: number;
-        imageId?: number;
-    }
-    interface ISaveConfigVm {
-        timeOut: number;
-        saveImage: boolean;
-        bytes: string;
-        fileName: string;
-        fileType: string;
-    }
-    interface IGlobalMessageVm {
-        message: string;
-        title: string;
-        date?: Date;
-        id: number;
-        hasImage: boolean;
-        image: Data.IPostedImage;
-    }
-    interface IPostedImage {
-        type: string;
-        name: string;
-        size: number;
-        bytes: string;
-    }
-    interface ISaldo {
-        saldoType: ESaldoType;
-        flexTimeHours: number;
-        flexTimeMinutes: number;
-        overTimeHours?: number;
-        overTimeMinutes?: number;
-        vacationDays: number;
-    }
-    interface ITimeBookingCm {
-        id?: number;
-        personId: number;
-        projectId?: number;
-        start: Date;
-        stop?: Date;
-        timeEntryTypeId: number;
-        state: ETimeBookingState;
-    }
-    interface ITimeEntryTypeVm {
-        id: number;
-        name: string;
-    }
-    interface ITimeBookingMetaDataVm {
-        persons: Data.ITimeBookingPersonVm[];
-        projects: Data.ITimeBookingProjectVm[];
-        types: Data.ITimeBookingTypeVm[];
-        states: Data.ITimeBookingStateVm[];
-    }
-    interface ITimeBookingSearchParams {
-        person: string;
-        from?: Date;
-        to?: Date;
-        timeEntryTypeId?: number;
-        state?: ETimeBookingState;
-    }
-    interface ITimeBookingPersonVm {
-        id: number;
-        firstName: string;
-        lastName: string;
-    }
-    interface ITimeBookingProjectVm {
-        id: number;
-        name: string;
-    }
-    interface ITimeBookingTypeVm {
-        id: number;
-        name: string;
-    }
-    interface ITimeBookingStateVm {
-        id: number;
-        name: string;
     }
     interface ICheckUserResult {
         presenceStatus: boolean;
@@ -326,36 +437,10 @@ declare module Data {
         skip: number;
         take: number;
     }
-    interface IProjectPersonVm {
-        personId: number;
-        name: string;
-    }
-    interface IProjectLocationVm {
-        locationId: number;
-        name: string;
-    }
-    interface IProjectVm {
-        id: number;
-        name: string;
-        description: string;
-        bookable: boolean;
-        explicit: boolean;
-        planningUnit: boolean;
-        hasChildren: boolean;
-        persons: Data.IProjectPersonVm[];
-        locations: Data.IProjectLocationVm[];
-        children: Data.IProjectVm[];
-        parent: Data.IProjectVm;
-    }
     enum EPlatform {
         Android = 0,
         iOS = 1,
         WindowsPhone = 2,
-    }
-    enum EAppUserType {
-        WebOnly = 0,
-        Terminal = 1,
-        Personal = 2,
     }
     enum EFieldType {
         Number = 1,
@@ -367,15 +452,25 @@ declare module Data {
         DailyDone = 0,
         TotalMonthDone = 1,
     }
+    enum ETimeBookingState {
+        Open = 0,
+        Complete = 1,
+        Faulted = 2,
+    }
+    enum EProjectFlag {
+        Bookable = 1,
+        Explicit = 2,
+        PlanningUnit = 4,
+    }
     enum ESaldoType {
         DefaultCh = 0,
         DefaultDe = 1,
         Enzler = 2,
     }
-    enum ETimeBookingState {
-        Open = 0,
-        Complete = 1,
-        Faulted = 2,
+    enum EAppUserType {
+        WebOnly = 0,
+        Terminal = 1,
+        Personal = 2,
     }
     enum EAuftragVerificationStatus {
         Success = 0,
@@ -386,11 +481,6 @@ declare module Data {
         AuftragNotExist = 16,
         PositionNotExist = 32,
         CommunicationError = -1,
-    }
-    enum EProjectFlag {
-        Bookable = 1,
-        Explicit = 2,
-        PlanningUnit = 4,
     }
     interface VersionGetLatestPlistParams {
         versionCode1: number;
@@ -410,542 +500,26 @@ declare module Data {
     interface IVersionResource {
         getLatestPlistRequest(params: VersionGetLatestPlistParams): Triarc.Data.DataRequest<any>;
         getLatestPlist(params: VersionGetLatestPlistParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getLatestVersionNumberRequest(params: VersionGetLatestVersionNumberParams): Triarc.Data.DataRequest<Data.IVersionVm>;
-        getLatestVersionNumber(params: VersionGetLatestVersionNumberParams): ng.IPromise<Triarc.Data.DataResponse<Data.IVersionVm>>;
+        getLatestVersionNumberRequest(params: VersionGetLatestVersionNumberParams): Triarc.Data.DataRequest<IVersionVm>;
+        getLatestVersionNumber(params: VersionGetLatestVersionNumberParams): ng.IPromise<Triarc.Data.DataResponse<IVersionVm>>;
         getServerVersionRequest(): Triarc.Data.DataRequest<string>;
         getServerVersion(): ng.IPromise<Triarc.Data.DataResponse<string>>;
-        getVersionsMultipleRequest(params: VersionGetVersionsEnumerableParams): Triarc.Data.DataRequest<Data.IVersionVm[]>;
-        getVersionsMultiple(params: VersionGetVersionsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IVersionVm[]>>;
+        getVersionsMultipleRequest(params: VersionGetVersionsEnumerableParams): Triarc.Data.DataRequest<IVersionVm[]>;
+        getVersionsMultiple(params: VersionGetVersionsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IVersionVm[]>>;
         newVersionVm(): IVersionVm;
     }
     class VersionResource implements IVersionResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
+        private $requestSender;
+        constructor($requestSender: any);
         getLatestPlistRequest(params: any): Triarc.Data.DataRequest<any>;
-        getLatestPlist(params: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        getLatestPlist(params: any): any;
         getLatestVersionNumberRequest(params: any): Triarc.Data.DataRequest<IVersionVm>;
-        getLatestVersionNumber(params: any): ng.IPromise<Triarc.Data.DataResponse<IVersionVm>>;
+        getLatestVersionNumber(params: any): any;
         getServerVersionRequest(): Triarc.Data.DataRequest<string>;
-        getServerVersion(): ng.IPromise<Triarc.Data.DataResponse<string>>;
+        getServerVersion(): any;
         getVersionsMultipleRequest(params: any): Triarc.Data.DataRequest<IVersionVm[]>;
-        getVersionsMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IVersionVm[]>>;
+        getVersionsMultiple(params: any): any;
         newVersionVm(): IVersionVm;
-    }
-    interface LocationGetLocationByIdParams {
-        id: string;
-    }
-    interface LocationGetEnumerableParams {
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface LocationDeleteParams {
-        id: number;
-    }
-    interface ILocationResource {
-        getLocationByIdRequest(params: LocationGetLocationByIdParams): Triarc.Data.DataRequest<Data.ILocationVm>;
-        getLocationById(params: LocationGetLocationByIdParams): ng.IPromise<Triarc.Data.DataResponse<Data.ILocationVm>>;
-        getMultipleRequest(params: LocationGetEnumerableParams): Triarc.Data.DataRequest<Data.ILocationVm[]>;
-        getMultiple(params: LocationGetEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.ILocationVm[]>>;
-        putRequest(data: ILocationVm): Triarc.Data.DataRequest<any>;
-        put(data: ILocationVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        deleteRequest(params: LocationDeleteParams): Triarc.Data.DataRequest<any>;
-        delete(params: LocationDeleteParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        newLocationVm(): ILocationVm;
-    }
-    class LocationResource implements ILocationResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        getLocationByIdRequest(params: any): Triarc.Data.DataRequest<ILocationVm>;
-        getLocationById(params: any): ng.IPromise<Triarc.Data.DataResponse<ILocationVm>>;
-        getMultipleRequest(params: any): Triarc.Data.DataRequest<ILocationVm[]>;
-        getMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<ILocationVm[]>>;
-        putRequest(data: any): Triarc.Data.DataRequest<any>;
-        put(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        deleteRequest(params: any): Triarc.Data.DataRequest<any>;
-        delete(params: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        newLocationVm(): ILocationVm;
-    }
-    interface AccountGetUsersEnumerableParams {
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface AccountSearchEnumerableParams {
-        search: string;
-        skip: number;
-        take: number;
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface AccountResetPasswordParams {
-        userId: string;
-    }
-    interface AccountGetManageInfoParams {
-        returnUrl: string;
-        generateState?: boolean;
-    }
-    interface AccountGetExternalLoginParams {
-        provider: string;
-        error?: string;
-    }
-    interface AccountGetExternalLoginsEnumerableParams {
-        returnUrl: string;
-        generateState?: boolean;
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface IAccountResource {
-        getAppUserRequest(): Triarc.Data.DataRequest<Data.IAppUser>;
-        getAppUser(): ng.IPromise<Triarc.Data.DataResponse<Data.IAppUser>>;
-        loginRequest(data: ILoginViewModel): Triarc.Data.DataRequest<any>;
-        login(data: ILoginViewModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getUsersMultipleRequest(params: AccountGetUsersEnumerableParams): Triarc.Data.DataRequest<Data.IUserVm[]>;
-        getUsersMultiple(params: AccountGetUsersEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IUserVm[]>>;
-        searchMultipleRequest(params: AccountSearchEnumerableParams): Triarc.Data.DataRequest<Data.IUserVm[]>;
-        searchMultiple(params: AccountSearchEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IUserVm[]>>;
-        createUserRequest(data: IUserVm): Triarc.Data.DataRequest<any>;
-        createUser(data: IUserVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        editUserRequest(data: IUserVm): Triarc.Data.DataRequest<any>;
-        editUser(data: IUserVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        resetPasswordRequest(params: AccountResetPasswordParams): Triarc.Data.DataRequest<any>;
-        resetPassword(params: AccountResetPasswordParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        deleteRequest(data: IUserVm): Triarc.Data.DataRequest<any>;
-        delete(data: IUserVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        pingRequest(): Triarc.Data.DataRequest<any>;
-        ping(): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        logoutRequest(): Triarc.Data.DataRequest<any>;
-        logout(): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getUserInfoRequest(): Triarc.Data.DataRequest<Data.IUserInfoViewModel>;
-        getUserInfo(): ng.IPromise<Triarc.Data.DataResponse<Data.IUserInfoViewModel>>;
-        getManageInfoRequest(params: AccountGetManageInfoParams): Triarc.Data.DataRequest<Data.IManageInfoViewModel>;
-        getManageInfo(params: AccountGetManageInfoParams): ng.IPromise<Triarc.Data.DataResponse<Data.IManageInfoViewModel>>;
-        changePasswordRequest(data: IChangePasswordBindingModel): Triarc.Data.DataRequest<any>;
-        changePassword(data: IChangePasswordBindingModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        setPasswordRequest(data: ISetPasswordBindingModel): Triarc.Data.DataRequest<any>;
-        setPassword(data: ISetPasswordBindingModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        addExternalLoginRequest(data: IAddExternalLoginBindingModel): Triarc.Data.DataRequest<any>;
-        addExternalLogin(data: IAddExternalLoginBindingModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        removeLoginRequest(data: IRemoveLoginBindingModel): Triarc.Data.DataRequest<any>;
-        removeLogin(data: IRemoveLoginBindingModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getExternalLoginRequest(params: AccountGetExternalLoginParams): Triarc.Data.DataRequest<any>;
-        getExternalLogin(params: AccountGetExternalLoginParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getExternalLoginsMultipleRequest(params: AccountGetExternalLoginsEnumerableParams): Triarc.Data.DataRequest<Data.IExternalLoginViewModel[]>;
-        getExternalLoginsMultiple(params: AccountGetExternalLoginsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IExternalLoginViewModel[]>>;
-        registerRequest(data: IRegisterVm): Triarc.Data.DataRequest<any>;
-        register(data: IRegisterVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        registerExternalRequest(data: IRegisterExternalBindingModel): Triarc.Data.DataRequest<any>;
-        registerExternal(data: IRegisterExternalBindingModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        newAppUser(): IAppUser;
-        newUserVm(): IUserVm;
-        newUserInfoViewModel(): IUserInfoViewModel;
-        newManageInfoViewModel(): IManageInfoViewModel;
-        newExternalLoginViewModel(): IExternalLoginViewModel;
-        newLoginViewModel(): ILoginViewModel;
-        newChangePasswordBindingModel(): IChangePasswordBindingModel;
-        newSetPasswordBindingModel(): ISetPasswordBindingModel;
-        newAddExternalLoginBindingModel(): IAddExternalLoginBindingModel;
-        newRemoveLoginBindingModel(): IRemoveLoginBindingModel;
-        newRegisterVm(): IRegisterVm;
-        newRegisterExternalBindingModel(): IRegisterExternalBindingModel;
-        newPersonVm(): IPersonVm;
-        newLocationVm(): ILocationVm;
-        newAppConfig(): IAppConfig;
-        newFeatureClaimVm(): IFeatureClaimVm;
-    }
-    class AccountResource implements IAccountResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        getAppUserRequest(): Triarc.Data.DataRequest<IAppUser>;
-        getAppUser(): ng.IPromise<Triarc.Data.DataResponse<IAppUser>>;
-        loginRequest(data: any): Triarc.Data.DataRequest<any>;
-        login(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getUsersMultipleRequest(params: any): Triarc.Data.DataRequest<IUserVm[]>;
-        getUsersMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IUserVm[]>>;
-        searchMultipleRequest(params: any): Triarc.Data.DataRequest<IUserVm[]>;
-        searchMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IUserVm[]>>;
-        createUserRequest(data: any): Triarc.Data.DataRequest<any>;
-        createUser(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        editUserRequest(data: any): Triarc.Data.DataRequest<any>;
-        editUser(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        resetPasswordRequest(params: any): Triarc.Data.DataRequest<any>;
-        resetPassword(params: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        deleteRequest(data: any): Triarc.Data.DataRequest<any>;
-        delete(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        pingRequest(): Triarc.Data.DataRequest<any>;
-        ping(): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        logoutRequest(): Triarc.Data.DataRequest<any>;
-        logout(): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getUserInfoRequest(): Triarc.Data.DataRequest<IUserInfoViewModel>;
-        getUserInfo(): ng.IPromise<Triarc.Data.DataResponse<IUserInfoViewModel>>;
-        getManageInfoRequest(params: any): Triarc.Data.DataRequest<IManageInfoViewModel>;
-        getManageInfo(params: any): ng.IPromise<Triarc.Data.DataResponse<IManageInfoViewModel>>;
-        changePasswordRequest(data: any): Triarc.Data.DataRequest<any>;
-        changePassword(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        setPasswordRequest(data: any): Triarc.Data.DataRequest<any>;
-        setPassword(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        addExternalLoginRequest(data: any): Triarc.Data.DataRequest<any>;
-        addExternalLogin(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        removeLoginRequest(data: any): Triarc.Data.DataRequest<any>;
-        removeLogin(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getExternalLoginRequest(params: any): Triarc.Data.DataRequest<any>;
-        getExternalLogin(params: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getExternalLoginsMultipleRequest(params: any): Triarc.Data.DataRequest<IExternalLoginViewModel[]>;
-        getExternalLoginsMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IExternalLoginViewModel[]>>;
-        registerRequest(data: any): Triarc.Data.DataRequest<any>;
-        register(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        registerExternalRequest(data: any): Triarc.Data.DataRequest<any>;
-        registerExternal(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        newAppUser(): IAppUser;
-        newUserVm(): IUserVm;
-        newUserInfoViewModel(): IUserInfoViewModel;
-        newManageInfoViewModel(): IManageInfoViewModel;
-        newExternalLoginViewModel(): IExternalLoginViewModel;
-        newLoginViewModel(): ILoginViewModel;
-        newChangePasswordBindingModel(): IChangePasswordBindingModel;
-        newSetPasswordBindingModel(): ISetPasswordBindingModel;
-        newAddExternalLoginBindingModel(): IAddExternalLoginBindingModel;
-        newRemoveLoginBindingModel(): IRemoveLoginBindingModel;
-        newRegisterVm(): IRegisterVm;
-        newRegisterExternalBindingModel(): IRegisterExternalBindingModel;
-        newPersonVm(): IPersonVm;
-        newLocationVm(): ILocationVm;
-        newAppConfig(): IAppConfig;
-        newFeatureClaimVm(): IFeatureClaimVm;
-    }
-    interface AdminGetConfigsEnumerableParams {
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface IAdminResource {
-        seedDatabaseRequest(): Triarc.Data.DataRequest<any>;
-        seedDatabase(): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        webServiceEnabledRequest(): Triarc.Data.DataRequest<boolean>;
-        webServiceEnabled(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        webServiceAvailableRequest(): Triarc.Data.DataRequest<boolean>;
-        webServiceAvailable(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        triggerPersonImportRequest(): Triarc.Data.DataRequest<boolean>;
-        triggerPersonImport(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        triggerProjectImportRequest(): Triarc.Data.DataRequest<boolean>;
-        triggerProjectImport(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        fetchOrderDataRequest(): Triarc.Data.DataRequest<any>;
-        fetchOrderData(): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getConfigsMultipleRequest(params: AdminGetConfigsEnumerableParams): Triarc.Data.DataRequest<Data.IKeyVaulePair[]>;
-        getConfigsMultiple(params: AdminGetConfigsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IKeyVaulePair[]>>;
-        echoServiceRequest(): Triarc.Data.DataRequest<boolean>;
-        echoService(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        newKeyVaulePair(): IKeyVaulePair;
-    }
-    class AdminResource implements IAdminResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        seedDatabaseRequest(): Triarc.Data.DataRequest<any>;
-        seedDatabase(): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        webServiceEnabledRequest(): Triarc.Data.DataRequest<boolean>;
-        webServiceEnabled(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        webServiceAvailableRequest(): Triarc.Data.DataRequest<boolean>;
-        webServiceAvailable(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        triggerPersonImportRequest(): Triarc.Data.DataRequest<boolean>;
-        triggerPersonImport(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        triggerProjectImportRequest(): Triarc.Data.DataRequest<boolean>;
-        triggerProjectImport(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        fetchOrderDataRequest(): Triarc.Data.DataRequest<any>;
-        fetchOrderData(): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getConfigsMultipleRequest(params: any): Triarc.Data.DataRequest<IKeyVaulePair[]>;
-        getConfigsMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IKeyVaulePair[]>>;
-        echoServiceRequest(): Triarc.Data.DataRequest<boolean>;
-        echoService(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        newKeyVaulePair(): IKeyVaulePair;
-    }
-    interface ITimesheetResource {
-        getTimesheetRequest(data: ITimesheetSearchCriteria): Triarc.Data.DataRequest<Data.ITimesheetCm>;
-        getTimesheet(data: ITimesheetSearchCriteria): ng.IPromise<Triarc.Data.DataResponse<Data.ITimesheetCm>>;
-        newTimesheetCm(): ITimesheetCm;
-        newTimesheetSearchCriteria(): ITimesheetSearchCriteria;
-    }
-    class TimesheetResource implements ITimesheetResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        getTimesheetRequest(data: any): Triarc.Data.DataRequest<ITimesheetCm>;
-        getTimesheet(data: any): ng.IPromise<Triarc.Data.DataResponse<ITimesheetCm>>;
-        newTimesheetCm(): ITimesheetCm;
-        newTimesheetSearchCriteria(): ITimesheetSearchCriteria;
-    }
-    interface ConfigurationProfileGetConfigsEnumerableParams {
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface IConfigurationProfileResource {
-        getConfigsMultipleRequest(params: ConfigurationProfileGetConfigsEnumerableParams): Triarc.Data.DataRequest<Data.IProfileConfigVm[]>;
-        getConfigsMultiple(params: ConfigurationProfileGetConfigsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IProfileConfigVm[]>>;
-        deleteRequest(data: IProfileConfigVm): Triarc.Data.DataRequest<any>;
-        delete(data: IProfileConfigVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        saveRequest(data: IProfileConfigVm): Triarc.Data.DataRequest<any>;
-        save(data: IProfileConfigVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        newProfileConfigVm(): IProfileConfigVm;
-    }
-    class ConfigurationProfileResource implements IConfigurationProfileResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        getConfigsMultipleRequest(params: any): Triarc.Data.DataRequest<IProfileConfigVm[]>;
-        getConfigsMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IProfileConfigVm[]>>;
-        deleteRequest(data: any): Triarc.Data.DataRequest<any>;
-        delete(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        saveRequest(data: any): Triarc.Data.DataRequest<any>;
-        save(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        newProfileConfigVm(): IProfileConfigVm;
-    }
-    interface PersonGetPersonByIdParams {
-        id: string;
-    }
-    interface PersonGetEnumerableParams {
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface PersonSearchEnumerableParams {
-        search: string;
-        skip: number;
-        take: number;
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface PersonDeleteParams {
-        id: number;
-    }
-    interface IPersonResource {
-        getPersonByIdRequest(params: PersonGetPersonByIdParams): Triarc.Data.DataRequest<Data.IPersonVm>;
-        getPersonById(params: PersonGetPersonByIdParams): ng.IPromise<Triarc.Data.DataResponse<Data.IPersonVm>>;
-        getMultipleRequest(params: PersonGetEnumerableParams): Triarc.Data.DataRequest<Data.IPersonVm[]>;
-        getMultiple(params: PersonGetEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IPersonVm[]>>;
-        searchMultipleRequest(params: PersonSearchEnumerableParams): Triarc.Data.DataRequest<Data.IPersonVm[]>;
-        searchMultiple(params: PersonSearchEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IPersonVm[]>>;
-        putRequest(data: IPersonVm): Triarc.Data.DataRequest<any>;
-        put(data: IPersonVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        deleteRequest(params: PersonDeleteParams): Triarc.Data.DataRequest<any>;
-        delete(params: PersonDeleteParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        newPersonVm(): IPersonVm;
-    }
-    class PersonResource implements IPersonResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        getPersonByIdRequest(params: any): Triarc.Data.DataRequest<IPersonVm>;
-        getPersonById(params: any): ng.IPromise<Triarc.Data.DataResponse<IPersonVm>>;
-        getMultipleRequest(params: any): Triarc.Data.DataRequest<IPersonVm[]>;
-        getMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IPersonVm[]>>;
-        searchMultipleRequest(params: any): Triarc.Data.DataRequest<IPersonVm[]>;
-        searchMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IPersonVm[]>>;
-        putRequest(data: any): Triarc.Data.DataRequest<any>;
-        put(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        deleteRequest(params: any): Triarc.Data.DataRequest<any>;
-        delete(params: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        newPersonVm(): IPersonVm;
-    }
-    interface PersonalMessageGetLatestMessagesEnumerableParams {
-        employeeId: number;
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface PersonalMessageMarkAsReadParams {
-        messageId: number;
-        personId: number;
-    }
-    interface PersonalMessageGetSentMessagesEnumerableParams {
-        personId: number;
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface IPersonalMessageResource {
-        getLatestMessagesMultipleRequest(params: PersonalMessageGetLatestMessagesEnumerableParams): Triarc.Data.DataRequest<Data.IMessage[]>;
-        getLatestMessagesMultiple(params: PersonalMessageGetLatestMessagesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IMessage[]>>;
-        saveMessageRequest(data: ISaveMessage): Triarc.Data.DataRequest<any>;
-        saveMessage(data: ISaveMessage): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        markAsReadRequest(params: PersonalMessageMarkAsReadParams): Triarc.Data.DataRequest<any>;
-        markAsRead(params: PersonalMessageMarkAsReadParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getSentMessagesMultipleRequest(params: PersonalMessageGetSentMessagesEnumerableParams): Triarc.Data.DataRequest<Data.ISentMessage[]>;
-        getSentMessagesMultiple(params: PersonalMessageGetSentMessagesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.ISentMessage[]>>;
-        newMessage(): IMessage;
-        newSentMessage(): ISentMessage;
-        newSaveMessage(): ISaveMessage;
-    }
-    class PersonalMessageResource implements IPersonalMessageResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        getLatestMessagesMultipleRequest(params: any): Triarc.Data.DataRequest<IMessage[]>;
-        getLatestMessagesMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IMessage[]>>;
-        saveMessageRequest(data: any): Triarc.Data.DataRequest<any>;
-        saveMessage(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        markAsReadRequest(params: any): Triarc.Data.DataRequest<any>;
-        markAsRead(params: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        getSentMessagesMultipleRequest(params: any): Triarc.Data.DataRequest<ISentMessage[]>;
-        getSentMessagesMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<ISentMessage[]>>;
-        newMessage(): IMessage;
-        newSentMessage(): ISentMessage;
-        newSaveMessage(): ISaveMessage;
-    }
-    interface WorkObjectGetProjectsForLocationEnumerableParams {
-        locationId: number;
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface IWorkObjectResource {
-        getProjectsForLocationMultipleRequest(params: WorkObjectGetProjectsForLocationEnumerableParams): Triarc.Data.DataRequest<Data.IWorkObjectViewModel[]>;
-        getProjectsForLocationMultiple(params: WorkObjectGetProjectsForLocationEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IWorkObjectViewModel[]>>;
-        newWorkObjectViewModel(): IWorkObjectViewModel;
-    }
-    class WorkObjectResource implements IWorkObjectResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        getProjectsForLocationMultipleRequest(params: any): Triarc.Data.DataRequest<IWorkObjectViewModel[]>;
-        getProjectsForLocationMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IWorkObjectViewModel[]>>;
-        newWorkObjectViewModel(): IWorkObjectViewModel;
-    }
-    interface IConfigResource {
-        getRequest(): Triarc.Data.DataRequest<Data.IConfigVm>;
-        get(): ng.IPromise<Triarc.Data.DataResponse<Data.IConfigVm>>;
-        putRequest(data: ISaveConfigVm): Triarc.Data.DataRequest<any>;
-        put(data: ISaveConfigVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        newConfigVm(): IConfigVm;
-        newSaveConfigVm(): ISaveConfigVm;
-    }
-    class ConfigResource implements IConfigResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        getRequest(): Triarc.Data.DataRequest<IConfigVm>;
-        get(): ng.IPromise<Triarc.Data.DataResponse<IConfigVm>>;
-        putRequest(data: any): Triarc.Data.DataRequest<any>;
-        put(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        newConfigVm(): IConfigVm;
-        newSaveConfigVm(): ISaveConfigVm;
-    }
-    interface ClaimGetClaimsEnumerableParams {
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface IClaimResource {
-        getClaimsMultipleRequest(params: ClaimGetClaimsEnumerableParams): Triarc.Data.DataRequest<Data.IFeatureClaimVm[]>;
-        getClaimsMultiple(params: ClaimGetClaimsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IFeatureClaimVm[]>>;
-        newFeatureClaimVm(): IFeatureClaimVm;
-    }
-    class ClaimResource implements IClaimResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        getClaimsMultipleRequest(params: any): Triarc.Data.DataRequest<IFeatureClaimVm[]>;
-        getClaimsMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IFeatureClaimVm[]>>;
-        newFeatureClaimVm(): IFeatureClaimVm;
-    }
-    interface GlobalMessageGetEnumerableParams {
-        $skip?: number;
-        $top?: number;
-        $orderBy?: string;
-        $filter?: string;
-    }
-    interface GlobalMessageDeleteParams {
-        id: number;
-    }
-    interface IGlobalMessageResource {
-        getDailyGlobalMessageRequest(): Triarc.Data.DataRequest<Data.IGlobalMessageVm>;
-        getDailyGlobalMessage(): ng.IPromise<Triarc.Data.DataResponse<Data.IGlobalMessageVm>>;
-        getMultipleRequest(params: GlobalMessageGetEnumerableParams): Triarc.Data.DataRequest<Data.IGlobalMessageVm[]>;
-        getMultiple(params: GlobalMessageGetEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IGlobalMessageVm[]>>;
-        putRequest(data: IGlobalMessageVm): Triarc.Data.DataRequest<any>;
-        put(data: IGlobalMessageVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        deleteRequest(params: GlobalMessageDeleteParams): Triarc.Data.DataRequest<any>;
-        delete(params: GlobalMessageDeleteParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        newGlobalMessageVm(): IGlobalMessageVm;
-        newPostedImage(): IPostedImage;
-    }
-    class GlobalMessageResource implements IGlobalMessageResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        getDailyGlobalMessageRequest(): Triarc.Data.DataRequest<IGlobalMessageVm>;
-        getDailyGlobalMessage(): ng.IPromise<Triarc.Data.DataResponse<IGlobalMessageVm>>;
-        getMultipleRequest(params: any): Triarc.Data.DataRequest<IGlobalMessageVm[]>;
-        getMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IGlobalMessageVm[]>>;
-        putRequest(data: any): Triarc.Data.DataRequest<any>;
-        put(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        deleteRequest(params: any): Triarc.Data.DataRequest<any>;
-        delete(params: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        newGlobalMessageVm(): IGlobalMessageVm;
-        newPostedImage(): IPostedImage;
-    }
-    interface SaldoGetByIdParams {
-        employeeId: string;
-    }
-    interface ISaldoResource {
-        getByIdRequest(params: SaldoGetByIdParams): Triarc.Data.DataRequest<Data.ISaldo>;
-        getById(params: SaldoGetByIdParams): ng.IPromise<Triarc.Data.DataResponse<Data.ISaldo>>;
-        newSaldo(): ISaldo;
-    }
-    class SaldoResource implements ISaldoResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        getByIdRequest(params: any): Triarc.Data.DataRequest<ISaldo>;
-        getById(params: any): ng.IPromise<Triarc.Data.DataResponse<ISaldo>>;
-        newSaldo(): ISaldo;
-    }
-    interface IOperationResource {
-        triggerImportPersonalDataRequest(): Triarc.Data.DataRequest<any>;
-        triggerImportPersonalData(): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        triggerImportObjectDataRequest(): Triarc.Data.DataRequest<any>;
-        triggerImportObjectData(): ng.IPromise<Triarc.Data.DataResponse<any>>;
-    }
-    class OperationResource implements IOperationResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        triggerImportPersonalDataRequest(): Triarc.Data.DataRequest<any>;
-        triggerImportPersonalData(): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        triggerImportObjectDataRequest(): Triarc.Data.DataRequest<any>;
-        triggerImportObjectData(): ng.IPromise<Triarc.Data.DataResponse<any>>;
     }
     interface ImageGetParams {
         id: number;
@@ -955,12 +529,127 @@ declare module Data {
         get(params: ImageGetParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
     }
     class ImageResource implements IImageResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
+        private $requestSender;
+        constructor($requestSender: any);
         getRequest(params: any): Triarc.Data.DataRequest<any>;
-        get(params: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        get(params: any): any;
+    }
+    interface EmployeeGetEmployeeByIdParams {
+        id: string;
+    }
+    interface EmployeeGetEnumerableParams {
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface EmployeeSearchEnumerableParams {
+        search: string;
+        skip: number;
+        take: number;
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface EmployeeDeleteParams {
+        id: number;
+    }
+    interface IEmployeeResource {
+        getEmployeeByIdRequest(params: EmployeeGetEmployeeByIdParams): Triarc.Data.DataRequest<IEmployeeCm>;
+        getEmployeeById(params: EmployeeGetEmployeeByIdParams): ng.IPromise<Triarc.Data.DataResponse<IEmployeeCm>>;
+        getMultipleRequest(params: EmployeeGetEnumerableParams): Triarc.Data.DataRequest<IEmployeeCm[]>;
+        getMultiple(params: EmployeeGetEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IEmployeeCm[]>>;
+        searchMultipleRequest(params: EmployeeSearchEnumerableParams): Triarc.Data.DataRequest<IPersonVm[]>;
+        searchMultiple(params: EmployeeSearchEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IPersonVm[]>>;
+        putRequest(data: IPersonVm): Triarc.Data.DataRequest<any>;
+        put(data: IPersonVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        deleteRequest(params: EmployeeDeleteParams): Triarc.Data.DataRequest<any>;
+        delete(params: EmployeeDeleteParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        newEmployeeCm(): IEmployeeCm;
+        newPersonVm(): IPersonVm;
+        newFeatureClaimVm(): IFeatureClaimVm;
+    }
+    class EmployeeResource implements IEmployeeResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getEmployeeByIdRequest(params: any): Triarc.Data.DataRequest<IEmployeeCm>;
+        getEmployeeById(params: any): any;
+        getMultipleRequest(params: any): Triarc.Data.DataRequest<IEmployeeCm[]>;
+        getMultiple(params: any): any;
+        searchMultipleRequest(params: any): Triarc.Data.DataRequest<IPersonVm[]>;
+        searchMultiple(params: any): any;
+        putRequest(data: any): Triarc.Data.DataRequest<any>;
+        put(data: any): any;
+        deleteRequest(params: any): Triarc.Data.DataRequest<any>;
+        delete(params: any): any;
+        newEmployeeCm(): IEmployeeCm;
+        newPersonVm(): IPersonVm;
+        newFeatureClaimVm(): IFeatureClaimVm;
+    }
+    interface AddressSearchAddressesEnumerableParams {
+        searchString: string;
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface AddressGetEnumerableParams {
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface AddressGetParams {
+        id: number;
+    }
+    interface IAddressResource {
+        searchAddressesMultipleRequest(params: AddressSearchAddressesEnumerableParams): Triarc.Data.DataRequest<IAddressCm[]>;
+        searchAddressesMultiple(params: AddressSearchAddressesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IAddressCm[]>>;
+        getMultipleRequest(params: AddressGetEnumerableParams): Triarc.Data.DataRequest<IAddressCm[]>;
+        getMultiple(params: AddressGetEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IAddressCm[]>>;
+        getRequest(params: AddressGetParams): Triarc.Data.DataRequest<IAddressCm>;
+        get(params: AddressGetParams): ng.IPromise<Triarc.Data.DataResponse<IAddressCm>>;
+        newAddressCm(): IAddressCm;
+    }
+    class AddressResource implements IAddressResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        searchAddressesMultipleRequest(params: any): Triarc.Data.DataRequest<IAddressCm[]>;
+        searchAddressesMultiple(params: any): any;
+        getMultipleRequest(params: any): Triarc.Data.DataRequest<IAddressCm[]>;
+        getMultiple(params: any): any;
+        getRequest(params: any): Triarc.Data.DataRequest<IAddressCm>;
+        get(params: any): any;
+        newAddressCm(): IAddressCm;
+    }
+    interface ITimesheetResource {
+        getTimesheetRequest(data: ITimesheetSearchCriteria): Triarc.Data.DataRequest<ITimesheetCm>;
+        getTimesheet(data: ITimesheetSearchCriteria): ng.IPromise<Triarc.Data.DataResponse<ITimesheetCm>>;
+        newTimesheetCm(): ITimesheetCm;
+        newTimesheetSearchCriteria(): ITimesheetSearchCriteria;
+    }
+    class TimesheetResource implements ITimesheetResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getTimesheetRequest(data: any): Triarc.Data.DataRequest<ITimesheetCm>;
+        getTimesheet(data: any): any;
+        newTimesheetCm(): ITimesheetCm;
+        newTimesheetSearchCriteria(): ITimesheetSearchCriteria;
+    }
+    interface IOperationResource {
+        triggerImportPersonalDataRequest(): Triarc.Data.DataRequest<any>;
+        triggerImportPersonalData(): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        triggerImportObjectDataRequest(): Triarc.Data.DataRequest<any>;
+        triggerImportObjectData(): ng.IPromise<Triarc.Data.DataResponse<any>>;
+    }
+    class OperationResource implements IOperationResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        triggerImportPersonalDataRequest(): Triarc.Data.DataRequest<any>;
+        triggerImportPersonalData(): any;
+        triggerImportObjectDataRequest(): Triarc.Data.DataRequest<any>;
+        triggerImportObjectData(): any;
     }
     interface TimeBookingSearchEnumerableParams {
         $skip?: number;
@@ -981,16 +670,16 @@ declare module Data {
         id: number;
     }
     interface ITimeBookingResource {
-        searchMultipleRequest(params: TimeBookingSearchEnumerableParams, data: ITimeBookingSearchParams): Triarc.Data.DataRequest<Data.ITimeBookingCm[]>;
-        searchMultiple(params: TimeBookingSearchEnumerableParams, data: ITimeBookingSearchParams): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingCm[]>>;
-        saveRequest(data: ITimeBookingCm): Triarc.Data.DataRequest<Data.ITimeBookingCm>;
-        save(data: ITimeBookingCm): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingCm>>;
-        getRequest(params: TimeBookingGetParams): Triarc.Data.DataRequest<Data.ITimeBookingCm>;
-        get(params: TimeBookingGetParams): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingCm>>;
-        getAvailableEntryTypesMultipleRequest(params: TimeBookingGetAvailableEntryTypesEnumerableParams): Triarc.Data.DataRequest<Data.ITimeEntryTypeVm[]>;
-        getAvailableEntryTypesMultiple(params: TimeBookingGetAvailableEntryTypesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeEntryTypeVm[]>>;
-        getMetaDataRequest(): Triarc.Data.DataRequest<Data.ITimeBookingMetaDataVm>;
-        getMetaData(): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingMetaDataVm>>;
+        searchMultipleRequest(params: TimeBookingSearchEnumerableParams, data: ITimeBookingSearchParams): Triarc.Data.DataRequest<ITimeBookingCm[]>;
+        searchMultiple(params: TimeBookingSearchEnumerableParams, data: ITimeBookingSearchParams): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm[]>>;
+        saveRequest(data: ITimeBookingCm): Triarc.Data.DataRequest<ITimeBookingCm>;
+        save(data: ITimeBookingCm): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm>>;
+        getRequest(params: TimeBookingGetParams): Triarc.Data.DataRequest<ITimeBookingCm>;
+        get(params: TimeBookingGetParams): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm>>;
+        getAvailableEntryTypesMultipleRequest(params: TimeBookingGetAvailableEntryTypesEnumerableParams): Triarc.Data.DataRequest<ITimeEntryTypeVm[]>;
+        getAvailableEntryTypesMultiple(params: TimeBookingGetAvailableEntryTypesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<ITimeEntryTypeVm[]>>;
+        getMetaDataRequest(): Triarc.Data.DataRequest<ITimeBookingMetaDataVm>;
+        getMetaData(): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingMetaDataVm>>;
         deleteRequest(params: TimeBookingDeleteParams): Triarc.Data.DataRequest<boolean>;
         delete(params: TimeBookingDeleteParams): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
         newTimeBookingCm(): ITimeBookingCm;
@@ -999,96 +688,182 @@ declare module Data {
         newTimeBookingSearchParams(): ITimeBookingSearchParams;
     }
     class TimeBookingResource implements ITimeBookingResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
+        private $requestSender;
+        constructor($requestSender: any);
         searchMultipleRequest(params: any, data: any): Triarc.Data.DataRequest<ITimeBookingCm[]>;
-        searchMultiple(params: any, data: any): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm[]>>;
+        searchMultiple(params: any, data: any): any;
         saveRequest(data: any): Triarc.Data.DataRequest<ITimeBookingCm>;
-        save(data: any): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm>>;
+        save(data: any): any;
         getRequest(params: any): Triarc.Data.DataRequest<ITimeBookingCm>;
-        get(params: any): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm>>;
+        get(params: any): any;
         getAvailableEntryTypesMultipleRequest(params: any): Triarc.Data.DataRequest<ITimeEntryTypeVm[]>;
-        getAvailableEntryTypesMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<ITimeEntryTypeVm[]>>;
+        getAvailableEntryTypesMultiple(params: any): any;
         getMetaDataRequest(): Triarc.Data.DataRequest<ITimeBookingMetaDataVm>;
-        getMetaData(): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingMetaDataVm>>;
+        getMetaData(): any;
         deleteRequest(params: any): Triarc.Data.DataRequest<boolean>;
-        delete(params: any): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
+        delete(params: any): any;
         newTimeBookingCm(): ITimeBookingCm;
         newTimeEntryTypeVm(): ITimeEntryTypeVm;
         newTimeBookingMetaDataVm(): ITimeBookingMetaDataVm;
         newTimeBookingSearchParams(): ITimeBookingSearchParams;
     }
-    interface TimeEntryValidateUserParams {
-        persNr: number;
-    }
-    interface TimeEntryValidateWorkObjectParams {
-        objectNumber: string;
-        positionNumber: string;
-        personalNumber: number;
-    }
-    interface TimeEntrySearchTimeEntriesEnumerableParams {
+    interface AdminGetConfigsEnumerableParams {
         $skip?: number;
         $top?: number;
         $orderBy?: string;
         $filter?: string;
     }
-    interface TimeEntryGetAvailableBookingTypesEnumerableParams {
+    interface IAdminResource {
+        seedDatabaseRequest(): Triarc.Data.DataRequest<any>;
+        seedDatabase(): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        webServiceEnabledRequest(): Triarc.Data.DataRequest<boolean>;
+        webServiceEnabled(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
+        webServiceAvailableRequest(): Triarc.Data.DataRequest<boolean>;
+        webServiceAvailable(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
+        triggerPersonImportRequest(): Triarc.Data.DataRequest<boolean>;
+        triggerPersonImport(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
+        triggerProjectImportRequest(): Triarc.Data.DataRequest<boolean>;
+        triggerProjectImport(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
+        fetchOrderDataRequest(): Triarc.Data.DataRequest<any>;
+        fetchOrderData(): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        getServerVersionRequest(): Triarc.Data.DataRequest<string>;
+        getServerVersion(): ng.IPromise<Triarc.Data.DataResponse<string>>;
+        getConfigsMultipleRequest(params: AdminGetConfigsEnumerableParams): Triarc.Data.DataRequest<IKeyVaulePair[]>;
+        getConfigsMultiple(params: AdminGetConfigsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IKeyVaulePair[]>>;
+        echoServiceRequest(): Triarc.Data.DataRequest<boolean>;
+        echoService(): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
+        newKeyVaulePair(): IKeyVaulePair;
+    }
+    class AdminResource implements IAdminResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        seedDatabaseRequest(): Triarc.Data.DataRequest<any>;
+        seedDatabase(): any;
+        webServiceEnabledRequest(): Triarc.Data.DataRequest<boolean>;
+        webServiceEnabled(): any;
+        webServiceAvailableRequest(): Triarc.Data.DataRequest<boolean>;
+        webServiceAvailable(): any;
+        triggerPersonImportRequest(): Triarc.Data.DataRequest<boolean>;
+        triggerPersonImport(): any;
+        triggerProjectImportRequest(): Triarc.Data.DataRequest<boolean>;
+        triggerProjectImport(): any;
+        fetchOrderDataRequest(): Triarc.Data.DataRequest<any>;
+        fetchOrderData(): any;
+        getServerVersionRequest(): Triarc.Data.DataRequest<string>;
+        getServerVersion(): any;
+        getConfigsMultipleRequest(params: any): Triarc.Data.DataRequest<IKeyVaulePair[]>;
+        getConfigsMultiple(params: any): any;
+        echoServiceRequest(): Triarc.Data.DataRequest<boolean>;
+        echoService(): any;
+        newKeyVaulePair(): IKeyVaulePair;
+    }
+    interface GlobalMessageGetEnumerableParams {
         $skip?: number;
         $top?: number;
         $orderBy?: string;
         $filter?: string;
     }
-    interface ITimeEntryResource {
-        postSingleRequest(data: ITimeEntryModel): Triarc.Data.DataRequest<any>;
-        postSingle(data: ITimeEntryModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        postMultipleRequest(data: ITimeEntryCollection): Triarc.Data.DataRequest<any>;
-        postMultiple(data: ITimeEntryCollection): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        validateUserRequest(params: TimeEntryValidateUserParams): Triarc.Data.DataRequest<Data.ICheckUserResult>;
-        validateUser(params: TimeEntryValidateUserParams): ng.IPromise<Triarc.Data.DataResponse<Data.ICheckUserResult>>;
-        putRequest(data: ITimeEntryVm): Triarc.Data.DataRequest<boolean>;
-        put(data: ITimeEntryVm): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        deleteRequest(data: ITimeEntryVm): Triarc.Data.DataRequest<boolean>;
-        delete(data: ITimeEntryVm): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        validateWorkObjectRequest(params: TimeEntryValidateWorkObjectParams): Triarc.Data.DataRequest<EAuftragVerificationStatus>;
-        validateWorkObject(params: TimeEntryValidateWorkObjectParams): ng.IPromise<Triarc.Data.DataResponse<EAuftragVerificationStatus>>;
-        searchTimeEntriesMultipleRequest(params: TimeEntrySearchTimeEntriesEnumerableParams, data: ITimeEntrySearchVm): Triarc.Data.DataRequest<Data.ITimeEntryVm[]>;
-        searchTimeEntriesMultiple(params: TimeEntrySearchTimeEntriesEnumerableParams, data: ITimeEntrySearchVm): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeEntryVm[]>>;
-        getAvailableBookingTypesMultipleRequest(params: TimeEntryGetAvailableBookingTypesEnumerableParams): Triarc.Data.DataRequest<string[]>;
-        getAvailableBookingTypesMultiple(params: TimeEntryGetAvailableBookingTypesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<string[]>>;
-        newCheckUserResult(): ICheckUserResult;
-        newTimeEntryVm(): ITimeEntryVm;
-        newTimeEntryModel(): ITimeEntryModel;
-        newTimeEntryCollection(): ITimeEntryCollection;
-        newTimeEntrySearchVm(): ITimeEntrySearchVm;
+    interface GlobalMessageDeleteParams {
+        id: number;
     }
-    class TimeEntryResource implements ITimeEntryResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
-        postSingleRequest(data: any): Triarc.Data.DataRequest<any>;
-        postSingle(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        postMultipleRequest(data: any): Triarc.Data.DataRequest<any>;
-        postMultiple(data: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        validateUserRequest(params: any): Triarc.Data.DataRequest<ICheckUserResult>;
-        validateUser(params: any): ng.IPromise<Triarc.Data.DataResponse<ICheckUserResult>>;
-        putRequest(data: any): Triarc.Data.DataRequest<boolean>;
-        put(data: any): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        deleteRequest(data: any): Triarc.Data.DataRequest<boolean>;
-        delete(data: any): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
-        validateWorkObjectRequest(params: any): Triarc.Data.DataRequest<EAuftragVerificationStatus>;
-        validateWorkObject(params: any): ng.IPromise<Triarc.Data.DataResponse<EAuftragVerificationStatus>>;
-        searchTimeEntriesMultipleRequest(params: any, data: any): Triarc.Data.DataRequest<ITimeEntryVm[]>;
-        searchTimeEntriesMultiple(params: any, data: any): ng.IPromise<Triarc.Data.DataResponse<ITimeEntryVm[]>>;
-        getAvailableBookingTypesMultipleRequest(params: any): Triarc.Data.DataRequest<string[]>;
-        getAvailableBookingTypesMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<string[]>>;
-        newCheckUserResult(): ICheckUserResult;
-        newTimeEntryVm(): ITimeEntryVm;
-        newTimeEntryModel(): ITimeEntryModel;
-        newTimeEntryCollection(): ITimeEntryCollection;
-        newTimeEntrySearchVm(): ITimeEntrySearchVm;
+    interface IGlobalMessageResource {
+        getDailyGlobalMessageRequest(): Triarc.Data.DataRequest<IGlobalMessageVm>;
+        getDailyGlobalMessage(): ng.IPromise<Triarc.Data.DataResponse<IGlobalMessageVm>>;
+        getMultipleRequest(params: GlobalMessageGetEnumerableParams): Triarc.Data.DataRequest<IGlobalMessageVm[]>;
+        getMultiple(params: GlobalMessageGetEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IGlobalMessageVm[]>>;
+        putRequest(data: IGlobalMessageVm): Triarc.Data.DataRequest<any>;
+        put(data: IGlobalMessageVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        deleteRequest(params: GlobalMessageDeleteParams): Triarc.Data.DataRequest<any>;
+        delete(params: GlobalMessageDeleteParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        newGlobalMessageVm(): IGlobalMessageVm;
+        newPostedImage(): IPostedImage;
+    }
+    class GlobalMessageResource implements IGlobalMessageResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getDailyGlobalMessageRequest(): Triarc.Data.DataRequest<IGlobalMessageVm>;
+        getDailyGlobalMessage(): any;
+        getMultipleRequest(params: any): Triarc.Data.DataRequest<IGlobalMessageVm[]>;
+        getMultiple(params: any): any;
+        putRequest(data: any): Triarc.Data.DataRequest<any>;
+        put(data: any): any;
+        deleteRequest(params: any): Triarc.Data.DataRequest<any>;
+        delete(params: any): any;
+        newGlobalMessageVm(): IGlobalMessageVm;
+        newPostedImage(): IPostedImage;
+    }
+    interface PersonGetPersonByIdParams {
+        id: number;
+    }
+    interface PersonSearchClientsEnumerableParams {
+        searchString: string;
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface PersonGetClientParams {
+        clientId: number;
+    }
+    interface PersonGetContactsForClientEnumerableParams {
+        clientId: number;
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface PersonSearchPeopleEnumerableParams {
+        searchString: string;
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface PersonGetContactParams {
+        contactId: number;
+    }
+    interface PersonGetPersonParams {
+        personId: number;
+    }
+    interface IPersonResource {
+        getPersonByIdRequest(params: PersonGetPersonByIdParams): Triarc.Data.DataRequest<IPersonCm>;
+        getPersonById(params: PersonGetPersonByIdParams): ng.IPromise<Triarc.Data.DataResponse<IPersonCm>>;
+        searchClientsMultipleRequest(params: PersonSearchClientsEnumerableParams): Triarc.Data.DataRequest<IClientCm[]>;
+        searchClientsMultiple(params: PersonSearchClientsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IClientCm[]>>;
+        getClientRequest(params: PersonGetClientParams): Triarc.Data.DataRequest<IClientCm>;
+        getClient(params: PersonGetClientParams): ng.IPromise<Triarc.Data.DataResponse<IClientCm>>;
+        getContactsForClientMultipleRequest(params: PersonGetContactsForClientEnumerableParams): Triarc.Data.DataRequest<IContactCm[]>;
+        getContactsForClientMultiple(params: PersonGetContactsForClientEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IContactCm[]>>;
+        searchPeopleMultipleRequest(params: PersonSearchPeopleEnumerableParams): Triarc.Data.DataRequest<IPersonCm[]>;
+        searchPeopleMultiple(params: PersonSearchPeopleEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IPersonCm[]>>;
+        getContactRequest(params: PersonGetContactParams): Triarc.Data.DataRequest<IPersonCm>;
+        getContact(params: PersonGetContactParams): ng.IPromise<Triarc.Data.DataResponse<IPersonCm>>;
+        getPersonRequest(params: PersonGetPersonParams): Triarc.Data.DataRequest<IPersonCm>;
+        getPerson(params: PersonGetPersonParams): ng.IPromise<Triarc.Data.DataResponse<IPersonCm>>;
+        newPersonCm(): IPersonCm;
+        newClientCm(): IClientCm;
+        newContactCm(): IContactCm;
+    }
+    class PersonResource implements IPersonResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getPersonByIdRequest(params: any): Triarc.Data.DataRequest<IPersonCm>;
+        getPersonById(params: any): any;
+        searchClientsMultipleRequest(params: any): Triarc.Data.DataRequest<IClientCm[]>;
+        searchClientsMultiple(params: any): any;
+        getClientRequest(params: any): Triarc.Data.DataRequest<IClientCm>;
+        getClient(params: any): any;
+        getContactsForClientMultipleRequest(params: any): Triarc.Data.DataRequest<IContactCm[]>;
+        getContactsForClientMultiple(params: any): any;
+        searchPeopleMultipleRequest(params: any): Triarc.Data.DataRequest<IPersonCm[]>;
+        searchPeopleMultiple(params: any): any;
+        getContactRequest(params: any): Triarc.Data.DataRequest<IPersonCm>;
+        getContact(params: any): any;
+        getPersonRequest(params: any): Triarc.Data.DataRequest<IPersonCm>;
+        getPerson(params: any): any;
+        newPersonCm(): IPersonCm;
+        newClientCm(): IClientCm;
+        newContactCm(): IContactCm;
     }
     interface ProjectGetAllPersonsEnumerableParams {
         $skip?: number;
@@ -1136,6 +911,9 @@ declare module Data {
         personId: number;
         value: boolean;
     }
+    interface ProjectGetProjectByIdParams {
+        projectId: number;
+    }
     interface ProjectPutLocationAssignmentParams {
         projectId: number;
         locationId: number;
@@ -1146,77 +924,539 @@ declare module Data {
         flags: EProjectFlag;
     }
     interface IProjectResource {
-        getAllPersonsMultipleRequest(params: ProjectGetAllPersonsEnumerableParams): Triarc.Data.DataRequest<Data.IProjectPersonVm[]>;
-        getAllPersonsMultiple(params: ProjectGetAllPersonsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IProjectPersonVm[]>>;
-        getAllLocationsMultipleRequest(params: ProjectGetAllLocationsEnumerableParams): Triarc.Data.DataRequest<Data.IProjectLocationVm[]>;
-        getAllLocationsMultiple(params: ProjectGetAllLocationsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IProjectLocationVm[]>>;
-        searchProjectsMultipleRequest(params: ProjectSearchProjectsEnumerableParams): Triarc.Data.DataRequest<Data.IProjectVm[]>;
-        searchProjectsMultiple(params: ProjectSearchProjectsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IProjectVm[]>>;
-        getRootProjectsMultipleRequest(params: ProjectGetRootProjectsEnumerableParams): Triarc.Data.DataRequest<Data.IProjectVm[]>;
-        getRootProjectsMultiple(params: ProjectGetRootProjectsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IProjectVm[]>>;
-        getChildrenMultipleRequest(params: ProjectGetChildrenEnumerableParams): Triarc.Data.DataRequest<Data.IProjectVm[]>;
-        getChildrenMultiple(params: ProjectGetChildrenEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<Data.IProjectVm[]>>;
+        getAllPersonsMultipleRequest(params: ProjectGetAllPersonsEnumerableParams): Triarc.Data.DataRequest<IProjectPersonVm[]>;
+        getAllPersonsMultiple(params: ProjectGetAllPersonsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IProjectPersonVm[]>>;
+        getAllLocationsMultipleRequest(params: ProjectGetAllLocationsEnumerableParams): Triarc.Data.DataRequest<IProjectLocationVm[]>;
+        getAllLocationsMultiple(params: ProjectGetAllLocationsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IProjectLocationVm[]>>;
+        searchProjectsMultipleRequest(params: ProjectSearchProjectsEnumerableParams): Triarc.Data.DataRequest<IProjectCm[]>;
+        searchProjectsMultiple(params: ProjectSearchProjectsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IProjectCm[]>>;
+        getRootProjectsMultipleRequest(params: ProjectGetRootProjectsEnumerableParams): Triarc.Data.DataRequest<IProjectVm[]>;
+        getRootProjectsMultiple(params: ProjectGetRootProjectsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IProjectVm[]>>;
+        getChildrenMultipleRequest(params: ProjectGetChildrenEnumerableParams): Triarc.Data.DataRequest<IProjectVm[]>;
+        getChildrenMultiple(params: ProjectGetChildrenEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IProjectVm[]>>;
         putProjectDescriptionRequest(params: ProjectPutProjectDescriptionParams): Triarc.Data.DataRequest<any>;
         putProjectDescription(params: ProjectPutProjectDescriptionParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
         putPersonAssignmentRequest(params: ProjectPutPersonAssignmentParams): Triarc.Data.DataRequest<any>;
         putPersonAssignment(params: ProjectPutPersonAssignmentParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        getProjectByIdRequest(params: ProjectGetProjectByIdParams): Triarc.Data.DataRequest<IProjectCm>;
+        getProjectById(params: ProjectGetProjectByIdParams): ng.IPromise<Triarc.Data.DataResponse<IProjectCm>>;
         putLocationAssignmentRequest(params: ProjectPutLocationAssignmentParams): Triarc.Data.DataRequest<any>;
         putLocationAssignment(params: ProjectPutLocationAssignmentParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
         setFlagsRequest(params: ProjectSetFlagsParams): Triarc.Data.DataRequest<any>;
         setFlags(params: ProjectSetFlagsParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
         newProjectPersonVm(): IProjectPersonVm;
         newProjectLocationVm(): IProjectLocationVm;
+        newProjectCm(): IProjectCm;
         newProjectVm(): IProjectVm;
     }
     class ProjectResource implements IProjectResource {
-        private $http;
-        private $q;
-        private $location;
-        constructor($http: any, $q: any, $location: any);
+        private $requestSender;
+        constructor($requestSender: any);
         getAllPersonsMultipleRequest(params: any): Triarc.Data.DataRequest<IProjectPersonVm[]>;
-        getAllPersonsMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IProjectPersonVm[]>>;
+        getAllPersonsMultiple(params: any): any;
         getAllLocationsMultipleRequest(params: any): Triarc.Data.DataRequest<IProjectLocationVm[]>;
-        getAllLocationsMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IProjectLocationVm[]>>;
-        searchProjectsMultipleRequest(params: any): Triarc.Data.DataRequest<IProjectVm[]>;
-        searchProjectsMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IProjectVm[]>>;
+        getAllLocationsMultiple(params: any): any;
+        searchProjectsMultipleRequest(params: any): Triarc.Data.DataRequest<IProjectCm[]>;
+        searchProjectsMultiple(params: any): any;
         getRootProjectsMultipleRequest(params: any): Triarc.Data.DataRequest<IProjectVm[]>;
-        getRootProjectsMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IProjectVm[]>>;
+        getRootProjectsMultiple(params: any): any;
         getChildrenMultipleRequest(params: any): Triarc.Data.DataRequest<IProjectVm[]>;
-        getChildrenMultiple(params: any): ng.IPromise<Triarc.Data.DataResponse<IProjectVm[]>>;
+        getChildrenMultiple(params: any): any;
         putProjectDescriptionRequest(params: any): Triarc.Data.DataRequest<any>;
-        putProjectDescription(params: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        putProjectDescription(params: any): any;
         putPersonAssignmentRequest(params: any): Triarc.Data.DataRequest<any>;
-        putPersonAssignment(params: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        putPersonAssignment(params: any): any;
+        getProjectByIdRequest(params: any): Triarc.Data.DataRequest<IProjectCm>;
+        getProjectById(params: any): any;
         putLocationAssignmentRequest(params: any): Triarc.Data.DataRequest<any>;
-        putLocationAssignment(params: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        putLocationAssignment(params: any): any;
         setFlagsRequest(params: any): Triarc.Data.DataRequest<any>;
-        setFlags(params: any): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        setFlags(params: any): any;
         newProjectPersonVm(): IProjectPersonVm;
         newProjectLocationVm(): IProjectLocationVm;
+        newProjectCm(): IProjectCm;
         newProjectVm(): IProjectVm;
+    }
+    interface ExpensesSearchEnumerableParams {
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface ExpensesGetExpenseTypesEnumerableParams {
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface IExpensesResource {
+        addOrUpdateExpenseRequest(data: IExpenseCm): Triarc.Data.DataRequest<IExpenseCm>;
+        addOrUpdateExpense(data: IExpenseCm): ng.IPromise<Triarc.Data.DataResponse<IExpenseCm>>;
+        searchMultipleRequest(params: ExpensesSearchEnumerableParams, data: IExpensesSearchCm): Triarc.Data.DataRequest<IExpenseCm[]>;
+        searchMultiple(params: ExpensesSearchEnumerableParams, data: IExpensesSearchCm): ng.IPromise<Triarc.Data.DataResponse<IExpenseCm[]>>;
+        getExpenseTypesMultipleRequest(params: ExpensesGetExpenseTypesEnumerableParams): Triarc.Data.DataRequest<IExpenseTypeCm[]>;
+        getExpenseTypesMultiple(params: ExpensesGetExpenseTypesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IExpenseTypeCm[]>>;
+        newExpenseCm(): IExpenseCm;
+        newExpenseTypeCm(): IExpenseTypeCm;
+        newExpensesSearchCm(): IExpensesSearchCm;
+    }
+    class ExpensesResource implements IExpensesResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        addOrUpdateExpenseRequest(data: any): Triarc.Data.DataRequest<IExpenseCm>;
+        addOrUpdateExpense(data: any): any;
+        searchMultipleRequest(params: any, data: any): Triarc.Data.DataRequest<IExpenseCm[]>;
+        searchMultiple(params: any, data: any): any;
+        getExpenseTypesMultipleRequest(params: any): Triarc.Data.DataRequest<IExpenseTypeCm[]>;
+        getExpenseTypesMultiple(params: any): any;
+        newExpenseCm(): IExpenseCm;
+        newExpenseTypeCm(): IExpenseTypeCm;
+        newExpensesSearchCm(): IExpensesSearchCm;
+    }
+    interface IConfigResource {
+        getRequest(): Triarc.Data.DataRequest<IConfigVm>;
+        get(): ng.IPromise<Triarc.Data.DataResponse<IConfigVm>>;
+        putRequest(data: ISaveConfigVm): Triarc.Data.DataRequest<any>;
+        put(data: ISaveConfigVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        newConfigVm(): IConfigVm;
+        newSaveConfigVm(): ISaveConfigVm;
+    }
+    class ConfigResource implements IConfigResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getRequest(): Triarc.Data.DataRequest<IConfigVm>;
+        get(): any;
+        putRequest(data: any): Triarc.Data.DataRequest<any>;
+        put(data: any): any;
+        newConfigVm(): IConfigVm;
+        newSaveConfigVm(): ISaveConfigVm;
+    }
+    interface ConfigurationProfileGetConfigsEnumerableParams {
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface IConfigurationProfileResource {
+        getConfigsMultipleRequest(params: ConfigurationProfileGetConfigsEnumerableParams): Triarc.Data.DataRequest<IProfileConfigVm[]>;
+        getConfigsMultiple(params: ConfigurationProfileGetConfigsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IProfileConfigVm[]>>;
+        deleteRequest(data: IProfileConfigVm): Triarc.Data.DataRequest<any>;
+        delete(data: IProfileConfigVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        saveRequest(data: IProfileConfigVm): Triarc.Data.DataRequest<any>;
+        save(data: IProfileConfigVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        newProfileConfigVm(): IProfileConfigVm;
+    }
+    class ConfigurationProfileResource implements IConfigurationProfileResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getConfigsMultipleRequest(params: any): Triarc.Data.DataRequest<IProfileConfigVm[]>;
+        getConfigsMultiple(params: any): any;
+        deleteRequest(data: any): Triarc.Data.DataRequest<any>;
+        delete(data: any): any;
+        saveRequest(data: any): Triarc.Data.DataRequest<any>;
+        save(data: any): any;
+        newProfileConfigVm(): IProfileConfigVm;
+    }
+    interface WorkReportGetParams {
+        externalWorkReportId: number;
+    }
+    interface IWorkReportResource {
+        getRequest(params: WorkReportGetParams): Triarc.Data.DataRequest<IExternalWorkReportCm>;
+        get(params: WorkReportGetParams): ng.IPromise<Triarc.Data.DataResponse<IExternalWorkReportCm>>;
+        newExternalWorkReportCm(): IExternalWorkReportCm;
+    }
+    class WorkReportResource implements IWorkReportResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getRequest(params: any): Triarc.Data.DataRequest<IExternalWorkReportCm>;
+        get(params: any): any;
+        newExternalWorkReportCm(): IExternalWorkReportCm;
+    }
+    interface ClaimGetClaimsEnumerableParams {
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface IClaimResource {
+        getClaimsMultipleRequest(params: ClaimGetClaimsEnumerableParams): Triarc.Data.DataRequest<IFeatureClaimVm[]>;
+        getClaimsMultiple(params: ClaimGetClaimsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IFeatureClaimVm[]>>;
+        newFeatureClaimVm(): IFeatureClaimVm;
+    }
+    class ClaimResource implements IClaimResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getClaimsMultipleRequest(params: any): Triarc.Data.DataRequest<IFeatureClaimVm[]>;
+        getClaimsMultiple(params: any): any;
+        newFeatureClaimVm(): IFeatureClaimVm;
+    }
+    interface SaldoGetByIdParams {
+        employeeId: string;
+    }
+    interface ISaldoResource {
+        getByIdRequest(params: SaldoGetByIdParams): Triarc.Data.DataRequest<ISaldo>;
+        getById(params: SaldoGetByIdParams): ng.IPromise<Triarc.Data.DataResponse<ISaldo>>;
+        newSaldo(): ISaldo;
+    }
+    class SaldoResource implements ISaldoResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getByIdRequest(params: any): Triarc.Data.DataRequest<ISaldo>;
+        getById(params: any): any;
+        newSaldo(): ISaldo;
+    }
+    interface WorkObjectGetProjectsForLocationEnumerableParams {
+        locationId: number;
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface IWorkObjectResource {
+        getProjectsForLocationMultipleRequest(params: WorkObjectGetProjectsForLocationEnumerableParams): Triarc.Data.DataRequest<IWorkObjectViewModel[]>;
+        getProjectsForLocationMultiple(params: WorkObjectGetProjectsForLocationEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IWorkObjectViewModel[]>>;
+        newWorkObjectViewModel(): IWorkObjectViewModel;
+    }
+    class WorkObjectResource implements IWorkObjectResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getProjectsForLocationMultipleRequest(params: any): Triarc.Data.DataRequest<IWorkObjectViewModel[]>;
+        getProjectsForLocationMultiple(params: any): any;
+        newWorkObjectViewModel(): IWorkObjectViewModel;
+    }
+    interface AccountGetUsersEnumerableParams {
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface AccountSearchEnumerableParams {
+        search: string;
+        skip: number;
+        take: number;
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface AccountResetPasswordParams {
+        userId: string;
+    }
+    interface AccountGetManageInfoParams {
+        returnUrl: string;
+        generateState?: boolean;
+    }
+    interface AccountGetExternalLoginParams {
+        provider: string;
+        error?: string;
+    }
+    interface AccountGetExternalLoginsEnumerableParams {
+        returnUrl: string;
+        generateState?: boolean;
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface IAccountResource {
+        getAppUserRequest(): Triarc.Data.DataRequest<IAppUser>;
+        getAppUser(): ng.IPromise<Triarc.Data.DataResponse<IAppUser>>;
+        loginRequest(data: ILoginViewModel): Triarc.Data.DataRequest<any>;
+        login(data: ILoginViewModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        getUsersMultipleRequest(params: AccountGetUsersEnumerableParams): Triarc.Data.DataRequest<IUserVm[]>;
+        getUsersMultiple(params: AccountGetUsersEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IUserVm[]>>;
+        searchMultipleRequest(params: AccountSearchEnumerableParams): Triarc.Data.DataRequest<IUserVm[]>;
+        searchMultiple(params: AccountSearchEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IUserVm[]>>;
+        createUserRequest(data: IUserVm): Triarc.Data.DataRequest<any>;
+        createUser(data: IUserVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        editUserRequest(data: IUserVm): Triarc.Data.DataRequest<any>;
+        editUser(data: IUserVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        resetPasswordRequest(params: AccountResetPasswordParams): Triarc.Data.DataRequest<any>;
+        resetPassword(params: AccountResetPasswordParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        deleteRequest(data: IUserVm): Triarc.Data.DataRequest<any>;
+        delete(data: IUserVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        pingRequest(): Triarc.Data.DataRequest<any>;
+        ping(): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        logoutRequest(): Triarc.Data.DataRequest<any>;
+        logout(): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        getUserInfoRequest(): Triarc.Data.DataRequest<IUserInfoViewModel>;
+        getUserInfo(): ng.IPromise<Triarc.Data.DataResponse<IUserInfoViewModel>>;
+        getManageInfoRequest(params: AccountGetManageInfoParams): Triarc.Data.DataRequest<IManageInfoViewModel>;
+        getManageInfo(params: AccountGetManageInfoParams): ng.IPromise<Triarc.Data.DataResponse<IManageInfoViewModel>>;
+        changePasswordRequest(data: IChangePasswordBindingModel): Triarc.Data.DataRequest<any>;
+        changePassword(data: IChangePasswordBindingModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        setPasswordRequest(data: ISetPasswordBindingModel): Triarc.Data.DataRequest<any>;
+        setPassword(data: ISetPasswordBindingModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        addExternalLoginRequest(data: IAddExternalLoginBindingModel): Triarc.Data.DataRequest<any>;
+        addExternalLogin(data: IAddExternalLoginBindingModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        removeLoginRequest(data: IRemoveLoginBindingModel): Triarc.Data.DataRequest<any>;
+        removeLogin(data: IRemoveLoginBindingModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        getExternalLoginRequest(params: AccountGetExternalLoginParams): Triarc.Data.DataRequest<any>;
+        getExternalLogin(params: AccountGetExternalLoginParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        getExternalLoginsMultipleRequest(params: AccountGetExternalLoginsEnumerableParams): Triarc.Data.DataRequest<IExternalLoginViewModel[]>;
+        getExternalLoginsMultiple(params: AccountGetExternalLoginsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IExternalLoginViewModel[]>>;
+        registerRequest(data: IRegisterVm): Triarc.Data.DataRequest<any>;
+        register(data: IRegisterVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        registerExternalRequest(data: IRegisterExternalBindingModel): Triarc.Data.DataRequest<any>;
+        registerExternal(data: IRegisterExternalBindingModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        newAppUser(): IAppUser;
+        newUserVm(): IUserVm;
+        newUserInfoViewModel(): IUserInfoViewModel;
+        newManageInfoViewModel(): IManageInfoViewModel;
+        newExternalLoginViewModel(): IExternalLoginViewModel;
+        newLoginViewModel(): ILoginViewModel;
+        newChangePasswordBindingModel(): IChangePasswordBindingModel;
+        newSetPasswordBindingModel(): ISetPasswordBindingModel;
+        newAddExternalLoginBindingModel(): IAddExternalLoginBindingModel;
+        newRemoveLoginBindingModel(): IRemoveLoginBindingModel;
+        newRegisterVm(): IRegisterVm;
+        newRegisterExternalBindingModel(): IRegisterExternalBindingModel;
+        newPersonVm(): IPersonVm;
+        newLocationVm(): ILocationVm;
+        newAppConfig(): IAppConfig;
+    }
+    class AccountResource implements IAccountResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getAppUserRequest(): Triarc.Data.DataRequest<IAppUser>;
+        getAppUser(): any;
+        loginRequest(data: any): Triarc.Data.DataRequest<any>;
+        login(data: any): any;
+        getUsersMultipleRequest(params: any): Triarc.Data.DataRequest<IUserVm[]>;
+        getUsersMultiple(params: any): any;
+        searchMultipleRequest(params: any): Triarc.Data.DataRequest<IUserVm[]>;
+        searchMultiple(params: any): any;
+        createUserRequest(data: any): Triarc.Data.DataRequest<any>;
+        createUser(data: any): any;
+        editUserRequest(data: any): Triarc.Data.DataRequest<any>;
+        editUser(data: any): any;
+        resetPasswordRequest(params: any): Triarc.Data.DataRequest<any>;
+        resetPassword(params: any): any;
+        deleteRequest(data: any): Triarc.Data.DataRequest<any>;
+        delete(data: any): any;
+        pingRequest(): Triarc.Data.DataRequest<any>;
+        ping(): any;
+        logoutRequest(): Triarc.Data.DataRequest<any>;
+        logout(): any;
+        getUserInfoRequest(): Triarc.Data.DataRequest<IUserInfoViewModel>;
+        getUserInfo(): any;
+        getManageInfoRequest(params: any): Triarc.Data.DataRequest<IManageInfoViewModel>;
+        getManageInfo(params: any): any;
+        changePasswordRequest(data: any): Triarc.Data.DataRequest<any>;
+        changePassword(data: any): any;
+        setPasswordRequest(data: any): Triarc.Data.DataRequest<any>;
+        setPassword(data: any): any;
+        addExternalLoginRequest(data: any): Triarc.Data.DataRequest<any>;
+        addExternalLogin(data: any): any;
+        removeLoginRequest(data: any): Triarc.Data.DataRequest<any>;
+        removeLogin(data: any): any;
+        getExternalLoginRequest(params: any): Triarc.Data.DataRequest<any>;
+        getExternalLogin(params: any): any;
+        getExternalLoginsMultipleRequest(params: any): Triarc.Data.DataRequest<IExternalLoginViewModel[]>;
+        getExternalLoginsMultiple(params: any): any;
+        registerRequest(data: any): Triarc.Data.DataRequest<any>;
+        register(data: any): any;
+        registerExternalRequest(data: any): Triarc.Data.DataRequest<any>;
+        registerExternal(data: any): any;
+        newAppUser(): IAppUser;
+        newUserVm(): IUserVm;
+        newUserInfoViewModel(): IUserInfoViewModel;
+        newManageInfoViewModel(): IManageInfoViewModel;
+        newExternalLoginViewModel(): IExternalLoginViewModel;
+        newLoginViewModel(): ILoginViewModel;
+        newChangePasswordBindingModel(): IChangePasswordBindingModel;
+        newSetPasswordBindingModel(): ISetPasswordBindingModel;
+        newAddExternalLoginBindingModel(): IAddExternalLoginBindingModel;
+        newRemoveLoginBindingModel(): IRemoveLoginBindingModel;
+        newRegisterVm(): IRegisterVm;
+        newRegisterExternalBindingModel(): IRegisterExternalBindingModel;
+        newPersonVm(): IPersonVm;
+        newLocationVm(): ILocationVm;
+        newAppConfig(): IAppConfig;
+    }
+    interface PersonalMessageGetLatestMessagesEnumerableParams {
+        employeeId: number;
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface PersonalMessageMarkAsReadParams {
+        messageId: number;
+        personId: number;
+    }
+    interface PersonalMessageGetSentMessagesEnumerableParams {
+        personId: number;
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface IPersonalMessageResource {
+        getLatestMessagesMultipleRequest(params: PersonalMessageGetLatestMessagesEnumerableParams): Triarc.Data.DataRequest<IMessage[]>;
+        getLatestMessagesMultiple(params: PersonalMessageGetLatestMessagesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IMessage[]>>;
+        saveMessageRequest(data: ISaveMessage): Triarc.Data.DataRequest<any>;
+        saveMessage(data: ISaveMessage): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        markAsReadRequest(params: PersonalMessageMarkAsReadParams): Triarc.Data.DataRequest<any>;
+        markAsRead(params: PersonalMessageMarkAsReadParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        getSentMessagesMultipleRequest(params: PersonalMessageGetSentMessagesEnumerableParams): Triarc.Data.DataRequest<ISentMessage[]>;
+        getSentMessagesMultiple(params: PersonalMessageGetSentMessagesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<ISentMessage[]>>;
+        newMessage(): IMessage;
+        newSentMessage(): ISentMessage;
+        newSaveMessage(): ISaveMessage;
+    }
+    class PersonalMessageResource implements IPersonalMessageResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getLatestMessagesMultipleRequest(params: any): Triarc.Data.DataRequest<IMessage[]>;
+        getLatestMessagesMultiple(params: any): any;
+        saveMessageRequest(data: any): Triarc.Data.DataRequest<any>;
+        saveMessage(data: any): any;
+        markAsReadRequest(params: any): Triarc.Data.DataRequest<any>;
+        markAsRead(params: any): any;
+        getSentMessagesMultipleRequest(params: any): Triarc.Data.DataRequest<ISentMessage[]>;
+        getSentMessagesMultiple(params: any): any;
+        newMessage(): IMessage;
+        newSentMessage(): ISentMessage;
+        newSaveMessage(): ISaveMessage;
+    }
+    interface LocationGetLocationByIdParams {
+        id: string;
+    }
+    interface LocationGetEnumerableParams {
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface LocationDeleteParams {
+        id: number;
+    }
+    interface ILocationResource {
+        getLocationByIdRequest(params: LocationGetLocationByIdParams): Triarc.Data.DataRequest<ILocationVm>;
+        getLocationById(params: LocationGetLocationByIdParams): ng.IPromise<Triarc.Data.DataResponse<ILocationVm>>;
+        getMultipleRequest(params: LocationGetEnumerableParams): Triarc.Data.DataRequest<ILocationVm[]>;
+        getMultiple(params: LocationGetEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<ILocationVm[]>>;
+        putRequest(data: ILocationVm): Triarc.Data.DataRequest<any>;
+        put(data: ILocationVm): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        deleteRequest(params: LocationDeleteParams): Triarc.Data.DataRequest<any>;
+        delete(params: LocationDeleteParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        newLocationVm(): ILocationVm;
+    }
+    class LocationResource implements ILocationResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        getLocationByIdRequest(params: any): Triarc.Data.DataRequest<ILocationVm>;
+        getLocationById(params: any): any;
+        getMultipleRequest(params: any): Triarc.Data.DataRequest<ILocationVm[]>;
+        getMultiple(params: any): any;
+        putRequest(data: any): Triarc.Data.DataRequest<any>;
+        put(data: any): any;
+        deleteRequest(params: any): Triarc.Data.DataRequest<any>;
+        delete(params: any): any;
+        newLocationVm(): ILocationVm;
+    }
+    interface TimeEntryValidateUserParams {
+        persNr: number;
+    }
+    interface TimeEntryValidateWorkObjectParams {
+        objectNumber: string;
+        positionNumber: string;
+        personalNumber: number;
+    }
+    interface TimeEntrySearchTimeEntriesEnumerableParams {
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface TimeEntryGetAvailableBookingTypesEnumerableParams {
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
+    interface ITimeEntryResource {
+        postSingleRequest(data: ITimeEntryModel): Triarc.Data.DataRequest<any>;
+        postSingle(data: ITimeEntryModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        postMultipleRequest(data: ITimeEntryCollection): Triarc.Data.DataRequest<any>;
+        postMultiple(data: ITimeEntryCollection): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        validateUserRequest(params: TimeEntryValidateUserParams): Triarc.Data.DataRequest<ICheckUserResult>;
+        validateUser(params: TimeEntryValidateUserParams): ng.IPromise<Triarc.Data.DataResponse<ICheckUserResult>>;
+        putRequest(data: ITimeEntryVm): Triarc.Data.DataRequest<boolean>;
+        put(data: ITimeEntryVm): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
+        deleteRequest(data: ITimeEntryVm): Triarc.Data.DataRequest<boolean>;
+        delete(data: ITimeEntryVm): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
+        validateWorkObjectRequest(params: TimeEntryValidateWorkObjectParams): Triarc.Data.DataRequest<EAuftragVerificationStatus>;
+        validateWorkObject(params: TimeEntryValidateWorkObjectParams): ng.IPromise<Triarc.Data.DataResponse<EAuftragVerificationStatus>>;
+        upateLegacyEntriesRequest(): Triarc.Data.DataRequest<any>;
+        upateLegacyEntries(): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        searchTimeEntriesMultipleRequest(params: TimeEntrySearchTimeEntriesEnumerableParams, data: ITimeEntrySearchVm): Triarc.Data.DataRequest<ITimeEntryVm[]>;
+        searchTimeEntriesMultiple(params: TimeEntrySearchTimeEntriesEnumerableParams, data: ITimeEntrySearchVm): ng.IPromise<Triarc.Data.DataResponse<ITimeEntryVm[]>>;
+        getAvailableBookingTypesMultipleRequest(params: TimeEntryGetAvailableBookingTypesEnumerableParams): Triarc.Data.DataRequest<string[]>;
+        getAvailableBookingTypesMultiple(params: TimeEntryGetAvailableBookingTypesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<string[]>>;
+        newCheckUserResult(): ICheckUserResult;
+        newTimeEntryVm(): ITimeEntryVm;
+        newTimeEntryModel(): ITimeEntryModel;
+        newTimeEntryCollection(): ITimeEntryCollection;
+        newTimeEntrySearchVm(): ITimeEntrySearchVm;
+    }
+    class TimeEntryResource implements ITimeEntryResource {
+        private $requestSender;
+        constructor($requestSender: any);
+        postSingleRequest(data: any): Triarc.Data.DataRequest<any>;
+        postSingle(data: any): any;
+        postMultipleRequest(data: any): Triarc.Data.DataRequest<any>;
+        postMultiple(data: any): any;
+        validateUserRequest(params: any): Triarc.Data.DataRequest<ICheckUserResult>;
+        validateUser(params: any): any;
+        putRequest(data: any): Triarc.Data.DataRequest<boolean>;
+        put(data: any): any;
+        deleteRequest(data: any): Triarc.Data.DataRequest<boolean>;
+        delete(data: any): any;
+        validateWorkObjectRequest(params: any): Triarc.Data.DataRequest<EAuftragVerificationStatus>;
+        validateWorkObject(params: any): any;
+        upateLegacyEntriesRequest(): Triarc.Data.DataRequest<any>;
+        upateLegacyEntries(): any;
+        searchTimeEntriesMultipleRequest(params: any, data: any): Triarc.Data.DataRequest<ITimeEntryVm[]>;
+        searchTimeEntriesMultiple(params: any, data: any): any;
+        getAvailableBookingTypesMultipleRequest(params: any): Triarc.Data.DataRequest<string[]>;
+        getAvailableBookingTypesMultiple(params: any): any;
+        newCheckUserResult(): ICheckUserResult;
+        newTimeEntryVm(): ITimeEntryVm;
+        newTimeEntryModel(): ITimeEntryModel;
+        newTimeEntryCollection(): ITimeEntryCollection;
+        newTimeEntrySearchVm(): ITimeEntrySearchVm;
     }
     interface ProxyContainer {
         Version: IVersionResource;
-        Location: ILocationResource;
-        Account: IAccountResource;
-        Admin: IAdminResource;
-        Timesheet: ITimesheetResource;
-        ConfigurationProfile: IConfigurationProfileResource;
-        Person: IPersonResource;
-        PersonalMessage: IPersonalMessageResource;
-        WorkObject: IWorkObjectResource;
-        Config: IConfigResource;
-        Claim: IClaimResource;
-        GlobalMessage: IGlobalMessageResource;
-        Saldo: ISaldoResource;
-        Operation: IOperationResource;
         Image: IImageResource;
+        Employee: IEmployeeResource;
+        Address: IAddressResource;
+        Timesheet: ITimesheetResource;
+        Operation: IOperationResource;
         TimeBooking: ITimeBookingResource;
-        TimeEntry: ITimeEntryResource;
+        Admin: IAdminResource;
+        GlobalMessage: IGlobalMessageResource;
+        Person: IPersonResource;
         Project: IProjectResource;
+        Expenses: IExpensesResource;
+        Config: IConfigResource;
+        ConfigurationProfile: IConfigurationProfileResource;
+        WorkReport: IWorkReportResource;
+        Claim: IClaimResource;
+        Saldo: ISaldoResource;
+        WorkObject: IWorkObjectResource;
+        Account: IAccountResource;
+        PersonalMessage: IPersonalMessageResource;
+        Location: ILocationResource;
+        TimeEntry: ITimeEntryResource;
     }
 }
 declare var timeRecorder: ng.IModule;
+declare module TimeRecorder {
+    var routingParent: any;
+}
 interface IToSelectScope extends ng.IScope {
     model: TimeRecorder.Web.ToSelectOption[];
     source: TimeRecorder.Web.ToSelectOption[];
@@ -1226,21 +1466,318 @@ interface IToSelectScope extends ng.IScope {
     removeItem: (item: TimeRecorder.Web.ToSelectOption) => void;
     realign: () => void;
 }
-declare module TimeRecorder.Web {
-    class AuthenticationService {
-        private $proxy;
-        private $q;
+declare module TimeRecorder.Web.Business {
+    class TimesheetEntryTypeVm {
+        private cm;
+        constructor(cm: () => Data.ITimesheetTimeEntryTypeCm);
+        id: number;
+        abbreviation: string;
+        name: string;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class TimesheetAvailabilityTimeEntryVm {
+        private cm;
+        private entryType;
+        constructor(cm: () => Data.ITimesheetAvailabilityTimeEntryCm, entryType: () => TimesheetEntryTypeVm);
+        entryTypeId: number;
+        mins: number;
+        abbreviation: string;
+        name: string;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class TimeEntryVm {
+        private cm;
+        private availabilityEntryTypes;
+        private _availabilityTimeEntries;
+        private _totalUnavalable;
+        private _threshold;
+        constructor(cm: () => Data.ITimesheetTimeEntryCm, availabilityEntryTypes: () => TimesheetEntryTypeVm[]);
+        date: Date;
+        planned: number;
+        done: any;
+        availabilityTimeEntries: TimesheetAvailabilityTimeEntryVm[];
+        totalAvailability: any;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class TimesheetEmployeeVm {
+        private cm;
+        private availabilityEntryTypes;
+        private _dayEntries;
+        private _totalMonthPlanned;
+        private _totalMonthDone;
+        private _totalMonthUnAvailable;
+        constructor(cm: () => Data.ITimesheetEmployeeCm, availabilityEntryTypes: () => TimesheetEntryTypeVm[]);
+        id: number;
+        name: string;
+        firstName: string;
+        lastName: string;
+        timeEntries: TimeEntryVm[];
+        timeEntry(date: Date): TimeEntryVm;
+        totalMonthPlanned: any;
+        totalMonthDone: any;
+        totalMonthAvailabilityEntries: any;
+        totalMonthAvailabilityFor(availabilityEntryType: TimesheetEntryTypeVm): number;
+        update(cm: Data.ITimesheetEmployeeCm): void;
+        reset(): void;
+        toCm(): Data.ITimesheetEmployeeCm;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class TimesheetVm {
+        private cm;
+        private _timeSheetEmployees;
+        private _thresholds;
+        private _availabilityEntryTypes;
+        constructor(cm: () => Data.ITimesheetCm);
+        timeSheetEmployees: TimesheetEmployeeVm[];
+        thresholds: TimesheetThresholdVm[];
+        availabilityEntryTypes: TimesheetEntryTypeVm[];
+        update(cm: Data.ITimesheetCm): void;
+        reset(): void;
+        toCm(): Data.ITimesheetCm;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class TimesheetThresholdVm {
+        private cm;
+        constructor(cm: () => Data.ITimesheetThresholdCm);
+        fromMins: number;
+        toMins: number;
+        color: string;
+        type: Data.EThresholdType;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class ExpenseVm {
+        private cm;
+        constructor(cm: () => Data.IExpenseCm);
+        id: number;
+        description: string;
+        employeeId: number;
+        value: number;
+        timestamp: Date;
+        expenseTypeId: number;
+        visaEmployeeId: number;
+        visaTimestamp: Date;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class ExpenseTypeVm {
+        private cm;
+        constructor(cm: () => Data.IExpenseTypeCm);
+        id: number;
+        name: string;
+        description: string;
+        validFrom: Date;
+        validTo: Date;
+        default: number;
+        fixed: boolean;
+        needAmount: boolean;
+    }
+}
+declare module TimeRecorder.Web.Bu {
+    class PersonVm {
+        protected cm: () => Data.IPersonCm;
+        constructor(cm: () => Data.IPersonCm);
+        mainAddressId: number;
+        lastName: string;
+        firstName: string;
+        email: string;
+        telephone: string;
+        id: number;
+        timestamp: Date;
+        fullName: string;
+        update(entityCm: Data.IPersonCm): void;
+        reset(): void;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    import PersonVm = Web.Bu.PersonVm;
+    class EmployeeVm extends PersonVm {
+        protected cm: () => Data.IEmployeeCm;
+        constructor(cm: () => Data.IEmployeeCm);
+        employeeId: string;
+        profileId: number;
+        userId: string;
+        userName: string;
+        emergencyPin: string;
+        externalId: string;
+        bookingLock: Date;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class ProjectVm {
+        private cm;
+        constructor(cm: () => Data.IProjectCm);
+        id: number;
+        name: string;
+        parentId: number;
+        description: string;
+        bookable: boolean;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class ClientVm {
+        private cm;
+        constructor(cm: () => Data.IClientCm);
+        id: number;
+        name: string;
+        mainContact: any;
+        mainAddress: any;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class ExternalWorkReportVm {
+        private cm;
+        private _project;
+        private _signedClient;
+        constructor(cm: () => Data.IExternalWorkReportCm);
+        id: number;
+        from: Date;
+        to: Date;
+        signatureImage: string;
+        signatureTimestamp: Date;
+        projectCompleted: boolean;
+        project: any;
+        signedClient: ClientVm;
+    }
+}
+declare module TimeRecorder.Web.Bu {
+    class ContactVm extends PersonVm {
+        protected cm: () => Data.IContactCm;
+        constructor(cm: () => Data.IContactCm);
+        clientId: number;
+        update(entityCm: Data.IPersonCm): void;
+        reset(): void;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class ExpenseTypeRepository {
+        protected $proxy: Data.ProxyContainer;
+        protected $q: ng.IQService;
         static $inject: string[];
         static serviceId: string;
-        appUser: Data.IAppUser;
-        isAuthenticated: boolean;
-        private loginInfo;
         constructor($proxy: Data.ProxyContainer, $q: ng.IQService);
-        getAppUser: () => ng.IPromise<Data.IAppUser>;
-        login: (password: string, userName: string, rememberMe: boolean) => ng.IPromise<{}>;
-        logout: () => void;
-        hasClaim(claim: string): ng.IPromise<boolean>;
-        private containsClaim(col, claim);
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class ExpenseRepository {
+        protected $proxy: Data.ProxyContainer;
+        protected $q: ng.IQService;
+        static $inject: string[];
+        static serviceId: string;
+        constructor($proxy: Data.ProxyContainer, $q: ng.IQService);
+        search(): ng.IPromise<Data.IExpenseCm[]>;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class ProjectRepository {
+        protected $proxy: Data.ProxyContainer;
+        protected $q: ng.IQService;
+        static $inject: string[];
+        static serviceId: string;
+        constructor($proxy: Data.ProxyContainer, $q: ng.IQService);
+        getProjectById(id: number): ng.IPromise<Data.IProjectCm>;
+        search(searchValue: string, skip: number, take: number): ng.IPromise<Data.IProjectCm[]>;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    import PersonVm = Web.Bu.PersonVm;
+    class PeopleRepository {
+        protected $proxy: Data.ProxyContainer;
+        static $inject: string[];
+        static serviceId: string;
+        constructor($proxy: Data.ProxyContainer);
+        getContactsForClient(clientId: number, isLiveData: boolean): ng.IPromise<PersonVm[]>;
+        getPerson(id: number, isLiveData: boolean): ng.IPromise<Data.IPersonCm>;
+        searchPeople(searchString: string): ng.IPromise<Data.IPersonCm[]>;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class EmployeeRepository {
+        protected $proxy: Data.ProxyContainer;
+        static $inject: string[];
+        static serviceId: string;
+        constructor($proxy: Data.ProxyContainer);
+        getById(id: string): ng.IPromise<Data.IEmployeeCm>;
+        getAllEmployees(): ng.IPromise<Data.IEmployeeCm[]>;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class TimeSheetDataController {
+        private $q;
+        private $proxy;
+        static serviceId: string;
+        static $inject: string[];
+        constructor($q: ng.IQService, $proxy: Data.ProxyContainer);
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class ExpenseTypeDataController {
+        private $q;
+        private expenseTypeRepository;
+        static serviceId: string;
+        static $inject: string[];
+        constructor($q: ng.IQService, expenseTypeRepository: ExpenseTypeRepository);
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class ExpenseDataController {
+        private $q;
+        private expenseRepository;
+        static serviceId: string;
+        static $inject: string[];
+        constructor($q: ng.IQService, expenseRepository: ExpenseRepository);
+        search(): ng.IPromise<ExpenseVm[]>;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class ProjectDataController {
+        private $q;
+        private projectRepository;
+        static serviceId: string;
+        static $inject: string[];
+        constructor($q: ng.IQService, projectRepository: ProjectRepository);
+        getProjectById(id: number): ng.IPromise<ProjectVm>;
+        search(searchValue: string, skip: number, take: number): ng.IPromise<ProjectVm[]>;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    import PersonVm = Web.Bu.PersonVm;
+    class PeopleDataController {
+        private $q;
+        private peopleRepository;
+        static serviceId: string;
+        static $inject: string[];
+        constructor($q: ng.IQService, peopleRepository: PeopleRepository);
+        getContactsForClient(clientId: number, isLiveData: boolean): ng.IPromise<PersonVm[]>;
+        getPerson(id: number, isLiveData: boolean): ng.IPromise<PersonVm>;
+        searchPeople(searchString: string): ng.IPromise<PersonVm[]>;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class EmployeeDataController {
+        private $q;
+        private employeeRepository;
+        static serviceId: string;
+        static $inject: string[];
+        constructor($q: ng.IQService, employeeRepository: EmployeeRepository);
+        getAllPersons(): ng.IPromise<Business.EmployeeVm[]>;
+        getById(id: string): ng.IPromise<Business.EmployeeVm>;
+    }
+}
+declare module TimeRecorder.Web {
+    interface IAuthenticationService {
+        getAppUser(): ng.IPromise<Data.IAppUser>;
+        login(password: string, userName: string, rememberMe: boolean): ng.IPromise<any>;
+        logout(): void;
+        hasClaim(claim: string): boolean;
+        hasAnyClaimOf(claims: string[]): boolean;
+        hasClaimEnsureLoggedIn(claim: string): ng.IPromise<boolean>;
+        hasAnyClaimOfEnsureLoggedIn(claims: string[]): ng.IPromise<boolean>;
     }
 }
 declare module TimeRecorder.Web {
@@ -1343,6 +1880,7 @@ declare module TimeRecorder.Web {
     class PersonService {
         private $proxy;
         private $q;
+        private personController;
         static serviceId: string;
         static $inject: string[];
         skip: number;
@@ -1353,10 +1891,10 @@ declare module TimeRecorder.Web {
         isLoading: boolean;
         endReached: boolean;
         people: Data.IPersonVm[];
-        constructor($proxy: Data.ProxyContainer, $q: ng.IQService);
+        constructor($proxy: Data.ProxyContainer, $q: ng.IQService, personController: Business.EmployeeDataController);
         startSearch(): ng.IPromise<{}>;
         loadMore(): void;
-        loadPersons(): ng.IPromise<Data.IPersonVm[]>;
+        loadPersons(): ng.IPromise<Business.EmployeeVm[]>;
         savePerson: (person: Data.IPersonVm) => ng.IPromise<boolean>;
         deletePerson: (personId: number) => ng.IPromise<{}>;
     }
@@ -1437,6 +1975,38 @@ declare module TimeRecorder.Web {
     }
 }
 declare module TimeRecorder.Web {
+    class ExpensesService {
+        private $proxy;
+        private $q;
+        static $inject: string[];
+        static serviceId: string;
+        metaData: Data.ITimeBookingMetaDataVm;
+        constructor($proxy: Data.ProxyContainer, $q: ng.IQService);
+        calendarSettings: {
+            fromIsOpen: boolean;
+            toIsOpen: boolean;
+            datepickerOptions: {
+                currentText: string;
+                clearText: string;
+                closeText: string;
+            };
+            dateFormat: string;
+            minDate: DateConstructor;
+        };
+        getPersonNameById(id: number): string;
+        getProjectNameById(id: number): string;
+        getTypeNameById(id: number): string;
+        getStateNameById(id: number): string;
+        getStateColor(state: Data.ETimeBookingState): string;
+        getIsEditable(): void;
+        getDetail(id: number): void;
+        search(data: Data.ITimeBookingSearchParams): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingCm[]>>;
+        save(data: Data.ITimeBookingCm): ng.IPromise<Triarc.Data.DataResponse<Data.ITimeBookingCm>>;
+        remove(id: number): void;
+        openCalendar(event: any, key: string): void;
+    }
+}
+declare module TimeRecorder.Web {
     class UserController {
         private authentication;
         private $state;
@@ -1452,11 +2022,11 @@ declare module TimeRecorder.Web {
         editPassword: boolean;
         showForm: boolean;
         locations: Data.ILocationVm[];
-        persons: Data.IPersonVm[];
+        persons: Business.EmployeeVm[];
         nameMaxLength: number;
         idMaxLength: number;
         passwordMaxLength: number;
-        constructor(authentication: AuthenticationService, $state: any, user: UserService, notification: NotificationServce, person: PersonService, location: LocationService);
+        constructor(authentication: IAuthenticationService, $state: any, user: UserService, notification: NotificationServce, person: PersonService, location: LocationService);
         init(): void;
         loadPersons: () => void;
         loadLocations: () => void;
@@ -1491,7 +2061,7 @@ declare module TimeRecorder.Web {
         selectedClaim: FeatureClaim;
         isCurrentClaimActive: boolean;
         maxNameLength: number;
-        constructor(authentication: AuthenticationService, $state: any, role: RoleService, notification: NotificationServce);
+        constructor(authentication: IAuthenticationService, $state: any, role: RoleService, notification: NotificationServce);
         init(): void;
         loadRoles: () => void;
         loadClaims: () => void;
@@ -1547,7 +2117,7 @@ declare module TimeRecorder.Web {
         selectedLocation: Data.ILocationVm;
         idMaxLength: number;
         nameMaxLength: number;
-        constructor(location: LocationService, notification: NotificationServce, authentication: AuthenticationService, $state: any);
+        constructor(location: LocationService, notification: NotificationServce, authentication: IAuthenticationService, $state: any);
         init(): void;
         select(location: Data.ILocationVm): void;
         create: () => void;
@@ -1575,7 +2145,7 @@ declare module TimeRecorder.Web {
         firstNameMaxLength: number;
         lastNameMaxLength: number;
         webServiceAvailable: boolean;
-        constructor(person: PersonService, role: RoleService, notification: NotificationServce, authentication: AuthenticationService, $state: any, $proxy: Data.ProxyContainer);
+        constructor(person: PersonService, role: RoleService, notification: NotificationServce, authentication: IAuthenticationService, $state: any, $proxy: Data.ProxyContainer);
         init(): void;
         select(person: Data.IPersonVm): void;
         create: () => void;
@@ -1622,7 +2192,7 @@ declare module TimeRecorder.Web {
         showPreview: boolean;
         messages: Data.IGlobalMessageVm[];
         selectedMessage: Data.IGlobalMessageVm;
-        constructor($q: ng.IQService, globalMessages: GlobalMessageService, notification: NotificationServce, authentication: AuthenticationService, $state: any);
+        constructor($q: ng.IQService, globalMessages: GlobalMessageService, notification: NotificationServce, authentication: IAuthenticationService, $state: any);
         init(): void;
         private resetForm;
         select: (msg: Data.IGlobalMessageVm) => void;
@@ -1658,7 +2228,7 @@ declare module TimeRecorder.Web {
         private $state;
         static $inject: string[];
         static controllerId: string;
-        persons: Data.IPersonVm[];
+        persons: Business.EmployeeVm[];
         selectOptions: ToSelectOption[];
         recipients: ToSelectOption[];
         body: string;
@@ -1668,7 +2238,7 @@ declare module TimeRecorder.Web {
         showForm: boolean;
         isNew: boolean;
         maxMsgLength: number;
-        constructor(personalMessages: PersonalMessageService, person: PersonService, authentication: AuthenticationService, notification: NotificationServce, $state: any);
+        constructor(personalMessages: PersonalMessageService, person: PersonService, authentication: IAuthenticationService, notification: NotificationServce, $state: any);
         init: () => void;
         send: () => void;
         select: (msg: Data.ISentMessage) => void;
@@ -1692,6 +2262,7 @@ declare module TimeRecorder.Web {
         private $state;
         private $proxy;
         private $scope;
+        private trWebApiUrl;
         static $inject: string[];
         static controllerId: string;
         config: Data.IConfigVm;
@@ -1702,7 +2273,7 @@ declare module TimeRecorder.Web {
         fileType: string;
         bytes: any[];
         newImage: boolean;
-        constructor(notification: NotificationServce, authentication: AuthenticationService, $state: any, $proxy: Data.ProxyContainer, $scope: ng.IScope);
+        constructor(notification: NotificationServce, authentication: IAuthenticationService, $state: any, $proxy: Data.ProxyContainer, $scope: ng.IScope, trWebApiUrl: string);
         init(): void;
         private loadConfig();
         save(): void;
@@ -1723,7 +2294,7 @@ declare module TimeRecorder.Web {
         static controllerId: string;
         static $inject: string[];
         persons: TypeAheadPerson[];
-        people: Data.IPersonVm[];
+        people: Business.EmployeeVm[];
         locations: Data.ILocationVm[];
         dateFormat: string;
         fromOpen: boolean;
@@ -1736,7 +2307,7 @@ declare module TimeRecorder.Web {
         selectedPerson: string;
         webServiceAvailable: boolean;
         minDate: Date;
-        constructor(search: SearchService, authentication: AuthenticationService, $state: any, person: PersonService, location: LocationService, $proxy: Data.ProxyContainer, notification: NotificationServce);
+        constructor(search: SearchService, authentication: IAuthenticationService, $state: any, person: PersonService, location: LocationService, $proxy: Data.ProxyContainer, notification: NotificationServce);
         init(): void;
         open(event: any, cal: any): void;
         selected(item: TypeAheadPerson): void;
@@ -1771,26 +2342,33 @@ declare module TimeRecorder.Web {
         stateValue: number;
         personValue: string;
         typeValue: number;
-        constructor(authentication: AuthenticationService, service: TimeBookingService, $state: any);
+        constructor(authentication: IAuthenticationService, service: TimeBookingService, $state: any);
         private init();
         search(): ng.IPromise<void>;
     }
 }
 declare module TimeRecorder.Web {
+    interface ITimebookingControllerScope extends ng.IScope {
+        timebookingForm: ng.IFormController;
+    }
     class TimeBookingFormController {
+        $scope: ITimebookingControllerScope;
         service: TimeBookingService;
         private authentication;
         private $state;
         private $stateParams;
         static controllerId: string;
         static $inject: string[];
+        triggerValidation: boolean;
         idValue: number;
-        personValue: number;
-        projectValue: number;
-        typeValue: number;
+        person: Data.ITimeBookingPersonVm;
+        project: Data.ITimeBookingProjectVm;
+        entryType: Data.ITimeBookingTypeVm;
         fromValue: Date;
+        fromTimeValue: Date;
         toValue: Date;
-        constructor(service: TimeBookingService, authentication: AuthenticationService, $state: any, $stateParams: any);
+        toTimeValue: Date;
+        constructor($scope: ITimebookingControllerScope, service: TimeBookingService, authentication: IAuthenticationService, $state: any, $stateParams: any);
         private init();
         isNew(): boolean;
         remove(): void;
@@ -1852,97 +2430,45 @@ declare module TimeRecorder.Web {
         static convert(data: Data.IProjectPersonVm[]): any[];
     }
 }
-declare module TimeRecorder.Web.Business {
-    class TimesheetEntryTypeVm {
-        private cm;
-        constructor(cm: () => Data.ITimesheetTimeEntryTypeCm);
-        id: number;
-        abbreviation: string;
-        name: string;
-    }
-}
-declare module TimeRecorder.Web.Business {
-    class TimesheetAvailabilityTimeEntryVm {
-        private cm;
-        private entryType;
-        constructor(cm: () => Data.ITimesheetAvailabilityTimeEntryCm, entryType: () => TimesheetEntryTypeVm);
-        entryTypeId: number;
-        mins: number;
-        abbreviation: string;
-        name: string;
-    }
-}
-declare module TimeRecorder.Web.Business {
-    class TimeEntryVm {
-        private cm;
-        private availabilityEntryTypes;
-        private _availabilityTimeEntries;
-        private _totalUnavalable;
-        private _threshold;
-        constructor(cm: () => Data.ITimesheetTimeEntryCm, availabilityEntryTypes: () => TimesheetEntryTypeVm[]);
-        date: Date;
-        planned: number;
-        done: any;
-        availabilityTimeEntries: TimesheetAvailabilityTimeEntryVm[];
-        totalAvailability: any;
-    }
-}
-declare module TimeRecorder.Web.Business {
-    class TimesheetEmployeeVm {
-        private cm;
-        private availabilityEntryTypes;
-        private _dayEntries;
-        private _totalMonthPlanned;
-        private _totalMonthDone;
-        private _totalMonthUnAvailable;
-        constructor(cm: () => Data.ITimesheetEmployeeCm, availabilityEntryTypes: () => TimesheetEntryTypeVm[]);
-        id: number;
-        name: string;
-        firstName: string;
-        lastName: string;
-        timeEntries: TimeEntryVm[];
-        timeEntry(date: Date): TimeEntryVm;
-        totalMonthPlanned: any;
-        totalMonthDone: any;
-        totalMonthAvailabilityEntries: any;
-        totalMonthAvailabilityFor(availabilityEntryType: TimesheetEntryTypeVm): number;
-        update(cm: Data.ITimesheetEmployeeCm): void;
-        reset(): void;
-        toCm(): Data.ITimesheetEmployeeCm;
-    }
-}
-declare module TimeRecorder.Web.Business {
-    class TimesheetVm {
-        private cm;
-        private _timeSheetEmployees;
-        private _thresholds;
-        private _availabilityEntryTypes;
-        constructor(cm: () => Data.ITimesheetCm);
-        timeSheetEmployees: TimesheetEmployeeVm[];
-        thresholds: TimesheetThresholdVm[];
-        availabilityEntryTypes: TimesheetEntryTypeVm[];
-        update(cm: Data.ITimesheetCm): void;
-        reset(): void;
-        toCm(): Data.ITimesheetCm;
-    }
-}
-declare module TimeRecorder.Web.Business {
-    class TimesheetThresholdVm {
-        private cm;
-        constructor(cm: () => Data.ITimesheetThresholdCm);
-        fromMins: number;
-        toMins: number;
-        color: string;
-        type: Data.EThresholdType;
-    }
-}
-declare module TimeRecorder.Web.Business {
-    class TimeSheetDataController {
-        private $q;
-        private $proxy;
-        static serviceId: string;
+declare module TimeRecorder.Web {
+    class ExpensesController {
+        private authentication;
+        service: ExpensesService;
+        private expensesDataController;
+        private $state;
+        static controllerId: string;
         static $inject: string[];
-        constructor($q: ng.IQService, $proxy: Data.ProxyContainer);
+        searchResult: Business.ExpenseVm[];
+        fromValue: Date;
+        toValue: Date;
+        stateValue: number;
+        personValue: string;
+        typeValue: number;
+        constructor(authentication: IAuthenticationService, service: ExpensesService, expensesDataController: Business.ExpenseDataController, $state: any);
+        private init();
+        getValue(entry: Business.ExpenseVm): string;
+        search(): void;
+    }
+}
+declare module TimeRecorder.Web {
+    class ExpensesFormController {
+        service: ExpensesService;
+        private authentication;
+        private $state;
+        private $stateParams;
+        static controllerId: string;
+        static $inject: string[];
+        idValue: number;
+        personValue: number;
+        projectValue: number;
+        typeValue: number;
+        fromValue: Date;
+        toValue: Date;
+        constructor(service: ExpensesService, authentication: IAuthenticationService, $state: any, $stateParams: any);
+        private init();
+        isNew(): boolean;
+        remove(): void;
+        save(): void;
     }
 }
 declare module TimeRecorder.Web {
@@ -1953,13 +2479,15 @@ declare module TimeRecorder.Web {
         private blockUi;
         private $proxy;
         private $timeSheetDataController;
+        private $projectDataController;
         static $inject: string[];
         static controllerId: string;
         static onDirectiveExpansionRowEvent: string;
         selectedDate: Date;
         timesheetData: TimesheetData;
-        selectedProject: Data.IProjectVm;
-        searchedProjects: Data.IProjectVm[];
+        selectedProject: Business.ProjectVm;
+        searchedProjects: Business.ProjectVm[];
+        isSearchingProjects: boolean;
         datePickerStates: {
             [name: string]: boolean;
         };
@@ -1967,7 +2495,7 @@ declare module TimeRecorder.Web {
             dateDisabled: string;
             datepickerMode: string;
         };
-        constructor($scope: ITimeSheetControllerScope, blockUi: ng.ui.block.IBlockService, $proxy: Data.ProxyContainer, $timeSheetDataController: Business.TimeSheetDataController);
+        constructor($scope: ITimeSheetControllerScope, blockUi: ng.ui.block.IBlockService, $proxy: Data.ProxyContainer, $timeSheetDataController: Business.TimeSheetDataController, $projectDataController: Business.ProjectDataController);
         searchProjects(searchValue: string): void;
         private tryLoadData();
         private selectDate(date);
@@ -2061,6 +2589,16 @@ declare module TimeRecorder.Web {
         breachedThreshold(): boolean;
         selectedThreshold: Business.TimesheetThresholdVm;
         availabilityEntryTypes: Business.TimesheetEntryTypeVm[];
+    }
+}
+declare module TimeRecorder.Web {
+    interface IInvoiceReportControllerScope extends ng.IScope {
+    }
+    class InvoiceReportController {
+        private $scope;
+        static $inject: string[];
+        static controllerId: string;
+        constructor($scope: IInvoiceReportControllerScope);
     }
 }
 declare module TimeRecorder.Web {

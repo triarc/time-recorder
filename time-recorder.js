@@ -1,1604 +1,1899 @@
-var Data;
-(function (Data) {
-    var Config = (function () {
-        function Config() {
-        }
-        Config.WebApiUrl = "api";
-        Config.ApplicationUrl = "/";
-        return Config;
-    })();
-    Data.Config = Config;
-})(Data || (Data = {}));
-var Data;
-(function (Data) {
-    (function (EPlatform) {
-        EPlatform[EPlatform["Android"] = 0] = "Android";
-        EPlatform[EPlatform["iOS"] = 1] = "iOS";
-        EPlatform[EPlatform["WindowsPhone"] = 2] = "WindowsPhone";
-    })(Data.EPlatform || (Data.EPlatform = {}));
-    var EPlatform = Data.EPlatform;
-    (function (EAppUserType) {
-        EAppUserType[EAppUserType["WebOnly"] = 0] = "WebOnly";
-        EAppUserType[EAppUserType["Terminal"] = 1] = "Terminal";
-        EAppUserType[EAppUserType["Personal"] = 2] = "Personal";
-    })(Data.EAppUserType || (Data.EAppUserType = {}));
-    var EAppUserType = Data.EAppUserType;
-    (function (EFieldType) {
-        EFieldType[EFieldType["Number"] = 1] = "Number";
-        EFieldType[EFieldType["String"] = 2] = "String";
-        EFieldType[EFieldType["Boolean"] = 3] = "Boolean";
-        EFieldType[EFieldType["DateTime"] = 4] = "DateTime";
-    })(Data.EFieldType || (Data.EFieldType = {}));
-    var EFieldType = Data.EFieldType;
-    (function (EThresholdType) {
-        EThresholdType[EThresholdType["DailyDone"] = 0] = "DailyDone";
-        EThresholdType[EThresholdType["TotalMonthDone"] = 1] = "TotalMonthDone";
-    })(Data.EThresholdType || (Data.EThresholdType = {}));
-    var EThresholdType = Data.EThresholdType;
-    (function (ESaldoType) {
-        ESaldoType[ESaldoType["DefaultCh"] = 0] = "DefaultCh";
-        ESaldoType[ESaldoType["DefaultDe"] = 1] = "DefaultDe";
-        ESaldoType[ESaldoType["Enzler"] = 2] = "Enzler";
-    })(Data.ESaldoType || (Data.ESaldoType = {}));
-    var ESaldoType = Data.ESaldoType;
-    (function (ETimeBookingState) {
-        ETimeBookingState[ETimeBookingState["Open"] = 0] = "Open";
-        ETimeBookingState[ETimeBookingState["Complete"] = 1] = "Complete";
-        ETimeBookingState[ETimeBookingState["Faulted"] = 2] = "Faulted";
-    })(Data.ETimeBookingState || (Data.ETimeBookingState = {}));
-    var ETimeBookingState = Data.ETimeBookingState;
-    (function (EAuftragVerificationStatus) {
-        EAuftragVerificationStatus[EAuftragVerificationStatus["Success"] = 0] = "Success";
-        EAuftragVerificationStatus[EAuftragVerificationStatus["ArbeitsgangNotValid"] = 1] = "ArbeitsgangNotValid";
-        EAuftragVerificationStatus[EAuftragVerificationStatus["AuftragNotValid"] = 2] = "AuftragNotValid";
-        EAuftragVerificationStatus[EAuftragVerificationStatus["PositionNotValid"] = 4] = "PositionNotValid";
-        EAuftragVerificationStatus[EAuftragVerificationStatus["ArbeitsgangNotExist"] = 8] = "ArbeitsgangNotExist";
-        EAuftragVerificationStatus[EAuftragVerificationStatus["AuftragNotExist"] = 16] = "AuftragNotExist";
-        EAuftragVerificationStatus[EAuftragVerificationStatus["PositionNotExist"] = 32] = "PositionNotExist";
-        EAuftragVerificationStatus[EAuftragVerificationStatus["CommunicationError"] = -1] = "CommunicationError";
-    })(Data.EAuftragVerificationStatus || (Data.EAuftragVerificationStatus = {}));
-    var EAuftragVerificationStatus = Data.EAuftragVerificationStatus;
-    (function (EProjectFlag) {
-        EProjectFlag[EProjectFlag["Bookable"] = 1] = "Bookable";
-        EProjectFlag[EProjectFlag["Explicit"] = 2] = "Explicit";
-        EProjectFlag[EProjectFlag["PlanningUnit"] = 4] = "PlanningUnit";
-    })(Data.EProjectFlag || (Data.EProjectFlag = {}));
-    var EProjectFlag = Data.EProjectFlag;
-    ;
-    var VersionResource = (function () {
-        function VersionResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        VersionResource.prototype.getLatestPlistRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Version/GetLatestPlist";
-            if (angular.isDefined(params.versionCode1)) {
-                url = Triarc.Data.appendUrlParameter(url, "versionCode1", encodeURIComponent(params.versionCode1));
-            }
-            if (angular.isDefined(params.versionCode2)) {
-                url = Triarc.Data.appendUrlParameter(url, "versionCode2", encodeURIComponent(params.versionCode2));
-            }
-            if (angular.isDefined(params.versionCode3)) {
-                url = Triarc.Data.appendUrlParameter(url, "versionCode3", encodeURIComponent(params.versionCode3));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Version", "any", false);
-            return dataRequest;
-        };
-        VersionResource.prototype.getLatestPlist = function (params) {
-            var request = this.getLatestPlistRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        VersionResource.prototype.getLatestVersionNumberRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Version/GetLatestVersionNumber";
-            if (angular.isDefined(params.includeBetas)) {
-                url = Triarc.Data.appendUrlParameter(url, "includeBetas", encodeURIComponent(params.includeBetas));
-            }
-            if (angular.isDefined(params.platform)) {
-                url = Triarc.Data.appendUrlParameter(url, "platform", encodeURIComponent(params.platform));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Version", "Data.IVersionVm", false);
-            return dataRequest;
-        };
-        VersionResource.prototype.getLatestVersionNumber = function (params) {
-            var request = this.getLatestVersionNumberRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        VersionResource.prototype.getServerVersionRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Version/GetServerVersion";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Version", "string", false);
-            return dataRequest;
-        };
-        VersionResource.prototype.getServerVersion = function () {
-            var request = this.getServerVersionRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        VersionResource.prototype.getVersionsMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Version/GetVersions";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Version", "Data.IVersionVm[]", false);
-            return dataRequest;
-        };
-        VersionResource.prototype.getVersionsMultiple = function (params) {
-            var request = this.getVersionsMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        VersionResource.prototype.newVersionVm = function () {
-            return {};
-        };
-        return VersionResource;
-    })();
-    Data.VersionResource = VersionResource;
-    ;
-    var LocationResource = (function () {
-        function LocationResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        LocationResource.prototype.getLocationByIdRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Location/GetLocationById";
-            if (angular.isDefined(params.id)) {
-                url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Location", "Data.ILocationVm", false);
-            return dataRequest;
-        };
-        LocationResource.prototype.getLocationById = function (params) {
-            var request = this.getLocationByIdRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        LocationResource.prototype.getMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Location/Get";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Location", "Data.ILocationVm[]", false);
-            return dataRequest;
-        };
-        LocationResource.prototype.getMultiple = function (params) {
-            var request = this.getMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        LocationResource.prototype.putRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Location/Put";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "PUT", url, data, "Location", "any", true);
-            return dataRequest;
-        };
-        LocationResource.prototype.put = function (data) {
-            var request = this.putRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        LocationResource.prototype.deleteRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Location/Delete";
-            if (angular.isDefined(params.id)) {
-                url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "DELETE", url, {}, "Location", "any", false);
-            return dataRequest;
-        };
-        LocationResource.prototype.delete = function (params) {
-            var request = this.deleteRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        LocationResource.prototype.newLocationVm = function () {
-            return {};
-        };
-        return LocationResource;
-    })();
-    Data.LocationResource = LocationResource;
-    ;
-    var AccountResource = (function () {
-        function AccountResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        AccountResource.prototype.getAppUserRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Account/GetAppUser";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Account", "Data.IAppUser", false);
-            return dataRequest;
-        };
-        AccountResource.prototype.getAppUser = function () {
-            var request = this.getAppUserRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.loginRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Account/Login";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "Account", "any", true);
-            return dataRequest;
-        };
-        AccountResource.prototype.login = function (data) {
-            var request = this.loginRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.getUsersMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Account/GetUsers";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Account", "Data.IUserVm[]", false);
-            return dataRequest;
-        };
-        AccountResource.prototype.getUsersMultiple = function (params) {
-            var request = this.getUsersMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.searchMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Account/Search";
-            if (angular.isDefined(params.search)) {
-                url = Triarc.Data.appendUrlParameter(url, "search", encodeURIComponent(params.search));
-            }
-            if (angular.isDefined(params.skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "skip", encodeURIComponent(params.skip));
-            }
-            if (angular.isDefined(params.take)) {
-                url = Triarc.Data.appendUrlParameter(url, "take", encodeURIComponent(params.take));
-            }
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Account", "Data.IUserVm[]", false);
-            return dataRequest;
-        };
-        AccountResource.prototype.searchMultiple = function (params) {
-            var request = this.searchMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.createUserRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Account/CreateUser";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "Account", "any", true);
-            return dataRequest;
-        };
-        AccountResource.prototype.createUser = function (data) {
-            var request = this.createUserRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.editUserRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Account/EditUser";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "Account", "any", true);
-            return dataRequest;
-        };
-        AccountResource.prototype.editUser = function (data) {
-            var request = this.editUserRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.resetPasswordRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Account/ResetPassword";
-            if (angular.isDefined(params.userId)) {
-                url = Triarc.Data.appendUrlParameter(url, "userId", encodeURIComponent(params.userId));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Account", "any", false);
-            return dataRequest;
-        };
-        AccountResource.prototype.resetPassword = function (params) {
-            var request = this.resetPasswordRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.deleteRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Account/Delete";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "Account", "any", true);
-            return dataRequest;
-        };
-        AccountResource.prototype.delete = function (data) {
-            var request = this.deleteRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.pingRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Account/Ping";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Account", "any", false);
-            return dataRequest;
-        };
-        AccountResource.prototype.ping = function () {
-            var request = this.pingRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.logoutRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Account/Logout";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, {}, "Account", "any", false);
-            return dataRequest;
-        };
-        AccountResource.prototype.logout = function () {
-            var request = this.logoutRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.getUserInfoRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Account/GetUserInfo";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Account", "Data.IUserInfoViewModel", false);
-            return dataRequest;
-        };
-        AccountResource.prototype.getUserInfo = function () {
-            var request = this.getUserInfoRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.getManageInfoRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Account/GetManageInfo";
-            if (angular.isDefined(params.returnUrl)) {
-                url = Triarc.Data.appendUrlParameter(url, "returnUrl", encodeURIComponent(params.returnUrl));
-            }
-            if (angular.isDefined(params.generateState)) {
-                url = Triarc.Data.appendUrlParameter(url, "generateState", encodeURIComponent(params.generateState));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Account", "Data.IManageInfoViewModel", false);
-            return dataRequest;
-        };
-        AccountResource.prototype.getManageInfo = function (params) {
-            var request = this.getManageInfoRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.changePasswordRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Account/ChangePassword";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "Account", "any", true);
-            return dataRequest;
-        };
-        AccountResource.prototype.changePassword = function (data) {
-            var request = this.changePasswordRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.setPasswordRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Account/SetPassword";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "Account", "any", true);
-            return dataRequest;
-        };
-        AccountResource.prototype.setPassword = function (data) {
-            var request = this.setPasswordRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.addExternalLoginRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Account/AddExternalLogin";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "Account", "any", true);
-            return dataRequest;
-        };
-        AccountResource.prototype.addExternalLogin = function (data) {
-            var request = this.addExternalLoginRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.removeLoginRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Account/RemoveLogin";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "Account", "any", true);
-            return dataRequest;
-        };
-        AccountResource.prototype.removeLogin = function (data) {
-            var request = this.removeLoginRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.getExternalLoginRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Account/GetExternalLogin";
-            if (angular.isDefined(params.provider)) {
-                url = Triarc.Data.appendUrlParameter(url, "provider", encodeURIComponent(params.provider));
-            }
-            if (angular.isDefined(params.error)) {
-                url = Triarc.Data.appendUrlParameter(url, "error", encodeURIComponent(params.error));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Account", "any", false);
-            return dataRequest;
-        };
-        AccountResource.prototype.getExternalLogin = function (params) {
-            var request = this.getExternalLoginRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.getExternalLoginsMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Account/GetExternalLogins";
-            if (angular.isDefined(params.returnUrl)) {
-                url = Triarc.Data.appendUrlParameter(url, "returnUrl", encodeURIComponent(params.returnUrl));
-            }
-            if (angular.isDefined(params.generateState)) {
-                url = Triarc.Data.appendUrlParameter(url, "generateState", encodeURIComponent(params.generateState));
-            }
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Account", "Data.IExternalLoginViewModel[]", false);
-            return dataRequest;
-        };
-        AccountResource.prototype.getExternalLoginsMultiple = function (params) {
-            var request = this.getExternalLoginsMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.registerRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Account/Register";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "Account", "any", true);
-            return dataRequest;
-        };
-        AccountResource.prototype.register = function (data) {
-            var request = this.registerRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.registerExternalRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Account/RegisterExternal";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "Account", "any", true);
-            return dataRequest;
-        };
-        AccountResource.prototype.registerExternal = function (data) {
-            var request = this.registerExternalRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        AccountResource.prototype.newAppUser = function () {
-            return {};
-        };
-        AccountResource.prototype.newUserVm = function () {
-            return {};
-        };
-        AccountResource.prototype.newUserInfoViewModel = function () {
-            return {};
-        };
-        AccountResource.prototype.newManageInfoViewModel = function () {
-            return {};
-        };
-        AccountResource.prototype.newExternalLoginViewModel = function () {
-            return {};
-        };
-        AccountResource.prototype.newLoginViewModel = function () {
-            return {};
-        };
-        AccountResource.prototype.newChangePasswordBindingModel = function () {
-            return {};
-        };
-        AccountResource.prototype.newSetPasswordBindingModel = function () {
-            return {};
-        };
-        AccountResource.prototype.newAddExternalLoginBindingModel = function () {
-            return {};
-        };
-        AccountResource.prototype.newRemoveLoginBindingModel = function () {
-            return {};
-        };
-        AccountResource.prototype.newRegisterVm = function () {
-            return {};
-        };
-        AccountResource.prototype.newRegisterExternalBindingModel = function () {
-            return {};
-        };
-        AccountResource.prototype.newPersonVm = function () {
-            return {};
-        };
-        AccountResource.prototype.newLocationVm = function () {
-            return {};
-        };
-        AccountResource.prototype.newAppConfig = function () {
-            return {};
-        };
-        AccountResource.prototype.newFeatureClaimVm = function () {
-            return {};
-        };
-        return AccountResource;
-    })();
-    Data.AccountResource = AccountResource;
-    ;
-    var AdminResource = (function () {
-        function AdminResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        AdminResource.prototype.seedDatabaseRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Admin/SeedDatabase";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Admin", "any", false);
-            return dataRequest;
-        };
-        AdminResource.prototype.seedDatabase = function () {
-            var request = this.seedDatabaseRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        AdminResource.prototype.webServiceEnabledRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Admin/WebServiceEnabled";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Admin", "boolean", false);
-            return dataRequest;
-        };
-        AdminResource.prototype.webServiceEnabled = function () {
-            var request = this.webServiceEnabledRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        AdminResource.prototype.webServiceAvailableRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Admin/WebServiceAvailable";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Admin", "boolean", false);
-            return dataRequest;
-        };
-        AdminResource.prototype.webServiceAvailable = function () {
-            var request = this.webServiceAvailableRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        AdminResource.prototype.triggerPersonImportRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Admin/TriggerPersonImport";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Admin", "boolean", false);
-            return dataRequest;
-        };
-        AdminResource.prototype.triggerPersonImport = function () {
-            var request = this.triggerPersonImportRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        AdminResource.prototype.triggerProjectImportRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Admin/TriggerProjectImport";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Admin", "boolean", false);
-            return dataRequest;
-        };
-        AdminResource.prototype.triggerProjectImport = function () {
-            var request = this.triggerProjectImportRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        AdminResource.prototype.fetchOrderDataRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Admin/FetchOrderData";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Admin", "any", false);
-            return dataRequest;
-        };
-        AdminResource.prototype.fetchOrderData = function () {
-            var request = this.fetchOrderDataRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        AdminResource.prototype.getConfigsMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Admin/GetConfigs";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Admin", "Data.IKeyVaulePair[]", false);
-            return dataRequest;
-        };
-        AdminResource.prototype.getConfigsMultiple = function (params) {
-            var request = this.getConfigsMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        AdminResource.prototype.echoServiceRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Admin/EchoService";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Admin", "boolean", false);
-            return dataRequest;
-        };
-        AdminResource.prototype.echoService = function () {
-            var request = this.echoServiceRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        AdminResource.prototype.newKeyVaulePair = function () {
-            return {};
-        };
-        return AdminResource;
-    })();
-    Data.AdminResource = AdminResource;
-    ;
-    var TimesheetResource = (function () {
-        function TimesheetResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        TimesheetResource.prototype.getTimesheetRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Timesheet/GetTimesheet";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "Timesheet", "Data.ITimesheetCm", true);
-            return dataRequest;
-        };
-        TimesheetResource.prototype.getTimesheet = function (data) {
-            var request = this.getTimesheetRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        TimesheetResource.prototype.newTimesheetCm = function () {
-            return {};
-        };
-        TimesheetResource.prototype.newTimesheetSearchCriteria = function () {
-            return {};
-        };
-        return TimesheetResource;
-    })();
-    Data.TimesheetResource = TimesheetResource;
-    ;
-    var ConfigurationProfileResource = (function () {
-        function ConfigurationProfileResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        ConfigurationProfileResource.prototype.getConfigsMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/ConfigurationProfile/GetConfigs";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "ConfigurationProfile", "Data.IProfileConfigVm[]", false);
-            return dataRequest;
-        };
-        ConfigurationProfileResource.prototype.getConfigsMultiple = function (params) {
-            var request = this.getConfigsMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        ConfigurationProfileResource.prototype.deleteRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/ConfigurationProfile/Delete";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "ConfigurationProfile", "any", true);
-            return dataRequest;
-        };
-        ConfigurationProfileResource.prototype.delete = function (data) {
-            var request = this.deleteRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        ConfigurationProfileResource.prototype.saveRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/ConfigurationProfile/Save";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "ConfigurationProfile", "any", true);
-            return dataRequest;
-        };
-        ConfigurationProfileResource.prototype.save = function (data) {
-            var request = this.saveRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        ConfigurationProfileResource.prototype.newProfileConfigVm = function () {
-            return {};
-        };
-        return ConfigurationProfileResource;
-    })();
-    Data.ConfigurationProfileResource = ConfigurationProfileResource;
-    ;
-    var PersonResource = (function () {
-        function PersonResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        PersonResource.prototype.getPersonByIdRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Person/GetPersonById";
-            if (angular.isDefined(params.id)) {
-                url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Person", "Data.IPersonVm", false);
-            return dataRequest;
-        };
-        PersonResource.prototype.getPersonById = function (params) {
-            var request = this.getPersonByIdRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        PersonResource.prototype.getMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Person/Get";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Person", "Data.IPersonVm[]", false);
-            return dataRequest;
-        };
-        PersonResource.prototype.getMultiple = function (params) {
-            var request = this.getMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        PersonResource.prototype.searchMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Person/Search";
-            if (angular.isDefined(params.search)) {
-                url = Triarc.Data.appendUrlParameter(url, "search", encodeURIComponent(params.search));
-            }
-            if (angular.isDefined(params.skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "skip", encodeURIComponent(params.skip));
-            }
-            if (angular.isDefined(params.take)) {
-                url = Triarc.Data.appendUrlParameter(url, "take", encodeURIComponent(params.take));
-            }
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, {}, "Person", "Data.IPersonVm[]", false);
-            return dataRequest;
-        };
-        PersonResource.prototype.searchMultiple = function (params) {
-            var request = this.searchMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        PersonResource.prototype.putRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Person/Put";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "PUT", url, data, "Person", "any", true);
-            return dataRequest;
-        };
-        PersonResource.prototype.put = function (data) {
-            var request = this.putRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        PersonResource.prototype.deleteRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Person/Delete";
-            if (angular.isDefined(params.id)) {
-                url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "DELETE", url, {}, "Person", "any", false);
-            return dataRequest;
-        };
-        PersonResource.prototype.delete = function (params) {
-            var request = this.deleteRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        PersonResource.prototype.newPersonVm = function () {
-            return {};
-        };
-        return PersonResource;
-    })();
-    Data.PersonResource = PersonResource;
-    ;
-    var PersonalMessageResource = (function () {
-        function PersonalMessageResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        PersonalMessageResource.prototype.getLatestMessagesMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/PersonalMessage/GetLatestMessages";
-            if (angular.isDefined(params.employeeId)) {
-                url = Triarc.Data.appendUrlParameter(url, "employeeId", encodeURIComponent(params.employeeId));
-            }
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "PersonalMessage", "Data.IMessage[]", false);
-            return dataRequest;
-        };
-        PersonalMessageResource.prototype.getLatestMessagesMultiple = function (params) {
-            var request = this.getLatestMessagesMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        PersonalMessageResource.prototype.saveMessageRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/PersonalMessage/SaveMessage";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "PersonalMessage", "any", true);
-            return dataRequest;
-        };
-        PersonalMessageResource.prototype.saveMessage = function (data) {
-            var request = this.saveMessageRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        PersonalMessageResource.prototype.markAsReadRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/PersonalMessage/MarkAsRead";
-            if (angular.isDefined(params.messageId)) {
-                url = Triarc.Data.appendUrlParameter(url, "messageId", encodeURIComponent(params.messageId));
-            }
-            if (angular.isDefined(params.personId)) {
-                url = Triarc.Data.appendUrlParameter(url, "personId", encodeURIComponent(params.personId));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, {}, "PersonalMessage", "any", false);
-            return dataRequest;
-        };
-        PersonalMessageResource.prototype.markAsRead = function (params) {
-            var request = this.markAsReadRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        PersonalMessageResource.prototype.getSentMessagesMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/PersonalMessage/GetSentMessages";
-            if (angular.isDefined(params.personId)) {
-                url = Triarc.Data.appendUrlParameter(url, "personId", encodeURIComponent(params.personId));
-            }
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "PersonalMessage", "Data.ISentMessage[]", false);
-            return dataRequest;
-        };
-        PersonalMessageResource.prototype.getSentMessagesMultiple = function (params) {
-            var request = this.getSentMessagesMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        PersonalMessageResource.prototype.newMessage = function () {
-            return {};
-        };
-        PersonalMessageResource.prototype.newSentMessage = function () {
-            return {};
-        };
-        PersonalMessageResource.prototype.newSaveMessage = function () {
-            return {};
-        };
-        return PersonalMessageResource;
-    })();
-    Data.PersonalMessageResource = PersonalMessageResource;
-    ;
-    var WorkObjectResource = (function () {
-        function WorkObjectResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        WorkObjectResource.prototype.getProjectsForLocationMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/WorkObject/GetProjectsForLocation";
-            if (angular.isDefined(params.locationId)) {
-                url = Triarc.Data.appendUrlParameter(url, "locationId", encodeURIComponent(params.locationId));
-            }
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "WorkObject", "Data.IWorkObjectViewModel[]", false);
-            return dataRequest;
-        };
-        WorkObjectResource.prototype.getProjectsForLocationMultiple = function (params) {
-            var request = this.getProjectsForLocationMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        WorkObjectResource.prototype.newWorkObjectViewModel = function () {
-            return {};
-        };
-        return WorkObjectResource;
-    })();
-    Data.WorkObjectResource = WorkObjectResource;
-    ;
-    var ConfigResource = (function () {
-        function ConfigResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        ConfigResource.prototype.getRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Config/Get";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Config", "Data.IConfigVm", false);
-            return dataRequest;
-        };
-        ConfigResource.prototype.get = function () {
-            var request = this.getRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        ConfigResource.prototype.putRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/Config/Put";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "Config", "any", true);
-            return dataRequest;
-        };
-        ConfigResource.prototype.put = function (data) {
-            var request = this.putRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        ConfigResource.prototype.newConfigVm = function () {
-            return {};
-        };
-        ConfigResource.prototype.newSaveConfigVm = function () {
-            return {};
-        };
-        return ConfigResource;
-    })();
-    Data.ConfigResource = ConfigResource;
-    ;
-    var ClaimResource = (function () {
-        function ClaimResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        ClaimResource.prototype.getClaimsMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Claim/GetClaims";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Claim", "Data.IFeatureClaimVm[]", false);
-            return dataRequest;
-        };
-        ClaimResource.prototype.getClaimsMultiple = function (params) {
-            var request = this.getClaimsMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        ClaimResource.prototype.newFeatureClaimVm = function () {
-            return {};
-        };
-        return ClaimResource;
-    })();
-    Data.ClaimResource = ClaimResource;
-    ;
-    var GlobalMessageResource = (function () {
-        function GlobalMessageResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        GlobalMessageResource.prototype.getDailyGlobalMessageRequest = function () {
-            var url = Data.Config.WebApiUrl + "/GlobalMessage/GetDailyGlobalMessage";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "GlobalMessage", "Data.IGlobalMessageVm", false);
-            return dataRequest;
-        };
-        GlobalMessageResource.prototype.getDailyGlobalMessage = function () {
-            var request = this.getDailyGlobalMessageRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        GlobalMessageResource.prototype.getMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/GlobalMessage/Get";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "GlobalMessage", "Data.IGlobalMessageVm[]", false);
-            return dataRequest;
-        };
-        GlobalMessageResource.prototype.getMultiple = function (params) {
-            var request = this.getMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        GlobalMessageResource.prototype.putRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/GlobalMessage/Put";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "PUT", url, data, "GlobalMessage", "any", true);
-            return dataRequest;
-        };
-        GlobalMessageResource.prototype.put = function (data) {
-            var request = this.putRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        GlobalMessageResource.prototype.deleteRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/GlobalMessage/Delete";
-            if (angular.isDefined(params.id)) {
-                url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "DELETE", url, {}, "GlobalMessage", "any", false);
-            return dataRequest;
-        };
-        GlobalMessageResource.prototype.delete = function (params) {
-            var request = this.deleteRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        GlobalMessageResource.prototype.newGlobalMessageVm = function () {
-            return {};
-        };
-        GlobalMessageResource.prototype.newPostedImage = function () {
-            return {};
-        };
-        return GlobalMessageResource;
-    })();
-    Data.GlobalMessageResource = GlobalMessageResource;
-    ;
-    var SaldoResource = (function () {
-        function SaldoResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        SaldoResource.prototype.getByIdRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Saldo/GetById";
-            if (angular.isDefined(params.employeeId)) {
-                url = Triarc.Data.appendUrlParameter(url, "employeeId", encodeURIComponent(params.employeeId));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Saldo", "Data.ISaldo", false);
-            return dataRequest;
-        };
-        SaldoResource.prototype.getById = function (params) {
-            var request = this.getByIdRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        SaldoResource.prototype.newSaldo = function () {
-            return {};
-        };
-        return SaldoResource;
-    })();
-    Data.SaldoResource = SaldoResource;
-    ;
-    var OperationResource = (function () {
-        function OperationResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        OperationResource.prototype.triggerImportPersonalDataRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Operation/TriggerImportPersonalData";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Operation", "any", false);
-            return dataRequest;
-        };
-        OperationResource.prototype.triggerImportPersonalData = function () {
-            var request = this.triggerImportPersonalDataRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        OperationResource.prototype.triggerImportObjectDataRequest = function () {
-            var url = Data.Config.WebApiUrl + "/Operation/TriggerImportObjectData";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Operation", "any", false);
-            return dataRequest;
-        };
-        OperationResource.prototype.triggerImportObjectData = function () {
-            var request = this.triggerImportObjectDataRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        return OperationResource;
-    })();
-    Data.OperationResource = OperationResource;
-    ;
-    var ImageResource = (function () {
-        function ImageResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        ImageResource.prototype.getRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Image/Get";
-            if (angular.isDefined(params.id)) {
-                url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Image", "any", false);
-            return dataRequest;
-        };
-        ImageResource.prototype.get = function (params) {
-            var request = this.getRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        return ImageResource;
-    })();
-    Data.ImageResource = ImageResource;
-    ;
-    var TimeBookingResource = (function () {
-        function TimeBookingResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        TimeBookingResource.prototype.searchMultipleRequest = function (params, data) {
-            var url = Data.Config.WebApiUrl + "/TimeBooking/Search";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "TimeBooking", "Data.ITimeBookingCm[]", true);
-            return dataRequest;
-        };
-        TimeBookingResource.prototype.searchMultiple = function (params, data) {
-            var request = this.searchMultipleRequest(params, data);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeBookingResource.prototype.saveRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/TimeBooking/Save";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "TimeBooking", "Data.ITimeBookingCm", true);
-            return dataRequest;
-        };
-        TimeBookingResource.prototype.save = function (data) {
-            var request = this.saveRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeBookingResource.prototype.getRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/TimeBooking/Get";
-            if (angular.isDefined(params.id)) {
-                url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, {}, "TimeBooking", "Data.ITimeBookingCm", false);
-            return dataRequest;
-        };
-        TimeBookingResource.prototype.get = function (params) {
-            var request = this.getRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeBookingResource.prototype.getAvailableEntryTypesMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/TimeBooking/GetAvailableEntryTypes";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "TimeBooking", "Data.ITimeEntryTypeVm[]", false);
-            return dataRequest;
-        };
-        TimeBookingResource.prototype.getAvailableEntryTypesMultiple = function (params) {
-            var request = this.getAvailableEntryTypesMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeBookingResource.prototype.getMetaDataRequest = function () {
-            var url = Data.Config.WebApiUrl + "/TimeBooking/GetMetaData";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "TimeBooking", "Data.ITimeBookingMetaDataVm", false);
-            return dataRequest;
-        };
-        TimeBookingResource.prototype.getMetaData = function () {
-            var request = this.getMetaDataRequest();
-            return Triarc.Data.requestValue(request);
-        };
-        TimeBookingResource.prototype.deleteRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/TimeBooking/Delete";
-            if (angular.isDefined(params.id)) {
-                url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "DELETE", url, {}, "TimeBooking", "boolean", false);
-            return dataRequest;
-        };
-        TimeBookingResource.prototype.delete = function (params) {
-            var request = this.deleteRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeBookingResource.prototype.newTimeBookingCm = function () {
-            return {};
-        };
-        TimeBookingResource.prototype.newTimeEntryTypeVm = function () {
-            return {};
-        };
-        TimeBookingResource.prototype.newTimeBookingMetaDataVm = function () {
-            return {};
-        };
-        TimeBookingResource.prototype.newTimeBookingSearchParams = function () {
-            return {};
-        };
-        return TimeBookingResource;
-    })();
-    Data.TimeBookingResource = TimeBookingResource;
-    ;
-    var TimeEntryResource = (function () {
-        function TimeEntryResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        TimeEntryResource.prototype.postSingleRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/TimeEntry/PostSingle";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "TimeEntry", "any", true);
-            return dataRequest;
-        };
-        TimeEntryResource.prototype.postSingle = function (data) {
-            var request = this.postSingleRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeEntryResource.prototype.postMultipleRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/TimeEntry/PostMultiple";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "TimeEntry", "any", true);
-            return dataRequest;
-        };
-        TimeEntryResource.prototype.postMultiple = function (data) {
-            var request = this.postMultipleRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeEntryResource.prototype.validateUserRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/TimeEntry/ValidateUser";
-            if (angular.isDefined(params.persNr)) {
-                url = Triarc.Data.appendUrlParameter(url, "persNr", encodeURIComponent(params.persNr));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "TimeEntry", "Data.ICheckUserResult", false);
-            return dataRequest;
-        };
-        TimeEntryResource.prototype.validateUser = function (params) {
-            var request = this.validateUserRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeEntryResource.prototype.putRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/TimeEntry/Put";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "TimeEntry", "boolean", true);
-            return dataRequest;
-        };
-        TimeEntryResource.prototype.put = function (data) {
-            var request = this.putRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeEntryResource.prototype.deleteRequest = function (data) {
-            var url = Data.Config.WebApiUrl + "/TimeEntry/Delete";
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "TimeEntry", "boolean", true);
-            return dataRequest;
-        };
-        TimeEntryResource.prototype.delete = function (data) {
-            var request = this.deleteRequest(data);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeEntryResource.prototype.validateWorkObjectRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/TimeEntry/ValidateWorkObject";
-            if (angular.isDefined(params.objectNumber)) {
-                url = Triarc.Data.appendUrlParameter(url, "objectNumber", encodeURIComponent(params.objectNumber));
-            }
-            if (angular.isDefined(params.positionNumber)) {
-                url = Triarc.Data.appendUrlParameter(url, "positionNumber", encodeURIComponent(params.positionNumber));
-            }
-            if (angular.isDefined(params.personalNumber)) {
-                url = Triarc.Data.appendUrlParameter(url, "personalNumber", encodeURIComponent(params.personalNumber));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "TimeEntry", "EAuftragVerificationStatus", false);
-            return dataRequest;
-        };
-        TimeEntryResource.prototype.validateWorkObject = function (params) {
-            var request = this.validateWorkObjectRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeEntryResource.prototype.searchTimeEntriesMultipleRequest = function (params, data) {
-            var url = Data.Config.WebApiUrl + "/TimeEntry/SearchTimeEntries";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, data, "TimeEntry", "Data.ITimeEntryVm[]", true);
-            return dataRequest;
-        };
-        TimeEntryResource.prototype.searchTimeEntriesMultiple = function (params, data) {
-            var request = this.searchTimeEntriesMultipleRequest(params, data);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeEntryResource.prototype.getAvailableBookingTypesMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/TimeEntry/GetAvailableBookingTypes";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "TimeEntry", "string[]", false);
-            return dataRequest;
-        };
-        TimeEntryResource.prototype.getAvailableBookingTypesMultiple = function (params) {
-            var request = this.getAvailableBookingTypesMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        TimeEntryResource.prototype.newCheckUserResult = function () {
-            return {};
-        };
-        TimeEntryResource.prototype.newTimeEntryVm = function () {
-            return {};
-        };
-        TimeEntryResource.prototype.newTimeEntryModel = function () {
-            return {};
-        };
-        TimeEntryResource.prototype.newTimeEntryCollection = function () {
-            return {};
-        };
-        TimeEntryResource.prototype.newTimeEntrySearchVm = function () {
-            return {};
-        };
-        return TimeEntryResource;
-    })();
-    Data.TimeEntryResource = TimeEntryResource;
-    ;
-    var ProjectResource = (function () {
-        function ProjectResource($http, $q, $location) {
-            this.$http = $http;
-            this.$q = $q;
-            this.$location = $location;
-        }
-        ProjectResource.prototype.getAllPersonsMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Project/GetAllPersons";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Project", "Data.IProjectPersonVm[]", false);
-            return dataRequest;
-        };
-        ProjectResource.prototype.getAllPersonsMultiple = function (params) {
-            var request = this.getAllPersonsMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        ProjectResource.prototype.getAllLocationsMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Project/GetAllLocations";
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Project", "Data.IProjectLocationVm[]", false);
-            return dataRequest;
-        };
-        ProjectResource.prototype.getAllLocationsMultiple = function (params) {
-            var request = this.getAllLocationsMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        ProjectResource.prototype.searchProjectsMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Project/SearchProjects";
-            if (angular.isDefined(params.searchValue)) {
-                url = Triarc.Data.appendUrlParameter(url, "searchValue", encodeURIComponent(params.searchValue));
-            }
-            if (angular.isDefined(params.skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "skip", encodeURIComponent(params.skip));
-            }
-            if (angular.isDefined(params.take)) {
-                url = Triarc.Data.appendUrlParameter(url, "take", encodeURIComponent(params.take));
-            }
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Project", "Data.IProjectVm[]", false);
-            return dataRequest;
-        };
-        ProjectResource.prototype.searchProjectsMultiple = function (params) {
-            var request = this.searchProjectsMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        ProjectResource.prototype.getRootProjectsMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Project/GetRootProjects";
-            if (angular.isDefined(params.search)) {
-                url = Triarc.Data.appendUrlParameter(url, "search", encodeURIComponent(params.search));
-            }
-            if (angular.isDefined(params.skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "skip", encodeURIComponent(params.skip));
-            }
-            if (angular.isDefined(params.take)) {
-                url = Triarc.Data.appendUrlParameter(url, "take", encodeURIComponent(params.take));
-            }
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Project", "Data.IProjectVm[]", false);
-            return dataRequest;
-        };
-        ProjectResource.prototype.getRootProjectsMultiple = function (params) {
-            var request = this.getRootProjectsMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        ProjectResource.prototype.getChildrenMultipleRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Project/GetChildren";
-            if (angular.isDefined(params.projectId)) {
-                url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
-            }
-            if (angular.isDefined(params.$skip)) {
-                url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
-            }
-            if (angular.isDefined(params.$top)) {
-                url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
-            }
-            if (angular.isDefined(params.$orderBy)) {
-                url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
-            }
-            if (angular.isDefined(params.$filter)) {
-                url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "GET", url, {}, "Project", "Data.IProjectVm[]", false);
-            return dataRequest;
-        };
-        ProjectResource.prototype.getChildrenMultiple = function (params) {
-            var request = this.getChildrenMultipleRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        ProjectResource.prototype.putProjectDescriptionRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Project/PutProjectDescription";
-            if (angular.isDefined(params.description)) {
-                url = Triarc.Data.appendUrlParameter(url, "description", encodeURIComponent(params.description));
-            }
-            if (angular.isDefined(params.projectId)) {
-                url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, {}, "Project", "any", false);
-            return dataRequest;
-        };
-        ProjectResource.prototype.putProjectDescription = function (params) {
-            var request = this.putProjectDescriptionRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        ProjectResource.prototype.putPersonAssignmentRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Project/PutPersonAssignment";
-            if (angular.isDefined(params.projectId)) {
-                url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
-            }
-            if (angular.isDefined(params.personId)) {
-                url = Triarc.Data.appendUrlParameter(url, "personId", encodeURIComponent(params.personId));
-            }
-            if (angular.isDefined(params.value)) {
-                url = Triarc.Data.appendUrlParameter(url, "value", encodeURIComponent(params.value));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, {}, "Project", "any", false);
-            return dataRequest;
-        };
-        ProjectResource.prototype.putPersonAssignment = function (params) {
-            var request = this.putPersonAssignmentRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        ProjectResource.prototype.putLocationAssignmentRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Project/PutLocationAssignment";
-            if (angular.isDefined(params.projectId)) {
-                url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
-            }
-            if (angular.isDefined(params.locationId)) {
-                url = Triarc.Data.appendUrlParameter(url, "locationId", encodeURIComponent(params.locationId));
-            }
-            if (angular.isDefined(params.value)) {
-                url = Triarc.Data.appendUrlParameter(url, "value", encodeURIComponent(params.value));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, {}, "Project", "any", false);
-            return dataRequest;
-        };
-        ProjectResource.prototype.putLocationAssignment = function (params) {
-            var request = this.putLocationAssignmentRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        ProjectResource.prototype.setFlagsRequest = function (params) {
-            var url = Data.Config.WebApiUrl + "/Project/SetFlags";
-            if (angular.isDefined(params.projectId)) {
-                url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
-            }
-            if (angular.isDefined(params.flags)) {
-                url = Triarc.Data.appendUrlParameter(url, "flags", encodeURIComponent(params.flags));
-            }
-            var dataRequest = new Triarc.Data.DataRequest(this.$http, this.$q, this.$location, "POST", url, {}, "Project", "any", false);
-            return dataRequest;
-        };
-        ProjectResource.prototype.setFlags = function (params) {
-            var request = this.setFlagsRequest(params);
-            return Triarc.Data.requestValue(request);
-        };
-        ProjectResource.prototype.newProjectPersonVm = function () {
-            return {};
-        };
-        ProjectResource.prototype.newProjectLocationVm = function () {
-            return {};
-        };
-        ProjectResource.prototype.newProjectVm = function () {
-            return {};
-        };
-        return ProjectResource;
-    })();
-    Data.ProjectResource = ProjectResource;
-    var mod = angular.module("tlDataServices");
-    mod.provider('$proxy', function () {
-        return {
-            $get: ['$http', '$q', '$location', function ($http, $q, $location) {
-                var proxy = {
-                    Version: new VersionResource($http, $q, $location),
-                    Location: new LocationResource($http, $q, $location),
-                    Account: new AccountResource($http, $q, $location),
-                    Admin: new AdminResource($http, $q, $location),
-                    Timesheet: new TimesheetResource($http, $q, $location),
-                    ConfigurationProfile: new ConfigurationProfileResource($http, $q, $location),
-                    Person: new PersonResource($http, $q, $location),
-                    PersonalMessage: new PersonalMessageResource($http, $q, $location),
-                    WorkObject: new WorkObjectResource($http, $q, $location),
-                    Config: new ConfigResource($http, $q, $location),
-                    Claim: new ClaimResource($http, $q, $location),
-                    GlobalMessage: new GlobalMessageResource($http, $q, $location),
-                    Saldo: new SaldoResource($http, $q, $location),
-                    Operation: new OperationResource($http, $q, $location),
-                    Image: new ImageResource($http, $q, $location),
-                    TimeBooking: new TimeBookingResource($http, $q, $location),
-                    TimeEntry: new TimeEntryResource($http, $q, $location),
-                    Project: new ProjectResource($http, $q, $location),
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Data;
+        (function (Data) {
+            (function (EPlatform) {
+                EPlatform[EPlatform["Android"] = 0] = "Android";
+                EPlatform[EPlatform["iOS"] = 1] = "iOS";
+                EPlatform[EPlatform["WindowsPhone"] = 2] = "WindowsPhone";
+            })(Data.EPlatform || (Data.EPlatform = {}));
+            var EPlatform = Data.EPlatform;
+            (function (EFieldType) {
+                EFieldType[EFieldType["Number"] = 1] = "Number";
+                EFieldType[EFieldType["String"] = 2] = "String";
+                EFieldType[EFieldType["Boolean"] = 3] = "Boolean";
+                EFieldType[EFieldType["DateTime"] = 4] = "DateTime";
+            })(Data.EFieldType || (Data.EFieldType = {}));
+            var EFieldType = Data.EFieldType;
+            (function (EThresholdType) {
+                EThresholdType[EThresholdType["DailyDone"] = 0] = "DailyDone";
+                EThresholdType[EThresholdType["TotalMonthDone"] = 1] = "TotalMonthDone";
+            })(Data.EThresholdType || (Data.EThresholdType = {}));
+            var EThresholdType = Data.EThresholdType;
+            (function (ETimeBookingState) {
+                ETimeBookingState[ETimeBookingState["Open"] = 0] = "Open";
+                ETimeBookingState[ETimeBookingState["Complete"] = 1] = "Complete";
+                ETimeBookingState[ETimeBookingState["Faulted"] = 2] = "Faulted";
+            })(Data.ETimeBookingState || (Data.ETimeBookingState = {}));
+            var ETimeBookingState = Data.ETimeBookingState;
+            (function (EProjectFlag) {
+                EProjectFlag[EProjectFlag["Bookable"] = 1] = "Bookable";
+                EProjectFlag[EProjectFlag["Explicit"] = 2] = "Explicit";
+                EProjectFlag[EProjectFlag["PlanningUnit"] = 4] = "PlanningUnit";
+            })(Data.EProjectFlag || (Data.EProjectFlag = {}));
+            var EProjectFlag = Data.EProjectFlag;
+            (function (ESaldoType) {
+                ESaldoType[ESaldoType["DefaultCh"] = 0] = "DefaultCh";
+                ESaldoType[ESaldoType["DefaultDe"] = 1] = "DefaultDe";
+                ESaldoType[ESaldoType["Enzler"] = 2] = "Enzler";
+            })(Data.ESaldoType || (Data.ESaldoType = {}));
+            var ESaldoType = Data.ESaldoType;
+            (function (EAppUserType) {
+                EAppUserType[EAppUserType["WebOnly"] = 0] = "WebOnly";
+                EAppUserType[EAppUserType["Terminal"] = 1] = "Terminal";
+                EAppUserType[EAppUserType["Personal"] = 2] = "Personal";
+            })(Data.EAppUserType || (Data.EAppUserType = {}));
+            var EAppUserType = Data.EAppUserType;
+            (function (EAuftragVerificationStatus) {
+                EAuftragVerificationStatus[EAuftragVerificationStatus["Success"] = 0] = "Success";
+                EAuftragVerificationStatus[EAuftragVerificationStatus["ArbeitsgangNotValid"] = 1] = "ArbeitsgangNotValid";
+                EAuftragVerificationStatus[EAuftragVerificationStatus["AuftragNotValid"] = 2] = "AuftragNotValid";
+                EAuftragVerificationStatus[EAuftragVerificationStatus["PositionNotValid"] = 4] = "PositionNotValid";
+                EAuftragVerificationStatus[EAuftragVerificationStatus["ArbeitsgangNotExist"] = 8] = "ArbeitsgangNotExist";
+                EAuftragVerificationStatus[EAuftragVerificationStatus["AuftragNotExist"] = 16] = "AuftragNotExist";
+                EAuftragVerificationStatus[EAuftragVerificationStatus["PositionNotExist"] = 32] = "PositionNotExist";
+                EAuftragVerificationStatus[EAuftragVerificationStatus["CommunicationError"] = -1] = "CommunicationError";
+            })(Data.EAuftragVerificationStatus || (Data.EAuftragVerificationStatus = {}));
+            var EAuftragVerificationStatus = Data.EAuftragVerificationStatus;
+            ;
+            var VersionResource = (function () {
+                function VersionResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                VersionResource.prototype.getLatestPlistRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Version/GetLatestPlist";
+                    if (angular.isDefined(params.versionCode1)) {
+                        url = Triarc.Data.appendUrlParameter(url, "versionCode1", encodeURIComponent(params.versionCode1));
+                    }
+                    if (angular.isDefined(params.versionCode2)) {
+                        url = Triarc.Data.appendUrlParameter(url, "versionCode2", encodeURIComponent(params.versionCode2));
+                    }
+                    if (angular.isDefined(params.versionCode3)) {
+                        url = Triarc.Data.appendUrlParameter(url, "versionCode3", encodeURIComponent(params.versionCode3));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Version", "any", false);
+                    return dataRequest;
                 };
-                return proxy;
-            }]
-        };
-    });
-})(Data || (Data = {}));
+                VersionResource.prototype.getLatestPlist = function (params) {
+                    var request = this.getLatestPlistRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                VersionResource.prototype.getLatestVersionNumberRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Version/GetLatestVersionNumber";
+                    if (angular.isDefined(params.includeBetas)) {
+                        url = Triarc.Data.appendUrlParameter(url, "includeBetas", encodeURIComponent(params.includeBetas));
+                    }
+                    if (angular.isDefined(params.platform)) {
+                        url = Triarc.Data.appendUrlParameter(url, "platform", encodeURIComponent(params.platform));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Version", "IVersionVm", false);
+                    return dataRequest;
+                };
+                VersionResource.prototype.getLatestVersionNumber = function (params) {
+                    var request = this.getLatestVersionNumberRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                VersionResource.prototype.getServerVersionRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Version/GetServerVersion";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Version", "string", false);
+                    return dataRequest;
+                };
+                VersionResource.prototype.getServerVersion = function () {
+                    var request = this.getServerVersionRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                VersionResource.prototype.getVersionsMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Version/GetVersions";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Version", "IVersionVm[]", false);
+                    return dataRequest;
+                };
+                VersionResource.prototype.getVersionsMultiple = function (params) {
+                    var request = this.getVersionsMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                VersionResource.prototype.newVersionVm = function () {
+                    return {};
+                };
+                return VersionResource;
+            })();
+            Data.VersionResource = VersionResource;
+            ;
+            var ImageResource = (function () {
+                function ImageResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                ImageResource.prototype.getRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Image/Get";
+                    if (angular.isDefined(params.id)) {
+                        url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Image", "any", false);
+                    return dataRequest;
+                };
+                ImageResource.prototype.get = function (params) {
+                    var request = this.getRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                return ImageResource;
+            })();
+            Data.ImageResource = ImageResource;
+            ;
+            var EmployeeResource = (function () {
+                function EmployeeResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                EmployeeResource.prototype.getEmployeeByIdRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Employee/GetEmployeeById";
+                    if (angular.isDefined(params.id)) {
+                        url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Employee", "IEmployeeCm", false);
+                    return dataRequest;
+                };
+                EmployeeResource.prototype.getEmployeeById = function (params) {
+                    var request = this.getEmployeeByIdRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                EmployeeResource.prototype.getMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Employee/Get";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Employee", "IEmployeeCm[]", false);
+                    return dataRequest;
+                };
+                EmployeeResource.prototype.getMultiple = function (params) {
+                    var request = this.getMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                EmployeeResource.prototype.searchMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Employee/Search";
+                    if (angular.isDefined(params.search)) {
+                        url = Triarc.Data.appendUrlParameter(url, "search", encodeURIComponent(params.search));
+                    }
+                    if (angular.isDefined(params.skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "skip", encodeURIComponent(params.skip));
+                    }
+                    if (angular.isDefined(params.take)) {
+                        url = Triarc.Data.appendUrlParameter(url, "take", encodeURIComponent(params.take));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Employee", "IPersonVm[]", false);
+                    return dataRequest;
+                };
+                EmployeeResource.prototype.searchMultiple = function (params) {
+                    var request = this.searchMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                EmployeeResource.prototype.putRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Employee/Put";
+                    var dataRequest = new Triarc.Data.DataRequest("PUT", url, data, "Employee", "any", true);
+                    return dataRequest;
+                };
+                EmployeeResource.prototype.put = function (data) {
+                    var request = this.putRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                EmployeeResource.prototype.deleteRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Employee/Delete";
+                    if (angular.isDefined(params.id)) {
+                        url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("DELETE", url, {}, "Employee", "any", false);
+                    return dataRequest;
+                };
+                EmployeeResource.prototype.delete = function (params) {
+                    var request = this.deleteRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                EmployeeResource.prototype.newEmployeeCm = function () {
+                    return {};
+                };
+                EmployeeResource.prototype.newPersonVm = function () {
+                    return {};
+                };
+                EmployeeResource.prototype.newFeatureClaimVm = function () {
+                    return {};
+                };
+                return EmployeeResource;
+            })();
+            Data.EmployeeResource = EmployeeResource;
+            ;
+            var AddressResource = (function () {
+                function AddressResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                AddressResource.prototype.searchAddressesMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Address/SearchAddresses";
+                    if (angular.isDefined(params.searchString)) {
+                        url = Triarc.Data.appendUrlParameter(url, "searchString", encodeURIComponent(params.searchString));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Address", "IAddressCm[]", false);
+                    return dataRequest;
+                };
+                AddressResource.prototype.searchAddressesMultiple = function (params) {
+                    var request = this.searchAddressesMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                AddressResource.prototype.getMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Address/Get";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Address", "IAddressCm[]", false);
+                    return dataRequest;
+                };
+                AddressResource.prototype.getMultiple = function (params) {
+                    var request = this.getMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                AddressResource.prototype.getRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Address/Get";
+                    if (angular.isDefined(params.id)) {
+                        url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Address", "IAddressCm", false);
+                    return dataRequest;
+                };
+                AddressResource.prototype.get = function (params) {
+                    var request = this.getRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                AddressResource.prototype.newAddressCm = function () {
+                    return {};
+                };
+                return AddressResource;
+            })();
+            Data.AddressResource = AddressResource;
+            ;
+            var TimesheetResource = (function () {
+                function TimesheetResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                TimesheetResource.prototype.getTimesheetRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Timesheet/GetTimesheet";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Timesheet", "ITimesheetCm", true);
+                    return dataRequest;
+                };
+                TimesheetResource.prototype.getTimesheet = function (data) {
+                    var request = this.getTimesheetRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimesheetResource.prototype.newTimesheetCm = function () {
+                    return {};
+                };
+                TimesheetResource.prototype.newTimesheetSearchCriteria = function () {
+                    return {};
+                };
+                return TimesheetResource;
+            })();
+            Data.TimesheetResource = TimesheetResource;
+            ;
+            var OperationResource = (function () {
+                function OperationResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                OperationResource.prototype.triggerImportPersonalDataRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Operation/TriggerImportPersonalData";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Operation", "any", false);
+                    return dataRequest;
+                };
+                OperationResource.prototype.triggerImportPersonalData = function () {
+                    var request = this.triggerImportPersonalDataRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                OperationResource.prototype.triggerImportObjectDataRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Operation/TriggerImportObjectData";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Operation", "any", false);
+                    return dataRequest;
+                };
+                OperationResource.prototype.triggerImportObjectData = function () {
+                    var request = this.triggerImportObjectDataRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                return OperationResource;
+            })();
+            Data.OperationResource = OperationResource;
+            ;
+            var TimeBookingResource = (function () {
+                function TimeBookingResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                TimeBookingResource.prototype.searchMultipleRequest = function (params, data) {
+                    var url = this.$requestSender.getUrl() + "/TimeBooking/Search";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeBooking", "ITimeBookingCm[]", true);
+                    return dataRequest;
+                };
+                TimeBookingResource.prototype.searchMultiple = function (params, data) {
+                    var request = this.searchMultipleRequest(params, data);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeBookingResource.prototype.saveRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/TimeBooking/Save";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeBooking", "ITimeBookingCm", true);
+                    return dataRequest;
+                };
+                TimeBookingResource.prototype.save = function (data) {
+                    var request = this.saveRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeBookingResource.prototype.getRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/TimeBooking/Get";
+                    if (angular.isDefined(params.id)) {
+                        url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "TimeBooking", "ITimeBookingCm", false);
+                    return dataRequest;
+                };
+                TimeBookingResource.prototype.get = function (params) {
+                    var request = this.getRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeBookingResource.prototype.getAvailableEntryTypesMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/TimeBooking/GetAvailableEntryTypes";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "TimeBooking", "ITimeEntryTypeVm[]", false);
+                    return dataRequest;
+                };
+                TimeBookingResource.prototype.getAvailableEntryTypesMultiple = function (params) {
+                    var request = this.getAvailableEntryTypesMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeBookingResource.prototype.getMetaDataRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/TimeBooking/GetMetaData";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "TimeBooking", "ITimeBookingMetaDataVm", false);
+                    return dataRequest;
+                };
+                TimeBookingResource.prototype.getMetaData = function () {
+                    var request = this.getMetaDataRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeBookingResource.prototype.deleteRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/TimeBooking/Delete";
+                    if (angular.isDefined(params.id)) {
+                        url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("DELETE", url, {}, "TimeBooking", "boolean", false);
+                    return dataRequest;
+                };
+                TimeBookingResource.prototype.delete = function (params) {
+                    var request = this.deleteRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeBookingResource.prototype.newTimeBookingCm = function () {
+                    return {};
+                };
+                TimeBookingResource.prototype.newTimeEntryTypeVm = function () {
+                    return {};
+                };
+                TimeBookingResource.prototype.newTimeBookingMetaDataVm = function () {
+                    return {};
+                };
+                TimeBookingResource.prototype.newTimeBookingSearchParams = function () {
+                    return {};
+                };
+                return TimeBookingResource;
+            })();
+            Data.TimeBookingResource = TimeBookingResource;
+            ;
+            var AdminResource = (function () {
+                function AdminResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                AdminResource.prototype.seedDatabaseRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Admin/SeedDatabase";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "any", false);
+                    return dataRequest;
+                };
+                AdminResource.prototype.seedDatabase = function () {
+                    var request = this.seedDatabaseRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                AdminResource.prototype.webServiceEnabledRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Admin/WebServiceEnabled";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "boolean", false);
+                    return dataRequest;
+                };
+                AdminResource.prototype.webServiceEnabled = function () {
+                    var request = this.webServiceEnabledRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                AdminResource.prototype.webServiceAvailableRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Admin/WebServiceAvailable";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "boolean", false);
+                    return dataRequest;
+                };
+                AdminResource.prototype.webServiceAvailable = function () {
+                    var request = this.webServiceAvailableRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                AdminResource.prototype.triggerPersonImportRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Admin/TriggerPersonImport";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "boolean", false);
+                    return dataRequest;
+                };
+                AdminResource.prototype.triggerPersonImport = function () {
+                    var request = this.triggerPersonImportRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                AdminResource.prototype.triggerProjectImportRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Admin/TriggerProjectImport";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "boolean", false);
+                    return dataRequest;
+                };
+                AdminResource.prototype.triggerProjectImport = function () {
+                    var request = this.triggerProjectImportRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                AdminResource.prototype.fetchOrderDataRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Admin/FetchOrderData";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "any", false);
+                    return dataRequest;
+                };
+                AdminResource.prototype.fetchOrderData = function () {
+                    var request = this.fetchOrderDataRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                AdminResource.prototype.getServerVersionRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Admin/GetServerVersion";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "string", false);
+                    return dataRequest;
+                };
+                AdminResource.prototype.getServerVersion = function () {
+                    var request = this.getServerVersionRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                AdminResource.prototype.getConfigsMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Admin/GetConfigs";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "IKeyVaulePair[]", false);
+                    return dataRequest;
+                };
+                AdminResource.prototype.getConfigsMultiple = function (params) {
+                    var request = this.getConfigsMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                AdminResource.prototype.echoServiceRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Admin/EchoService";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "boolean", false);
+                    return dataRequest;
+                };
+                AdminResource.prototype.echoService = function () {
+                    var request = this.echoServiceRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                AdminResource.prototype.newKeyVaulePair = function () {
+                    return {};
+                };
+                return AdminResource;
+            })();
+            Data.AdminResource = AdminResource;
+            ;
+            var GlobalMessageResource = (function () {
+                function GlobalMessageResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                GlobalMessageResource.prototype.getDailyGlobalMessageRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/GlobalMessage/GetDailyGlobalMessage";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "GlobalMessage", "IGlobalMessageVm", false);
+                    return dataRequest;
+                };
+                GlobalMessageResource.prototype.getDailyGlobalMessage = function () {
+                    var request = this.getDailyGlobalMessageRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                GlobalMessageResource.prototype.getMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/GlobalMessage/Get";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "GlobalMessage", "IGlobalMessageVm[]", false);
+                    return dataRequest;
+                };
+                GlobalMessageResource.prototype.getMultiple = function (params) {
+                    var request = this.getMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                GlobalMessageResource.prototype.putRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/GlobalMessage/Put";
+                    var dataRequest = new Triarc.Data.DataRequest("PUT", url, data, "GlobalMessage", "any", true);
+                    return dataRequest;
+                };
+                GlobalMessageResource.prototype.put = function (data) {
+                    var request = this.putRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                GlobalMessageResource.prototype.deleteRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/GlobalMessage/Delete";
+                    if (angular.isDefined(params.id)) {
+                        url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("DELETE", url, {}, "GlobalMessage", "any", false);
+                    return dataRequest;
+                };
+                GlobalMessageResource.prototype.delete = function (params) {
+                    var request = this.deleteRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                GlobalMessageResource.prototype.newGlobalMessageVm = function () {
+                    return {};
+                };
+                GlobalMessageResource.prototype.newPostedImage = function () {
+                    return {};
+                };
+                return GlobalMessageResource;
+            })();
+            Data.GlobalMessageResource = GlobalMessageResource;
+            ;
+            var PersonResource = (function () {
+                function PersonResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                PersonResource.prototype.getPersonByIdRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Person/GetPersonById";
+                    if (angular.isDefined(params.id)) {
+                        url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Person", "IPersonCm", false);
+                    return dataRequest;
+                };
+                PersonResource.prototype.getPersonById = function (params) {
+                    var request = this.getPersonByIdRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                PersonResource.prototype.searchClientsMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Person/SearchClients";
+                    if (angular.isDefined(params.searchString)) {
+                        url = Triarc.Data.appendUrlParameter(url, "searchString", encodeURIComponent(params.searchString));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Person", "IClientCm[]", false);
+                    return dataRequest;
+                };
+                PersonResource.prototype.searchClientsMultiple = function (params) {
+                    var request = this.searchClientsMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                PersonResource.prototype.getClientRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Person/GetClient";
+                    if (angular.isDefined(params.clientId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "clientId", encodeURIComponent(params.clientId));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Person", "IClientCm", false);
+                    return dataRequest;
+                };
+                PersonResource.prototype.getClient = function (params) {
+                    var request = this.getClientRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                PersonResource.prototype.getContactsForClientMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Person/GetContactsForClient";
+                    if (angular.isDefined(params.clientId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "clientId", encodeURIComponent(params.clientId));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Person", "IContactCm[]", false);
+                    return dataRequest;
+                };
+                PersonResource.prototype.getContactsForClientMultiple = function (params) {
+                    var request = this.getContactsForClientMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                PersonResource.prototype.searchPeopleMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Person/SearchPeople";
+                    if (angular.isDefined(params.searchString)) {
+                        url = Triarc.Data.appendUrlParameter(url, "searchString", encodeURIComponent(params.searchString));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Person", "IPersonCm[]", false);
+                    return dataRequest;
+                };
+                PersonResource.prototype.searchPeopleMultiple = function (params) {
+                    var request = this.searchPeopleMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                PersonResource.prototype.getContactRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Person/GetContact";
+                    if (angular.isDefined(params.contactId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "contactId", encodeURIComponent(params.contactId));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Person", "IPersonCm", false);
+                    return dataRequest;
+                };
+                PersonResource.prototype.getContact = function (params) {
+                    var request = this.getContactRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                PersonResource.prototype.getPersonRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Person/GetPerson";
+                    if (angular.isDefined(params.personId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "personId", encodeURIComponent(params.personId));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Person", "IPersonCm", false);
+                    return dataRequest;
+                };
+                PersonResource.prototype.getPerson = function (params) {
+                    var request = this.getPersonRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                PersonResource.prototype.newPersonCm = function () {
+                    return {};
+                };
+                PersonResource.prototype.newClientCm = function () {
+                    return {};
+                };
+                PersonResource.prototype.newContactCm = function () {
+                    return {};
+                };
+                return PersonResource;
+            })();
+            Data.PersonResource = PersonResource;
+            ;
+            var ProjectResource = (function () {
+                function ProjectResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                ProjectResource.prototype.getAllPersonsMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Project/GetAllPersons";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Project", "IProjectPersonVm[]", false);
+                    return dataRequest;
+                };
+                ProjectResource.prototype.getAllPersonsMultiple = function (params) {
+                    var request = this.getAllPersonsMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ProjectResource.prototype.getAllLocationsMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Project/GetAllLocations";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Project", "IProjectLocationVm[]", false);
+                    return dataRequest;
+                };
+                ProjectResource.prototype.getAllLocationsMultiple = function (params) {
+                    var request = this.getAllLocationsMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ProjectResource.prototype.searchProjectsMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Project/SearchProjects";
+                    if (angular.isDefined(params.searchValue)) {
+                        url = Triarc.Data.appendUrlParameter(url, "searchValue", encodeURIComponent(params.searchValue));
+                    }
+                    if (angular.isDefined(params.skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "skip", encodeURIComponent(params.skip));
+                    }
+                    if (angular.isDefined(params.take)) {
+                        url = Triarc.Data.appendUrlParameter(url, "take", encodeURIComponent(params.take));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Project", "IProjectCm[]", false);
+                    return dataRequest;
+                };
+                ProjectResource.prototype.searchProjectsMultiple = function (params) {
+                    var request = this.searchProjectsMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ProjectResource.prototype.getRootProjectsMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Project/GetRootProjects";
+                    if (angular.isDefined(params.search)) {
+                        url = Triarc.Data.appendUrlParameter(url, "search", encodeURIComponent(params.search));
+                    }
+                    if (angular.isDefined(params.skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "skip", encodeURIComponent(params.skip));
+                    }
+                    if (angular.isDefined(params.take)) {
+                        url = Triarc.Data.appendUrlParameter(url, "take", encodeURIComponent(params.take));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Project", "IProjectVm[]", false);
+                    return dataRequest;
+                };
+                ProjectResource.prototype.getRootProjectsMultiple = function (params) {
+                    var request = this.getRootProjectsMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ProjectResource.prototype.getChildrenMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Project/GetChildren";
+                    if (angular.isDefined(params.projectId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Project", "IProjectVm[]", false);
+                    return dataRequest;
+                };
+                ProjectResource.prototype.getChildrenMultiple = function (params) {
+                    var request = this.getChildrenMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ProjectResource.prototype.putProjectDescriptionRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Project/PutProjectDescription";
+                    if (angular.isDefined(params.description)) {
+                        url = Triarc.Data.appendUrlParameter(url, "description", encodeURIComponent(params.description));
+                    }
+                    if (angular.isDefined(params.projectId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Project", "any", false);
+                    return dataRequest;
+                };
+                ProjectResource.prototype.putProjectDescription = function (params) {
+                    var request = this.putProjectDescriptionRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ProjectResource.prototype.putPersonAssignmentRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Project/PutPersonAssignment";
+                    if (angular.isDefined(params.projectId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
+                    }
+                    if (angular.isDefined(params.personId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "personId", encodeURIComponent(params.personId));
+                    }
+                    if (angular.isDefined(params.value)) {
+                        url = Triarc.Data.appendUrlParameter(url, "value", encodeURIComponent(params.value));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Project", "any", false);
+                    return dataRequest;
+                };
+                ProjectResource.prototype.putPersonAssignment = function (params) {
+                    var request = this.putPersonAssignmentRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ProjectResource.prototype.getProjectByIdRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Project/GetProjectById";
+                    if (angular.isDefined(params.projectId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Project", "IProjectCm", false);
+                    return dataRequest;
+                };
+                ProjectResource.prototype.getProjectById = function (params) {
+                    var request = this.getProjectByIdRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ProjectResource.prototype.putLocationAssignmentRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Project/PutLocationAssignment";
+                    if (angular.isDefined(params.projectId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
+                    }
+                    if (angular.isDefined(params.locationId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "locationId", encodeURIComponent(params.locationId));
+                    }
+                    if (angular.isDefined(params.value)) {
+                        url = Triarc.Data.appendUrlParameter(url, "value", encodeURIComponent(params.value));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Project", "any", false);
+                    return dataRequest;
+                };
+                ProjectResource.prototype.putLocationAssignment = function (params) {
+                    var request = this.putLocationAssignmentRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ProjectResource.prototype.setFlagsRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Project/SetFlags";
+                    if (angular.isDefined(params.projectId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
+                    }
+                    if (angular.isDefined(params.flags)) {
+                        url = Triarc.Data.appendUrlParameter(url, "flags", encodeURIComponent(params.flags));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Project", "any", false);
+                    return dataRequest;
+                };
+                ProjectResource.prototype.setFlags = function (params) {
+                    var request = this.setFlagsRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ProjectResource.prototype.newProjectPersonVm = function () {
+                    return {};
+                };
+                ProjectResource.prototype.newProjectLocationVm = function () {
+                    return {};
+                };
+                ProjectResource.prototype.newProjectCm = function () {
+                    return {};
+                };
+                ProjectResource.prototype.newProjectVm = function () {
+                    return {};
+                };
+                return ProjectResource;
+            })();
+            Data.ProjectResource = ProjectResource;
+            ;
+            var ExpensesResource = (function () {
+                function ExpensesResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                ExpensesResource.prototype.addOrUpdateExpenseRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Expenses/AddOrUpdateExpense";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Expenses", "IExpenseCm", true);
+                    return dataRequest;
+                };
+                ExpensesResource.prototype.addOrUpdateExpense = function (data) {
+                    var request = this.addOrUpdateExpenseRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                ExpensesResource.prototype.searchMultipleRequest = function (params, data) {
+                    var url = this.$requestSender.getUrl() + "/Expenses/Search";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Expenses", "IExpenseCm[]", true);
+                    return dataRequest;
+                };
+                ExpensesResource.prototype.searchMultiple = function (params, data) {
+                    var request = this.searchMultipleRequest(params, data);
+                    return this.$requestSender.requestValue(request);
+                };
+                ExpensesResource.prototype.getExpenseTypesMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Expenses/GetExpenseTypes";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Expenses", "IExpenseTypeCm[]", false);
+                    return dataRequest;
+                };
+                ExpensesResource.prototype.getExpenseTypesMultiple = function (params) {
+                    var request = this.getExpenseTypesMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ExpensesResource.prototype.newExpenseCm = function () {
+                    return {};
+                };
+                ExpensesResource.prototype.newExpenseTypeCm = function () {
+                    return {};
+                };
+                ExpensesResource.prototype.newExpensesSearchCm = function () {
+                    return {};
+                };
+                return ExpensesResource;
+            })();
+            Data.ExpensesResource = ExpensesResource;
+            ;
+            var ConfigResource = (function () {
+                function ConfigResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                ConfigResource.prototype.getRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Config/Get";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Config", "IConfigVm", false);
+                    return dataRequest;
+                };
+                ConfigResource.prototype.get = function () {
+                    var request = this.getRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                ConfigResource.prototype.putRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Config/Put";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Config", "any", true);
+                    return dataRequest;
+                };
+                ConfigResource.prototype.put = function (data) {
+                    var request = this.putRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                ConfigResource.prototype.newConfigVm = function () {
+                    return {};
+                };
+                ConfigResource.prototype.newSaveConfigVm = function () {
+                    return {};
+                };
+                return ConfigResource;
+            })();
+            Data.ConfigResource = ConfigResource;
+            ;
+            var ConfigurationProfileResource = (function () {
+                function ConfigurationProfileResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                ConfigurationProfileResource.prototype.getConfigsMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/ConfigurationProfile/GetConfigs";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "ConfigurationProfile", "IProfileConfigVm[]", false);
+                    return dataRequest;
+                };
+                ConfigurationProfileResource.prototype.getConfigsMultiple = function (params) {
+                    var request = this.getConfigsMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ConfigurationProfileResource.prototype.deleteRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/ConfigurationProfile/Delete";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "ConfigurationProfile", "any", true);
+                    return dataRequest;
+                };
+                ConfigurationProfileResource.prototype.delete = function (data) {
+                    var request = this.deleteRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                ConfigurationProfileResource.prototype.saveRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/ConfigurationProfile/Save";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "ConfigurationProfile", "any", true);
+                    return dataRequest;
+                };
+                ConfigurationProfileResource.prototype.save = function (data) {
+                    var request = this.saveRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                ConfigurationProfileResource.prototype.newProfileConfigVm = function () {
+                    return {};
+                };
+                return ConfigurationProfileResource;
+            })();
+            Data.ConfigurationProfileResource = ConfigurationProfileResource;
+            ;
+            var WorkReportResource = (function () {
+                function WorkReportResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                WorkReportResource.prototype.getRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/WorkReport/Get";
+                    if (angular.isDefined(params.externalWorkReportId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "externalWorkReportId", encodeURIComponent(params.externalWorkReportId));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "WorkReport", "IExternalWorkReportCm", false);
+                    return dataRequest;
+                };
+                WorkReportResource.prototype.get = function (params) {
+                    var request = this.getRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                WorkReportResource.prototype.newExternalWorkReportCm = function () {
+                    return {};
+                };
+                return WorkReportResource;
+            })();
+            Data.WorkReportResource = WorkReportResource;
+            ;
+            var ClaimResource = (function () {
+                function ClaimResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                ClaimResource.prototype.getClaimsMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Claim/GetClaims";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Claim", "IFeatureClaimVm[]", false);
+                    return dataRequest;
+                };
+                ClaimResource.prototype.getClaimsMultiple = function (params) {
+                    var request = this.getClaimsMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                ClaimResource.prototype.newFeatureClaimVm = function () {
+                    return {};
+                };
+                return ClaimResource;
+            })();
+            Data.ClaimResource = ClaimResource;
+            ;
+            var SaldoResource = (function () {
+                function SaldoResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                SaldoResource.prototype.getByIdRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Saldo/GetById";
+                    if (angular.isDefined(params.employeeId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "employeeId", encodeURIComponent(params.employeeId));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Saldo", "ISaldo", false);
+                    return dataRequest;
+                };
+                SaldoResource.prototype.getById = function (params) {
+                    var request = this.getByIdRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                SaldoResource.prototype.newSaldo = function () {
+                    return {};
+                };
+                return SaldoResource;
+            })();
+            Data.SaldoResource = SaldoResource;
+            ;
+            var WorkObjectResource = (function () {
+                function WorkObjectResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                WorkObjectResource.prototype.getProjectsForLocationMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/WorkObject/GetProjectsForLocation";
+                    if (angular.isDefined(params.locationId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "locationId", encodeURIComponent(params.locationId));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "WorkObject", "IWorkObjectViewModel[]", false);
+                    return dataRequest;
+                };
+                WorkObjectResource.prototype.getProjectsForLocationMultiple = function (params) {
+                    var request = this.getProjectsForLocationMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                WorkObjectResource.prototype.newWorkObjectViewModel = function () {
+                    return {};
+                };
+                return WorkObjectResource;
+            })();
+            Data.WorkObjectResource = WorkObjectResource;
+            ;
+            var AccountResource = (function () {
+                function AccountResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                AccountResource.prototype.getAppUserRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Account/GetAppUser";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Account", "IAppUser", false);
+                    return dataRequest;
+                };
+                AccountResource.prototype.getAppUser = function () {
+                    var request = this.getAppUserRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.loginRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Account/Login";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
+                    return dataRequest;
+                };
+                AccountResource.prototype.login = function (data) {
+                    var request = this.loginRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.getUsersMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Account/GetUsers";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Account", "IUserVm[]", false);
+                    return dataRequest;
+                };
+                AccountResource.prototype.getUsersMultiple = function (params) {
+                    var request = this.getUsersMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.searchMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Account/Search";
+                    if (angular.isDefined(params.search)) {
+                        url = Triarc.Data.appendUrlParameter(url, "search", encodeURIComponent(params.search));
+                    }
+                    if (angular.isDefined(params.skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "skip", encodeURIComponent(params.skip));
+                    }
+                    if (angular.isDefined(params.take)) {
+                        url = Triarc.Data.appendUrlParameter(url, "take", encodeURIComponent(params.take));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Account", "IUserVm[]", false);
+                    return dataRequest;
+                };
+                AccountResource.prototype.searchMultiple = function (params) {
+                    var request = this.searchMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.createUserRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Account/CreateUser";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
+                    return dataRequest;
+                };
+                AccountResource.prototype.createUser = function (data) {
+                    var request = this.createUserRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.editUserRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Account/EditUser";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
+                    return dataRequest;
+                };
+                AccountResource.prototype.editUser = function (data) {
+                    var request = this.editUserRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.resetPasswordRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Account/ResetPassword";
+                    if (angular.isDefined(params.userId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "userId", encodeURIComponent(params.userId));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Account", "any", false);
+                    return dataRequest;
+                };
+                AccountResource.prototype.resetPassword = function (params) {
+                    var request = this.resetPasswordRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.deleteRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Account/Delete";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
+                    return dataRequest;
+                };
+                AccountResource.prototype.delete = function (data) {
+                    var request = this.deleteRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.pingRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Account/Ping";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Account", "any", false);
+                    return dataRequest;
+                };
+                AccountResource.prototype.ping = function () {
+                    var request = this.pingRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.logoutRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Account/Logout";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Account", "any", false);
+                    return dataRequest;
+                };
+                AccountResource.prototype.logout = function () {
+                    var request = this.logoutRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.getUserInfoRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/Account/GetUserInfo";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Account", "IUserInfoViewModel", false);
+                    return dataRequest;
+                };
+                AccountResource.prototype.getUserInfo = function () {
+                    var request = this.getUserInfoRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.getManageInfoRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Account/GetManageInfo";
+                    if (angular.isDefined(params.returnUrl)) {
+                        url = Triarc.Data.appendUrlParameter(url, "returnUrl", encodeURIComponent(params.returnUrl));
+                    }
+                    if (angular.isDefined(params.generateState)) {
+                        url = Triarc.Data.appendUrlParameter(url, "generateState", encodeURIComponent(params.generateState));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Account", "IManageInfoViewModel", false);
+                    return dataRequest;
+                };
+                AccountResource.prototype.getManageInfo = function (params) {
+                    var request = this.getManageInfoRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.changePasswordRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Account/ChangePassword";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
+                    return dataRequest;
+                };
+                AccountResource.prototype.changePassword = function (data) {
+                    var request = this.changePasswordRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.setPasswordRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Account/SetPassword";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
+                    return dataRequest;
+                };
+                AccountResource.prototype.setPassword = function (data) {
+                    var request = this.setPasswordRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.addExternalLoginRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Account/AddExternalLogin";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
+                    return dataRequest;
+                };
+                AccountResource.prototype.addExternalLogin = function (data) {
+                    var request = this.addExternalLoginRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.removeLoginRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Account/RemoveLogin";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
+                    return dataRequest;
+                };
+                AccountResource.prototype.removeLogin = function (data) {
+                    var request = this.removeLoginRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.getExternalLoginRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Account/GetExternalLogin";
+                    if (angular.isDefined(params.provider)) {
+                        url = Triarc.Data.appendUrlParameter(url, "provider", encodeURIComponent(params.provider));
+                    }
+                    if (angular.isDefined(params.error)) {
+                        url = Triarc.Data.appendUrlParameter(url, "error", encodeURIComponent(params.error));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Account", "any", false);
+                    return dataRequest;
+                };
+                AccountResource.prototype.getExternalLogin = function (params) {
+                    var request = this.getExternalLoginRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.getExternalLoginsMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Account/GetExternalLogins";
+                    if (angular.isDefined(params.returnUrl)) {
+                        url = Triarc.Data.appendUrlParameter(url, "returnUrl", encodeURIComponent(params.returnUrl));
+                    }
+                    if (angular.isDefined(params.generateState)) {
+                        url = Triarc.Data.appendUrlParameter(url, "generateState", encodeURIComponent(params.generateState));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Account", "IExternalLoginViewModel[]", false);
+                    return dataRequest;
+                };
+                AccountResource.prototype.getExternalLoginsMultiple = function (params) {
+                    var request = this.getExternalLoginsMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.registerRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Account/Register";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
+                    return dataRequest;
+                };
+                AccountResource.prototype.register = function (data) {
+                    var request = this.registerRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.registerExternalRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Account/RegisterExternal";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
+                    return dataRequest;
+                };
+                AccountResource.prototype.registerExternal = function (data) {
+                    var request = this.registerExternalRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                AccountResource.prototype.newAppUser = function () {
+                    return {};
+                };
+                AccountResource.prototype.newUserVm = function () {
+                    return {};
+                };
+                AccountResource.prototype.newUserInfoViewModel = function () {
+                    return {};
+                };
+                AccountResource.prototype.newManageInfoViewModel = function () {
+                    return {};
+                };
+                AccountResource.prototype.newExternalLoginViewModel = function () {
+                    return {};
+                };
+                AccountResource.prototype.newLoginViewModel = function () {
+                    return {};
+                };
+                AccountResource.prototype.newChangePasswordBindingModel = function () {
+                    return {};
+                };
+                AccountResource.prototype.newSetPasswordBindingModel = function () {
+                    return {};
+                };
+                AccountResource.prototype.newAddExternalLoginBindingModel = function () {
+                    return {};
+                };
+                AccountResource.prototype.newRemoveLoginBindingModel = function () {
+                    return {};
+                };
+                AccountResource.prototype.newRegisterVm = function () {
+                    return {};
+                };
+                AccountResource.prototype.newRegisterExternalBindingModel = function () {
+                    return {};
+                };
+                AccountResource.prototype.newPersonVm = function () {
+                    return {};
+                };
+                AccountResource.prototype.newLocationVm = function () {
+                    return {};
+                };
+                AccountResource.prototype.newAppConfig = function () {
+                    return {};
+                };
+                return AccountResource;
+            })();
+            Data.AccountResource = AccountResource;
+            ;
+            var PersonalMessageResource = (function () {
+                function PersonalMessageResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                PersonalMessageResource.prototype.getLatestMessagesMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/PersonalMessage/GetLatestMessages";
+                    if (angular.isDefined(params.employeeId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "employeeId", encodeURIComponent(params.employeeId));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "PersonalMessage", "IMessage[]", false);
+                    return dataRequest;
+                };
+                PersonalMessageResource.prototype.getLatestMessagesMultiple = function (params) {
+                    var request = this.getLatestMessagesMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                PersonalMessageResource.prototype.saveMessageRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/PersonalMessage/SaveMessage";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "PersonalMessage", "any", true);
+                    return dataRequest;
+                };
+                PersonalMessageResource.prototype.saveMessage = function (data) {
+                    var request = this.saveMessageRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                PersonalMessageResource.prototype.markAsReadRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/PersonalMessage/MarkAsRead";
+                    if (angular.isDefined(params.messageId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "messageId", encodeURIComponent(params.messageId));
+                    }
+                    if (angular.isDefined(params.personId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "personId", encodeURIComponent(params.personId));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "PersonalMessage", "any", false);
+                    return dataRequest;
+                };
+                PersonalMessageResource.prototype.markAsRead = function (params) {
+                    var request = this.markAsReadRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                PersonalMessageResource.prototype.getSentMessagesMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/PersonalMessage/GetSentMessages";
+                    if (angular.isDefined(params.personId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "personId", encodeURIComponent(params.personId));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "PersonalMessage", "ISentMessage[]", false);
+                    return dataRequest;
+                };
+                PersonalMessageResource.prototype.getSentMessagesMultiple = function (params) {
+                    var request = this.getSentMessagesMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                PersonalMessageResource.prototype.newMessage = function () {
+                    return {};
+                };
+                PersonalMessageResource.prototype.newSentMessage = function () {
+                    return {};
+                };
+                PersonalMessageResource.prototype.newSaveMessage = function () {
+                    return {};
+                };
+                return PersonalMessageResource;
+            })();
+            Data.PersonalMessageResource = PersonalMessageResource;
+            ;
+            var LocationResource = (function () {
+                function LocationResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                LocationResource.prototype.getLocationByIdRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Location/GetLocationById";
+                    if (angular.isDefined(params.id)) {
+                        url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Location", "ILocationVm", false);
+                    return dataRequest;
+                };
+                LocationResource.prototype.getLocationById = function (params) {
+                    var request = this.getLocationByIdRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                LocationResource.prototype.getMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Location/Get";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Location", "ILocationVm[]", false);
+                    return dataRequest;
+                };
+                LocationResource.prototype.getMultiple = function (params) {
+                    var request = this.getMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                LocationResource.prototype.putRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/Location/Put";
+                    var dataRequest = new Triarc.Data.DataRequest("PUT", url, data, "Location", "any", true);
+                    return dataRequest;
+                };
+                LocationResource.prototype.put = function (data) {
+                    var request = this.putRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                LocationResource.prototype.deleteRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/Location/Delete";
+                    if (angular.isDefined(params.id)) {
+                        url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("DELETE", url, {}, "Location", "any", false);
+                    return dataRequest;
+                };
+                LocationResource.prototype.delete = function (params) {
+                    var request = this.deleteRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                LocationResource.prototype.newLocationVm = function () {
+                    return {};
+                };
+                return LocationResource;
+            })();
+            Data.LocationResource = LocationResource;
+            ;
+            var TimeEntryResource = (function () {
+                function TimeEntryResource($requestSender) {
+                    this.$requestSender = $requestSender;
+                }
+                TimeEntryResource.prototype.postSingleRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/TimeEntry/PostSingle";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "any", true);
+                    return dataRequest;
+                };
+                TimeEntryResource.prototype.postSingle = function (data) {
+                    var request = this.postSingleRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeEntryResource.prototype.postMultipleRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/TimeEntry/PostMultiple";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "any", true);
+                    return dataRequest;
+                };
+                TimeEntryResource.prototype.postMultiple = function (data) {
+                    var request = this.postMultipleRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeEntryResource.prototype.validateUserRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/TimeEntry/ValidateUser";
+                    if (angular.isDefined(params.persNr)) {
+                        url = Triarc.Data.appendUrlParameter(url, "persNr", encodeURIComponent(params.persNr));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "TimeEntry", "ICheckUserResult", false);
+                    return dataRequest;
+                };
+                TimeEntryResource.prototype.validateUser = function (params) {
+                    var request = this.validateUserRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeEntryResource.prototype.putRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/TimeEntry/Put";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "boolean", true);
+                    return dataRequest;
+                };
+                TimeEntryResource.prototype.put = function (data) {
+                    var request = this.putRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeEntryResource.prototype.deleteRequest = function (data) {
+                    var url = this.$requestSender.getUrl() + "/TimeEntry/Delete";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "boolean", true);
+                    return dataRequest;
+                };
+                TimeEntryResource.prototype.delete = function (data) {
+                    var request = this.deleteRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeEntryResource.prototype.validateWorkObjectRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/TimeEntry/ValidateWorkObject";
+                    if (angular.isDefined(params.objectNumber)) {
+                        url = Triarc.Data.appendUrlParameter(url, "objectNumber", encodeURIComponent(params.objectNumber));
+                    }
+                    if (angular.isDefined(params.positionNumber)) {
+                        url = Triarc.Data.appendUrlParameter(url, "positionNumber", encodeURIComponent(params.positionNumber));
+                    }
+                    if (angular.isDefined(params.personalNumber)) {
+                        url = Triarc.Data.appendUrlParameter(url, "personalNumber", encodeURIComponent(params.personalNumber));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "TimeEntry", "EAuftragVerificationStatus", false);
+                    return dataRequest;
+                };
+                TimeEntryResource.prototype.validateWorkObject = function (params) {
+                    var request = this.validateWorkObjectRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeEntryResource.prototype.upateLegacyEntriesRequest = function () {
+                    var url = this.$requestSender.getUrl() + "/TimeEntry/UpateLegacyEntries";
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "TimeEntry", "any", false);
+                    return dataRequest;
+                };
+                TimeEntryResource.prototype.upateLegacyEntries = function () {
+                    var request = this.upateLegacyEntriesRequest();
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeEntryResource.prototype.searchTimeEntriesMultipleRequest = function (params, data) {
+                    var url = this.$requestSender.getUrl() + "/TimeEntry/SearchTimeEntries";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "ITimeEntryVm[]", true);
+                    return dataRequest;
+                };
+                TimeEntryResource.prototype.searchTimeEntriesMultiple = function (params, data) {
+                    var request = this.searchTimeEntriesMultipleRequest(params, data);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeEntryResource.prototype.getAvailableBookingTypesMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl() + "/TimeEntry/GetAvailableBookingTypes";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "TimeEntry", "string[]", false);
+                    return dataRequest;
+                };
+                TimeEntryResource.prototype.getAvailableBookingTypesMultiple = function (params) {
+                    var request = this.getAvailableBookingTypesMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeEntryResource.prototype.newCheckUserResult = function () {
+                    return {};
+                };
+                TimeEntryResource.prototype.newTimeEntryVm = function () {
+                    return {};
+                };
+                TimeEntryResource.prototype.newTimeEntryModel = function () {
+                    return {};
+                };
+                TimeEntryResource.prototype.newTimeEntryCollection = function () {
+                    return {};
+                };
+                TimeEntryResource.prototype.newTimeEntrySearchVm = function () {
+                    return {};
+                };
+                return TimeEntryResource;
+            })();
+            Data.TimeEntryResource = TimeEntryResource;
+            var mod = angular.module("tlDataServices");
+            mod.provider('$tr-proxy', function () {
+                return {
+                    $get: ['$requestSender', function ($requestSender) {
+                        var proxy = {
+                            Version: new VersionResource($requestSender),
+                            Image: new ImageResource($requestSender),
+                            Employee: new EmployeeResource($requestSender),
+                            Address: new AddressResource($requestSender),
+                            Timesheet: new TimesheetResource($requestSender),
+                            Operation: new OperationResource($requestSender),
+                            TimeBooking: new TimeBookingResource($requestSender),
+                            Admin: new AdminResource($requestSender),
+                            GlobalMessage: new GlobalMessageResource($requestSender),
+                            Person: new PersonResource($requestSender),
+                            Project: new ProjectResource($requestSender),
+                            Expenses: new ExpensesResource($requestSender),
+                            Config: new ConfigResource($requestSender),
+                            ConfigurationProfile: new ConfigurationProfileResource($requestSender),
+                            WorkReport: new WorkReportResource($requestSender),
+                            Claim: new ClaimResource($requestSender),
+                            Saldo: new SaldoResource($requestSender),
+                            WorkObject: new WorkObjectResource($requestSender),
+                            Account: new AccountResource($requestSender),
+                            PersonalMessage: new PersonalMessageResource($requestSender),
+                            Location: new LocationResource($requestSender),
+                            TimeEntry: new TimeEntryResource($requestSender),
+                        };
+                        return proxy;
+                    }]
+                };
+            });
+        })(Data = Web.Data || (Web.Data = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
 var timeRecorder = angular.module("tl-time-recorder", [
     "tlDataServices",
     "tlAuth",
@@ -1715,6 +2010,22 @@ timeRecorder.config([
         $stateProvider.state("tr.projects", {
             url: "/projects",
             templateUrl: "Client/Views/projects.html",
+        });
+        $stateProvider.state("tr.expenses", {
+            url: "/expenses",
+            templateUrl: "Client/Views/expenses.html"
+        });
+        $stateProvider.state("tr.expensesAdd", {
+            url: "/expenses/add",
+            templateUrl: "Client/Views/expenses.form.html"
+        });
+        $stateProvider.state("tr.expensesEdit", {
+            url: "/expenses/edit/:id",
+            templateUrl: "Client/Views/expenses.form.html"
+        });
+        $stateProvider.state("tr.employeeInvoiceReport", {
+            url: "/employeeInvoiceReport",
+            templateUrl: "Client/Views/employee/employeeInvoiceReport.html"
         });
         $stateProvider.state("tr.timebookings", {
             url: "/timebookings",
@@ -1854,99 +2165,1307 @@ var TimeRecorder;
 (function (TimeRecorder) {
     var Web;
     (function (Web) {
-        var AuthenticationService = (function () {
-            function AuthenticationService($proxy, $q) {
-                var _this = this;
-                this.$proxy = $proxy;
-                this.$q = $q;
-                this.getAppUser = function () {
-                    var d = _this.$q.defer();
-                    if (angular.isDefined(_this.appUser)) {
-                        d.resolve(_this.appUser);
-                        return d.promise;
-                    }
-                    _this.$proxy.Account.getAppUser().then(function (response) {
-                        var au = response.data;
-                        if (au) {
-                            d.resolve(au);
-                            _this.appUser = au;
-                            _this.isAuthenticated = true;
-                        }
-                        else {
-                            _this.isAuthenticated = false;
-                            d.reject();
-                        }
-                    }, function () {
-                        _this.isAuthenticated = false;
-                        d.reject();
-                    });
-                    return d.promise;
-                };
-                this.login = function (password, userName, rememberMe) {
-                    var d = _this.$q.defer();
-                    var loginVm = { password: password, username: userName, rememberMe: rememberMe };
-                    if (rememberMe) {
-                    }
-                    _this.$proxy.Account.login(loginVm).then(function () {
-                        _this.$proxy.Account.getAppUser().then(function (response) {
-                            _this.appUser = response.data;
-                            _this.isAuthenticated = true;
-                            d.resolve();
-                        }, function (err) {
-                            d.reject();
-                        });
-                    }, function (error) {
-                        console.log("login fail...");
-                        d.reject();
-                    });
-                    return d.promise;
-                };
-                this.logout = function () {
-                    _this.$proxy.Account.logout().then(function () {
-                        _this.appUser = null;
-                        _this.isAuthenticated = false;
-                    }, function () {
-                    });
-                };
-            }
-            AuthenticationService.prototype.hasClaim = function (claim) {
-                var _this = this;
-                var q = this.$q.defer();
-                if (angular.isDefined(this.appUser)) {
-                    if (angular.isDefined(this.appUser.person))
-                        q.resolve(this.appUser.isAdmin || this.containsClaim(this.appUser.person.claimConfigurations, claim));
-                    else {
-                        q.resolve(false);
-                    }
+        var Business;
+        (function (Business) {
+            var TimesheetEntryTypeVm = (function () {
+                function TimesheetEntryTypeVm(cm) {
+                    this.cm = cm;
                 }
-                else {
-                    this.getAppUser().then(function (au) {
-                        if (angular.isDefined(au.person))
-                            q.resolve(au.isAdmin || _this.containsClaim(au.person.claimConfigurations, claim));
-                        else {
-                            q.resolve(false);
-                        }
-                    }, function () {
-                        q.resolve(false);
-                    });
-                }
-                return q.promise;
-            };
-            AuthenticationService.prototype.containsClaim = function (col, claim) {
-                for (var i = 0; i < col.length; i++) {
-                    if (col[i].featureClaim.claim === claim)
-                        return true;
-                }
-                return false;
-            };
-            AuthenticationService.$inject = ["$proxy", "$q"];
-            AuthenticationService.serviceId = "authentication";
-            return AuthenticationService;
-        })();
-        Web.AuthenticationService = AuthenticationService;
-        timeRecorder.service(AuthenticationService.serviceId, AuthenticationService);
+                Object.defineProperty(TimesheetEntryTypeVm.prototype, "id", {
+                    get: function () {
+                        return this.cm().id;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetEntryTypeVm.prototype, "abbreviation", {
+                    get: function () {
+                        return this.cm().abbreviation;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetEntryTypeVm.prototype, "name", {
+                    get: function () {
+                        return this.cm().name;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return TimesheetEntryTypeVm;
+            })();
+            Business.TimesheetEntryTypeVm = TimesheetEntryTypeVm;
+        })(Business = Web.Business || (Web.Business = {}));
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var TimesheetAvailabilityTimeEntryVm = (function () {
+                function TimesheetAvailabilityTimeEntryVm(cm, entryType) {
+                    this.cm = cm;
+                    this.entryType = entryType;
+                }
+                Object.defineProperty(TimesheetAvailabilityTimeEntryVm.prototype, "entryTypeId", {
+                    get: function () {
+                        return this.cm().entryTypeId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetAvailabilityTimeEntryVm.prototype, "mins", {
+                    get: function () {
+                        return this.cm().mins;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetAvailabilityTimeEntryVm.prototype, "abbreviation", {
+                    get: function () {
+                        return this.entryType().abbreviation;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetAvailabilityTimeEntryVm.prototype, "name", {
+                    get: function () {
+                        return this.entryType().name;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return TimesheetAvailabilityTimeEntryVm;
+            })();
+            Business.TimesheetAvailabilityTimeEntryVm = TimesheetAvailabilityTimeEntryVm;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var TimeEntryVm = (function () {
+                function TimeEntryVm(cm, availabilityEntryTypes) {
+                    var _this = this;
+                    this.cm = cm;
+                    this.availabilityEntryTypes = availabilityEntryTypes;
+                    this._totalUnavalable = null;
+                    this._availabilityTimeEntries = cm().availabilityTimeEntries.toEnumerable().select(function (te) {
+                        return new Business.TimesheetAvailabilityTimeEntryVm(function () { return te; }, function () { return _this.availabilityEntryTypes().toEnumerable().firstOrDefault(function (t) { return t.id === te.entryTypeId; }); });
+                    }).toArray();
+                    // fill in the missing availability time entries for drawing
+                    var entriesSet = this._availabilityTimeEntries.toEnumerable().select(function (te) { return te.entryTypeId; }).toArray();
+                    var unsetEntries = this.availabilityEntryTypes().toEnumerable().where(function (et) { return !entriesSet.contains(et.id); }).toArray();
+                    this._availabilityTimeEntries.addRange(unsetEntries.toEnumerable().select(function (e) { return new Business.TimesheetAvailabilityTimeEntryVm(function () {
+                        return {
+                            entryTypeId: e.id,
+                            mins: null
+                        };
+                    }, function () { return e; }); }).toArray());
+                }
+                Object.defineProperty(TimeEntryVm.prototype, "date", {
+                    get: function () {
+                        return this.cm().date;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimeEntryVm.prototype, "planned", {
+                    get: function () {
+                        return this.cm().plannedMins !== 0 ? this.cm().plannedMins : 240;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimeEntryVm.prototype, "done", {
+                    get: function () {
+                        // unavailabilities get added to the total done value
+                        return this.cm().doneMins + this.totalAvailability;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimeEntryVm.prototype, "availabilityTimeEntries", {
+                    get: function () {
+                        return this._availabilityTimeEntries;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimeEntryVm.prototype, "totalAvailability", {
+                    get: function () {
+                        var _this = this;
+                        if (Triarc.hasValue(this._totalUnavalable))
+                            return this._totalUnavalable;
+                        this._totalUnavalable = 0;
+                        this.cm().availabilityTimeEntries.forEach(function (a) {
+                            _this._totalUnavalable += angular.isNumber(a.mins) ? a.mins : 0;
+                        });
+                        return this._totalUnavalable;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return TimeEntryVm;
+            })();
+            Business.TimeEntryVm = TimeEntryVm;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+//    get sickLeave() {
+//      return this.cm().sickLeave;
+//    }
+//
+//    get sicknessWaitingPeriod() {
+//      return this.cm().sicknessWaitingPeriod;
+//    }
+//
+//    get dailySicknessAllowence() {
+//      return this.cm().dailySicknessAllowence;
+//    }
+//
+//    get accidentWaiting() {
+//      return this.cm().accidentWaiting;
+//    }
+//
+//    get accidentDailyAllowence() {
+//      return this.cm().accidentDailyAllowence;
+//    }
+//
+//    get holiday() {
+//      return this.cm().holiday;
+//    }
+//
+//    get maternityLeave() {
+//      return this.cm().maternityLeave;
+//    }
+//
+//    get absent() {
+//      return this.cm().absent;
+//    }
+//
+//
+//    get absentWithoutPay() {
+//      return this.cm().absentWithoutPay;
+//    }
+//
+//    get regionalHoliday() {
+//      return this.cm().regionalHoliday;
+//    } 
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var TimesheetEmployeeVm = (function () {
+                function TimesheetEmployeeVm(cm, availabilityEntryTypes) {
+                    this.cm = cm;
+                    this.availabilityEntryTypes = availabilityEntryTypes;
+                    this._totalMonthPlanned = null;
+                    this._totalMonthDone = null;
+                    this._totalMonthUnAvailable = null;
+                }
+                Object.defineProperty(TimesheetEmployeeVm.prototype, "id", {
+                    get: function () {
+                        return this.cm().id;
+                    },
+                    set: function (id) {
+                        this.cm().id = id;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetEmployeeVm.prototype, "name", {
+                    get: function () {
+                        return this.firstName + " " + this.lastName;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetEmployeeVm.prototype, "firstName", {
+                    get: function () {
+                        return this.cm().firstName;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetEmployeeVm.prototype, "lastName", {
+                    get: function () {
+                        return this.cm().lastName;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetEmployeeVm.prototype, "timeEntries", {
+                    get: function () {
+                        var _this = this;
+                        if (angular.isArray(this._dayEntries))
+                            return this._dayEntries;
+                        this._dayEntries = [];
+                        this._dayEntries = this.cm().timeEntries.toEnumerable().select(function (te) { return new Business.TimeEntryVm(function () { return te; }, function () { return _this.availabilityEntryTypes(); }); }).toArray();
+                        return this._dayEntries;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                TimesheetEmployeeVm.prototype.timeEntry = function (date) {
+                    var _this = this;
+                    var timeEntry = this.timeEntries.toEnumerable().firstOrDefault(function (te) { return moment(te.date).isSame(moment(date), "day"); });
+                    if (Triarc.hasNoValue(timeEntry)) {
+                        timeEntry = new Business.TimeEntryVm(function () { return {
+                            plannedMins: 0,
+                            doneMins: 0,
+                            date: new Date(date.getTime()),
+                            availabilityTimeEntries: []
+                        }; }, function () { return _this.availabilityEntryTypes(); });
+                        this.timeEntries.add(timeEntry);
+                    }
+                    return timeEntry;
+                };
+                Object.defineProperty(TimesheetEmployeeVm.prototype, "totalMonthPlanned", {
+                    get: function () {
+                        var _this = this;
+                        if (Triarc.hasValue(this._totalMonthPlanned))
+                            return this._totalMonthPlanned;
+                        this._totalMonthPlanned = 0;
+                        var timeEntries = this.timeEntries;
+                        timeEntries.forEach(function (te) {
+                            _this._totalMonthPlanned += angular.isNumber(te.planned) ? te.planned : 0;
+                        });
+                        return this._totalMonthPlanned;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetEmployeeVm.prototype, "totalMonthDone", {
+                    get: function () {
+                        var _this = this;
+                        if (Triarc.hasValue(this._totalMonthDone))
+                            return this._totalMonthDone;
+                        this._totalMonthDone = 0;
+                        var timeEntries = this.timeEntries;
+                        timeEntries.forEach(function (te) {
+                            _this._totalMonthDone += angular.isNumber(te.done) ? te.done : 0;
+                        });
+                        return this._totalMonthDone;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetEmployeeVm.prototype, "totalMonthAvailabilityEntries", {
+                    get: function () {
+                        var _this = this;
+                        if (Triarc.hasValue(this._totalMonthUnAvailable))
+                            return this._totalMonthUnAvailable;
+                        this._totalMonthUnAvailable = 0;
+                        var timeEntries = this.timeEntries;
+                        timeEntries.forEach(function (te) {
+                            _this._totalMonthUnAvailable += angular.isNumber(te.totalAvailability) ? te.totalAvailability : 0;
+                        });
+                        return this._totalMonthUnAvailable;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                TimesheetEmployeeVm.prototype.totalMonthAvailabilityFor = function (availabilityEntryType) {
+                    var totalUnAvailability = 0;
+                    var timeEntries = this.timeEntries;
+                    timeEntries.forEach(function (te) {
+                        te.availabilityTimeEntries.forEach(function (unAvailability) {
+                            if (unAvailability.entryTypeId === availabilityEntryType.id) {
+                                totalUnAvailability += angular.isNumber(unAvailability.mins) ? unAvailability.mins : 0;
+                            }
+                        });
+                    });
+                    return totalUnAvailability;
+                };
+                TimesheetEmployeeVm.prototype.update = function (cm) {
+                };
+                TimesheetEmployeeVm.prototype.reset = function () {
+                };
+                TimesheetEmployeeVm.prototype.toCm = function () {
+                    var cm = this.cm();
+                    return cm;
+                };
+                return TimesheetEmployeeVm;
+            })();
+            Business.TimesheetEmployeeVm = TimesheetEmployeeVm;
+            ;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var TimesheetVm = (function () {
+                function TimesheetVm(cm) {
+                    this.cm = cm;
+                }
+                Object.defineProperty(TimesheetVm.prototype, "timeSheetEmployees", {
+                    get: function () {
+                        var _this = this;
+                        if (angular.isArray(this._timeSheetEmployees))
+                            return this._timeSheetEmployees;
+                        this._timeSheetEmployees = [];
+                        this._timeSheetEmployees.addRange(this.cm().timesheetEmployees.toEnumerable().select(function (e) { return new Business.TimesheetEmployeeVm(function () { return e; }, function () { return _this._availabilityEntryTypes; }); }).toArray());
+                        return this._timeSheetEmployees;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetVm.prototype, "thresholds", {
+                    get: function () {
+                        if (angular.isArray(this._thresholds))
+                            return this._thresholds;
+                        this._thresholds = [];
+                        this._thresholds.addRange(this.cm().thresholds.toEnumerable().select(function (t) { return new Business.TimesheetThresholdVm(function () { return t; }); }).toArray());
+                        return this._thresholds;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetVm.prototype, "availabilityEntryTypes", {
+                    get: function () {
+                        if (angular.isArray(this._availabilityEntryTypes))
+                            return this._availabilityEntryTypes;
+                        this._availabilityEntryTypes = [];
+                        this._availabilityEntryTypes.addRange(this.cm().timeEntryTypeCms.toEnumerable().select(function (t) { return new Business.TimesheetEntryTypeVm(function () { return t; }); }).toArray());
+                        return this._availabilityEntryTypes;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                TimesheetVm.prototype.update = function (cm) {
+                };
+                TimesheetVm.prototype.reset = function () {
+                };
+                TimesheetVm.prototype.toCm = function () {
+                    var cm = this.cm();
+                    return cm;
+                };
+                return TimesheetVm;
+            })();
+            Business.TimesheetVm = TimesheetVm;
+            ;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var TimesheetThresholdVm = (function () {
+                function TimesheetThresholdVm(cm) {
+                    this.cm = cm;
+                }
+                Object.defineProperty(TimesheetThresholdVm.prototype, "fromMins", {
+                    get: function () {
+                        return this.cm().fromMins;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetThresholdVm.prototype, "toMins", {
+                    get: function () {
+                        return this.cm().toMins;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetThresholdVm.prototype, "color", {
+                    get: function () {
+                        return this.cm().colorCode;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimesheetThresholdVm.prototype, "type", {
+                    get: function () {
+                        return this.cm().type;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return TimesheetThresholdVm;
+            })();
+            Business.TimesheetThresholdVm = TimesheetThresholdVm;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+/// <reference path="timesheetimeentrytypevm.ts" />
+/// <reference path="TimesheetAvailabilityTimeEntryVm.ts" />
+/// <reference path="TimesheetEntryVm.ts" />
+/// <reference path="timesheetemployeevm.ts" />
+/// <reference path="timesheetvm.ts" />
+/// <reference path="timesheetthreshold.ts" />
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ExpenseVm = (function () {
+                function ExpenseVm(cm) {
+                    this.cm = cm;
+                }
+                Object.defineProperty(ExpenseVm.prototype, "id", {
+                    get: function () {
+                        return this.cm().id;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseVm.prototype, "description", {
+                    get: function () {
+                        return this.cm().description;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseVm.prototype, "employeeId", {
+                    get: function () {
+                        return this.cm().employeeId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseVm.prototype, "value", {
+                    get: function () {
+                        return this.cm().value;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseVm.prototype, "timestamp", {
+                    get: function () {
+                        return this.cm().timestamp;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseVm.prototype, "expenseTypeId", {
+                    get: function () {
+                        return this.cm().expenseTypeId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseVm.prototype, "visaEmployeeId", {
+                    get: function () {
+                        return this.cm().visaEmployeeId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseVm.prototype, "visaTimestamp", {
+                    get: function () {
+                        return this.cm().visaTimestamp;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return ExpenseVm;
+            })();
+            Business.ExpenseVm = ExpenseVm;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ExpenseTypeVm = (function () {
+                function ExpenseTypeVm(cm) {
+                    this.cm = cm;
+                }
+                Object.defineProperty(ExpenseTypeVm.prototype, "id", {
+                    get: function () {
+                        return this.cm().id;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseTypeVm.prototype, "name", {
+                    get: function () {
+                        return this.cm().name;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseTypeVm.prototype, "description", {
+                    get: function () {
+                        return this.cm().description;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseTypeVm.prototype, "validFrom", {
+                    get: function () {
+                        return this.cm().validFrom;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseTypeVm.prototype, "validTo", {
+                    get: function () {
+                        return this.cm().validTo;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseTypeVm.prototype, "default", {
+                    get: function () {
+                        return this.cm().default;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseTypeVm.prototype, "fixed", {
+                    get: function () {
+                        return this.cm().fixed;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExpenseTypeVm.prototype, "needAmount", {
+                    get: function () {
+                        return this.cm().needAmount;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return ExpenseTypeVm;
+            })();
+            Business.ExpenseTypeVm = ExpenseTypeVm;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Bu;
+        (function (Bu) {
+            var PersonVm = (function () {
+                function PersonVm(cm) {
+                    this.cm = cm;
+                }
+                Object.defineProperty(PersonVm.prototype, "mainAddressId", {
+                    get: function () {
+                        return this.cm().mainAddressId;
+                    },
+                    set: function (val) {
+                        this.cm().mainAddressId = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(PersonVm.prototype, "lastName", {
+                    get: function () {
+                        return this.cm().lastName;
+                    },
+                    set: function (val) {
+                        this.cm().lastName = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(PersonVm.prototype, "firstName", {
+                    get: function () {
+                        return this.cm().firstName;
+                    },
+                    set: function (val) {
+                        this.cm().firstName = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(PersonVm.prototype, "email", {
+                    get: function () {
+                        return this.cm().email;
+                    },
+                    set: function (val) {
+                        this.cm().email = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(PersonVm.prototype, "telephone", {
+                    get: function () {
+                        return this.cm().telephone;
+                    },
+                    set: function (val) {
+                        this.cm().telephone = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(PersonVm.prototype, "id", {
+                    get: function () {
+                        return this.cm().id;
+                    },
+                    set: function (val) {
+                        this.cm().id = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(PersonVm.prototype, "timestamp", {
+                    get: function () {
+                        return this.cm().timestamp;
+                    },
+                    set: function (val) {
+                        this.cm().timestamp = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(PersonVm.prototype, "fullName", {
+                    //    get clientId() {
+                    //      return this.cm().clientId;
+                    //    }
+                    //
+                    //    set clientId(val) {
+                    //      this.cm().clientId = val;
+                    //    }
+                    get: function () {
+                        return this.cm().firstName + " " + this.cm().lastName;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                PersonVm.prototype.update = function (entityCm) {
+                    this.reset();
+                    this.cm = function () { return entityCm; };
+                };
+                PersonVm.prototype.reset = function () {
+                };
+                return PersonVm;
+            })();
+            Bu.PersonVm = PersonVm;
+        })(Bu = Web.Bu || (Web.Bu = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var PersonVm = Web.Bu.PersonVm;
+            var EmployeeVm = (function (_super) {
+                __extends(EmployeeVm, _super);
+                function EmployeeVm(cm) {
+                    _super.call(this, cm);
+                    this.cm = cm;
+                }
+                Object.defineProperty(EmployeeVm.prototype, "employeeId", {
+                    get: function () {
+                        return this.cm().employeeId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(EmployeeVm.prototype, "profileId", {
+                    get: function () {
+                        return this.cm().profileId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(EmployeeVm.prototype, "userId", {
+                    get: function () {
+                        return this.cm().userId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(EmployeeVm.prototype, "userName", {
+                    get: function () {
+                        return this.cm().userName;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(EmployeeVm.prototype, "emergencyPin", {
+                    get: function () {
+                        return this.cm().emergencyPin;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(EmployeeVm.prototype, "externalId", {
+                    get: function () {
+                        return this.cm().externalId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(EmployeeVm.prototype, "bookingLock", {
+                    get: function () {
+                        return this.cm().bookingLock;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return EmployeeVm;
+            })(PersonVm);
+            Business.EmployeeVm = EmployeeVm;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ProjectVm = (function () {
+                function ProjectVm(cm) {
+                    this.cm = cm;
+                }
+                Object.defineProperty(ProjectVm.prototype, "id", {
+                    get: function () {
+                        return this.cm().id;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ProjectVm.prototype, "name", {
+                    get: function () {
+                        return this.cm().name;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ProjectVm.prototype, "parentId", {
+                    get: function () {
+                        return this.cm().parentId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ProjectVm.prototype, "description", {
+                    get: function () {
+                        return this.cm().description;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ProjectVm.prototype, "bookable", {
+                    get: function () {
+                        return this.cm().bookable;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return ProjectVm;
+            })();
+            Business.ProjectVm = ProjectVm;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ClientVm = (function () {
+                function ClientVm(cm) {
+                    this.cm = cm;
+                }
+                Object.defineProperty(ClientVm.prototype, "id", {
+                    get: function () {
+                        return this.cm().id;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ClientVm.prototype, "name", {
+                    get: function () {
+                        return this.cm().name;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ClientVm.prototype, "mainContact", {
+                    get: function () {
+                        return null;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ClientVm.prototype, "mainAddress", {
+                    get: function () {
+                        return null;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return ClientVm;
+            })();
+            Business.ClientVm = ClientVm;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ExternalWorkReportVm = (function () {
+                function ExternalWorkReportVm(cm) {
+                    this.cm = cm;
+                }
+                Object.defineProperty(ExternalWorkReportVm.prototype, "id", {
+                    get: function () {
+                        return this.cm().id;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExternalWorkReportVm.prototype, "from", {
+                    get: function () {
+                        return this.cm().from;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExternalWorkReportVm.prototype, "to", {
+                    get: function () {
+                        return this.cm().to;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExternalWorkReportVm.prototype, "signatureImage", {
+                    get: function () {
+                        return this.cm().signatureImage;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExternalWorkReportVm.prototype, "signatureTimestamp", {
+                    get: function () {
+                        return this.cm().signatureTimestamp;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExternalWorkReportVm.prototype, "projectCompleted", {
+                    get: function () {
+                        return this.cm().projectCompleted;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExternalWorkReportVm.prototype, "project", {
+                    get: function () {
+                        if (Triarc.hasValue(this._project))
+                            return this.project;
+                        return null;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ExternalWorkReportVm.prototype, "signedClient", {
+                    get: function () {
+                        return this._signedClient;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return ExternalWorkReportVm;
+            })();
+            Business.ExternalWorkReportVm = ExternalWorkReportVm;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Bu;
+        (function (Bu) {
+            var ContactVm = (function (_super) {
+                __extends(ContactVm, _super);
+                function ContactVm(cm) {
+                    _super.call(this, cm);
+                    this.cm = cm;
+                }
+                Object.defineProperty(ContactVm.prototype, "clientId", {
+                    get: function () {
+                        return this.cm().clientId;
+                    },
+                    set: function (val) {
+                        this.cm().clientId = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                ContactVm.prototype.update = function (entityCm) {
+                    this.reset();
+                    this.cm = function () { return entityCm; };
+                };
+                ContactVm.prototype.reset = function () {
+                };
+                return ContactVm;
+            })(Bu.PersonVm);
+            Bu.ContactVm = ContactVm;
+        })(Bu = Web.Bu || (Web.Bu = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+/// <reference path="timesheet/_timesheet_vm_references.ts" />
+/// <reference path="expensevm.ts" />
+/// <reference path="expensetypevm.ts" />
+/// <reference path="personvm.ts" />
+/// <reference path="EmployeeVm.ts" />
+/// <reference path="projectvm.ts" />
+/// <reference path="clientvm.ts" />
+/// <reference path="externalworkreportvm.ts" />
+/// <reference path="contactvm.ts" />
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ExpenseTypeRepository = (function () {
+                function ExpenseTypeRepository($proxy, $q) {
+                    this.$proxy = $proxy;
+                    this.$q = $q;
+                }
+                ExpenseTypeRepository.$inject = [
+                    "$tr-proxy",
+                    "$q"
+                ];
+                ExpenseTypeRepository.serviceId = "ExpenseTypeRepository";
+                return ExpenseTypeRepository;
+            })();
+            Business.ExpenseTypeRepository = ExpenseTypeRepository;
+            timeRecorder.service(ExpenseTypeRepository.serviceId, ExpenseTypeRepository);
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ExpenseRepository = (function () {
+                function ExpenseRepository($proxy, $q) {
+                    this.$proxy = $proxy;
+                    this.$q = $q;
+                }
+                //getAllPersons(): ng.IPromise<Data.IPersonVm[]> {
+                //  return null;
+                //}
+                //getPersonById(id: number): ng.IPromise<Data.IPersonVm> {
+                //  return null;
+                //}
+                //getPersonsById(ids: number[]): ng.IPromise<Data.IPersonVm[]> {
+                //  return null;
+                //}
+                ExpenseRepository.prototype.search = function () {
+                    //return null;
+                    return this.$proxy.Expenses.searchMultiple({}, {}).then(function (response) { return response.data; });
+                };
+                ExpenseRepository.$inject = [
+                    "$tr-proxy",
+                    "$q"
+                ];
+                ExpenseRepository.serviceId = "ExpenseRepository";
+                return ExpenseRepository;
+            })();
+            Business.ExpenseRepository = ExpenseRepository;
+            timeRecorder.service(ExpenseRepository.serviceId, ExpenseRepository);
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ProjectRepository = (function () {
+                function ProjectRepository($proxy, $q) {
+                    this.$proxy = $proxy;
+                    this.$q = $q;
+                }
+                ProjectRepository.prototype.getProjectById = function (id) {
+                    return this.$proxy.Project.getProjectById({ projectId: id }).then(function (p) { return p.data; });
+                };
+                ProjectRepository.prototype.search = function (searchValue, skip, take) {
+                    return this.$proxy.Project.searchProjectsMultiple({ searchValue: searchValue, skip: skip, take: take }).then(function (ret) { return ret.data; });
+                };
+                ProjectRepository.$inject = [
+                    "$tr-proxy",
+                    "$q"
+                ];
+                ProjectRepository.serviceId = "ProjectRepository";
+                return ProjectRepository;
+            })();
+            Business.ProjectRepository = ProjectRepository;
+            timeRecorder.service(ProjectRepository.serviceId, ProjectRepository);
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var PersonVm = Web.Bu.PersonVm;
+            var PeopleRepository = (function () {
+                function PeopleRepository($proxy) {
+                    this.$proxy = $proxy;
+                }
+                PeopleRepository.prototype.getContactsForClient = function (clientId, isLiveData) {
+                    return this.$proxy.Person.getContactsForClientMultiple({ clientId: clientId }).then(function (response) {
+                        return response.data.toEnumerable().select(function (p) { return new PersonVm(function () { return p; }); }).toArray();
+                    });
+                };
+                PeopleRepository.prototype.getPerson = function (id, isLiveData) {
+                    return this.$proxy.Person.getContact({ contactId: id }).then(function (response) { return response.data; });
+                };
+                PeopleRepository.prototype.searchPeople = function (searchString) {
+                    return this.$proxy.Person.searchPeopleMultiple({ searchString: searchString }).then(function (response) { return response.data; });
+                };
+                PeopleRepository.$inject = [
+                    "$tr-proxy"
+                ];
+                PeopleRepository.serviceId = "PeopleRepository";
+                return PeopleRepository;
+            })();
+            Business.PeopleRepository = PeopleRepository;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var EmployeeRepository = (function () {
+                function EmployeeRepository($proxy) {
+                    this.$proxy = $proxy;
+                }
+                EmployeeRepository.prototype.getById = function (id) {
+                    return this.$proxy.Employee.getEmployeeById({ id: id }).then(function (response) { return response.data; });
+                };
+                EmployeeRepository.prototype.getAllEmployees = function () {
+                    return this.$proxy.Employee.getMultiple({}).then(function (response) { return response.data; });
+                };
+                EmployeeRepository.$inject = [
+                    "$tr-proxy"
+                ];
+                EmployeeRepository.serviceId = "EmployeeRepository";
+                return EmployeeRepository;
+            })();
+            Business.EmployeeRepository = EmployeeRepository;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+/// <reference path="expensetyperepository.ts" />
+/// <reference path="expenserepository.ts" />
+/// <reference path="projectrepository.ts" />
+/// <reference path="peoplerepository.ts" />
+/// <reference path="employeerespository.ts" />
+// Update the most local relative references and declare this service.
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var TimeSheetDataController = (function () {
+                function TimeSheetDataController($q, $proxy) {
+                    this.$q = $q;
+                    this.$proxy = $proxy;
+                }
+                TimeSheetDataController.serviceId = "$TimeSheetDataController";
+                TimeSheetDataController.$inject = ["$q", "$tr-proxy"];
+                return TimeSheetDataController;
+            })();
+            Business.TimeSheetDataController = TimeSheetDataController;
+            // declare correct angularjs module
+            timeRecorder.service(TimeSheetDataController.serviceId, TimeSheetDataController);
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ExpenseTypeDataController = (function () {
+                function ExpenseTypeDataController($q, expenseTypeRepository) {
+                    this.$q = $q;
+                    this.expenseTypeRepository = expenseTypeRepository;
+                }
+                ExpenseTypeDataController.serviceId = "ExpenseTypeDataController";
+                ExpenseTypeDataController.$inject = [
+                    "$q",
+                    Business.ExpenseRepository.serviceId
+                ];
+                return ExpenseTypeDataController;
+            })();
+            Business.ExpenseTypeDataController = ExpenseTypeDataController;
+            timeRecorder.service(ExpenseTypeDataController.serviceId, ExpenseTypeDataController);
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ExpenseDataController = (function () {
+                function ExpenseDataController($q, expenseRepository) {
+                    this.$q = $q;
+                    this.expenseRepository = expenseRepository;
+                }
+                ExpenseDataController.prototype.search = function () {
+                    return this.expenseRepository.search().then(function (expenses) { return expenses.toEnumerable().select(function (e) { return new Business.ExpenseVm(function () { return e; }); }).toArray(); });
+                };
+                ExpenseDataController.serviceId = "ExpenseDataController";
+                ExpenseDataController.$inject = [
+                    "$q",
+                    Business.ExpenseRepository.serviceId
+                ];
+                return ExpenseDataController;
+            })();
+            Business.ExpenseDataController = ExpenseDataController;
+            timeRecorder.service(ExpenseDataController.serviceId, ExpenseDataController);
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ProjectDataController = (function () {
+                function ProjectDataController($q, projectRepository) {
+                    this.$q = $q;
+                    this.projectRepository = projectRepository;
+                }
+                ProjectDataController.prototype.getProjectById = function (id) {
+                    return this.projectRepository.getProjectById(id).then(function (p) { return new Business.ProjectVm(function () { return p; }); });
+                };
+                ProjectDataController.prototype.search = function (searchValue, skip, take) {
+                    return this.projectRepository.search(searchValue, skip, take).then(function (projects) { return projects.toEnumerable().select(function (p) { return new Business.ProjectVm(function () { return p; }); }).toArray(); });
+                };
+                ProjectDataController.serviceId = "ProjectDataController";
+                ProjectDataController.$inject = [
+                    "$q",
+                    Business.ProjectRepository.serviceId
+                ];
+                return ProjectDataController;
+            })();
+            Business.ProjectDataController = ProjectDataController;
+            timeRecorder.service(ProjectDataController.serviceId, ProjectDataController);
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var PersonVm = Web.Bu.PersonVm;
+            var PeopleDataController = (function () {
+                function PeopleDataController($q, peopleRepository) {
+                    this.$q = $q;
+                    this.peopleRepository = peopleRepository;
+                }
+                PeopleDataController.prototype.getContactsForClient = function (clientId, isLiveData) {
+                    return this.peopleRepository.getContactsForClient(clientId, isLiveData);
+                };
+                PeopleDataController.prototype.getPerson = function (id, isLiveData) {
+                    return this.peopleRepository.getPerson(id, isLiveData);
+                };
+                PeopleDataController.prototype.searchPeople = function (searchString) {
+                    return this.peopleRepository.searchPeople(searchString).then(function (people) {
+                        return people.toEnumerable().select(function (p) { return new PersonVm(function () { return p; }); }).toArray();
+                    });
+                };
+                PeopleDataController.serviceId = "$PersonDataController";
+                PeopleDataController.$inject = [
+                    "$q",
+                    Business.PeopleRepository.serviceId
+                ];
+                return PeopleDataController;
+            })();
+            Business.PeopleDataController = PeopleDataController;
+            timeRecorder.service(PeopleDataController.serviceId, PeopleDataController);
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var EmployeeDataController = (function () {
+                function EmployeeDataController($q, employeeRepository) {
+                    this.$q = $q;
+                    this.employeeRepository = employeeRepository;
+                }
+                EmployeeDataController.prototype.getAllPersons = function () {
+                    return this.employeeRepository.getAllEmployees().then(function (employee) { return employee.toEnumerable().select(function (p) { return new Web.Business.EmployeeVm(function () { return p; }); }).toArray(); });
+                };
+                EmployeeDataController.prototype.getById = function (id) {
+                    return this.employeeRepository.getById(id).then(function (p) { return new Business.EmployeeVm(function () { return p; }); });
+                };
+                EmployeeDataController.serviceId = "EmployeeDataController";
+                EmployeeDataController.$inject = [
+                    "$q",
+                    Business.EmployeeRepository.serviceId
+                ];
+                return EmployeeDataController;
+            })();
+            Business.EmployeeDataController = EmployeeDataController;
+            timeRecorder.service(EmployeeDataController.serviceId, EmployeeDataController);
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+/// <reference path="timesheetdatacontroller.ts" />
+/// <reference path="expensetypedatacontroller.ts" />
+/// <reference path="expensedatacontroller.ts" />
+/// <reference path="projectdatacontroller.ts" />
+/// <reference path="people/peopledatacontroller.ts" />
+/// <reference path="people/employeedatacontroller.ts" />
 var TimeRecorder;
 (function (TimeRecorder) {
     var Web;
@@ -2043,7 +3562,7 @@ var TimeRecorder;
                 if (this.calendarSettings.hasOwnProperty(key))
                     this.calendarSettings[key] = true;
             };
-            TimeBookingService.$inject = ["$proxy", "$q"];
+            TimeBookingService.$inject = ["$tr-proxy", "$q"];
             TimeBookingService.serviceId = "timeBooking";
             return TimeBookingService;
         })();
@@ -2145,7 +3664,7 @@ var TimeRecorder;
                 return q.promise;
             };
             UserService.serviceId = "user";
-            UserService.$inject = ["$proxy", "$q"];
+            UserService.$inject = ["$tr-proxy", "$q"];
             return UserService;
         })();
         Web.UserService = UserService;
@@ -2222,7 +3741,7 @@ var TimeRecorder;
                 };
             }
             RoleService.serviceId = "role";
-            RoleService.$inject = ["$proxy", "$q"];
+            RoleService.$inject = ["$tr-proxy", "$q"];
             return RoleService;
         })();
         Web.RoleService = RoleService;
@@ -2268,7 +3787,7 @@ var TimeRecorder;
                 this.loadLocations();
             }
             LocationService.serviceId = "location";
-            LocationService.$inject = ["$proxy", "$q"];
+            LocationService.$inject = ["$tr-proxy", "$q"];
             return LocationService;
         })();
         Web.LocationService = LocationService;
@@ -2280,17 +3799,18 @@ var TimeRecorder;
     var Web;
     (function (Web) {
         var PersonService = (function () {
-            function PersonService($proxy, $q) {
+            function PersonService($proxy, $q, personController) {
                 var _this = this;
                 this.$proxy = $proxy;
                 this.$q = $q;
+                this.personController = personController;
                 this.skip = 0;
                 this.take = 10;
                 this.initialTake = 30;
                 this.search = "";
                 this.savePerson = function (person) {
                     var q = _this.$q.defer();
-                    _this.$proxy.Person.put(person).then(function () {
+                    _this.$proxy.Employee.put(person).then(function () {
                         q.resolve(true);
                     }, function (e) {
                         q.reject(e.data.Data);
@@ -2299,7 +3819,7 @@ var TimeRecorder;
                 };
                 this.deletePerson = function (personId) {
                     var q = _this.$q.defer();
-                    _this.$proxy.Person.delete({ id: personId }).then(function () {
+                    _this.$proxy.Employee.delete({ id: personId }).then(function () {
                         q.resolve();
                     }, function (e) {
                         q.reject(e);
@@ -2314,7 +3834,7 @@ var TimeRecorder;
                     q.resolve();
                 this.isLoading = true;
                 this.skip = 0;
-                this.$proxy.Person.searchMultiple({ take: this.initialTake, skip: this.skip, search: this.search }).then(function (response) {
+                this.$proxy.Employee.searchMultiple({ take: this.initialTake, skip: this.skip, search: this.search }).then(function (response) {
                     _this.people = response.data;
                     _this.skip = _this.initialTake;
                     _this.hasSearch = true;
@@ -2331,7 +3851,7 @@ var TimeRecorder;
                 if (!this.hasSearch || this.isLoading || this.endReached)
                     return;
                 this.isLoading = true;
-                this.$proxy.Person.searchMultiple({ take: this.take, skip: this.skip, search: this.search }).then(function (response) {
+                this.$proxy.Employee.searchMultiple({ take: this.take, skip: this.skip, search: this.search }).then(function (response) {
                     var l = response.data.length;
                     for (var i = 0; i < l; ++i)
                         _this.people.push(response.data[i]);
@@ -2343,15 +3863,15 @@ var TimeRecorder;
             };
             PersonService.prototype.loadPersons = function () {
                 var q = this.$q.defer();
-                this.$proxy.Person.getMultiple({}).then(function (response) {
-                    q.resolve(response.data);
+                this.personController.getAllPersons().then(function (people) {
+                    q.resolve(people);
                 }, function () {
                     q.reject();
                 });
                 return q.promise;
             };
             PersonService.serviceId = "person";
-            PersonService.$inject = ["$proxy", "$q"];
+            PersonService.$inject = ["$tr-proxy", "$q", Web.Business.EmployeeDataController.serviceId];
             return PersonService;
         })();
         Web.PersonService = PersonService;
@@ -2396,7 +3916,7 @@ var TimeRecorder;
                 };
             }
             GlobalMessageService.serviceId = "globalMessages";
-            GlobalMessageService.$inject = ["$q", "$proxy"];
+            GlobalMessageService.$inject = ["$q", "$tr-proxy"];
             return GlobalMessageService;
         })();
         Web.GlobalMessageService = GlobalMessageService;
@@ -2419,7 +3939,7 @@ var TimeRecorder;
                     return _this.$proxy.PersonalMessage.getSentMessagesMultiple({ personId: personId });
                 };
             }
-            PersonalMessageService.$inject = ["$proxy", "$q"];
+            PersonalMessageService.$inject = ["$tr-proxy", "$q"];
             PersonalMessageService.serviceId = "personalMessages";
             return PersonalMessageService;
         })();
@@ -2485,7 +4005,7 @@ var TimeRecorder;
                 };
             };
             SearchService.serviceId = "search";
-            SearchService.$inject = ["$proxy", "$q"];
+            SearchService.$inject = ["$tr-proxy", "$q"];
             return SearchService;
         })();
         Web.SearchService = SearchService;
@@ -2618,14 +4138,99 @@ var TimeRecorder;
                 return (project.bookable ? 1 : 0) | (project.explicit ? 2 : 0) | (project.planningUnit ? 4 : 0);
             };
             ProjectService.serviceId = "project";
-            ProjectService.$inject = ["$proxy", "$q"];
+            ProjectService.$inject = ["$tr-proxy", "$q"];
             return ProjectService;
         })();
         Web.ProjectService = ProjectService;
         timeRecorder.service(ProjectService.serviceId, ProjectService);
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
-/// <reference path="services/authenticationservice.ts" />
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var ExpensesService = (function () {
+            function ExpensesService($proxy, $q) {
+                this.$proxy = $proxy;
+                this.$q = $q;
+                // date picker settings
+                this.calendarSettings = {
+                    fromIsOpen: false,
+                    toIsOpen: false,
+                    datepickerOptions: { currentText: "Heute", clearText: "Löschen", closeText: "Schliessen" },
+                    dateFormat: "dd.MM.yyyy",
+                    minDate: Date
+                };
+            }
+            //getMetaData(forceReload: boolean) {
+            //  var q = this.$q.defer<Data.ITimeBookingMetaDataVm>();
+            //  if (this.metaData == null || forceReload)
+            //    this.$proxy.TimeBooking.getMetaData().then((response) => {
+            //      this.metaData = response.data;
+            //      q.resolve(response.data);
+            //    }, q.reject);
+            //  else
+            //    q.resolve(this.metaData);
+            //  return q.promise;
+            //}
+            //getMetaDataVm<T extends IMetaDataVm>(id: number, data: T[]): T {
+            //  if (id == null || data == null || this.metaData == null)
+            //    return null;
+            //  var vmList = data.toEnumerable();
+            //  return vmList.firstOrDefault((e) => e.Id === id);
+            //}
+            ExpensesService.prototype.getPersonNameById = function (id) {
+                return "";
+            };
+            ExpensesService.prototype.getProjectNameById = function (id) {
+                return "";
+            };
+            ExpensesService.prototype.getTypeNameById = function (id) {
+                return "";
+            };
+            ExpensesService.prototype.getStateNameById = function (id) {
+                return "";
+            };
+            ExpensesService.prototype.getStateColor = function (state) {
+                switch (state) {
+                    case 0 /* Open */:
+                        return "#00FF00";
+                    case 1 /* Complete */:
+                        return "#333333";
+                    case 2 /* Faulted */:
+                        return "#FF0000";
+                    default:
+                        return "#000000";
+                }
+            };
+            ExpensesService.prototype.getIsEditable = function () {
+            };
+            ExpensesService.prototype.getDetail = function (id) {
+            };
+            ExpensesService.prototype.search = function (data) {
+                return this.$proxy.TimeBooking.searchMultiple({}, data);
+            };
+            ExpensesService.prototype.save = function (data) {
+                return this.$proxy.TimeBooking.save(data);
+            };
+            ExpensesService.prototype.remove = function (id) {
+            };
+            ExpensesService.prototype.openCalendar = function (event, key) {
+                key = key + "IsOpen";
+                event.preventDefault();
+                event.stopPropagation();
+                if (this.calendarSettings.hasOwnProperty(key))
+                    this.calendarSettings[key] = true;
+            };
+            ExpensesService.$inject = ["$tr-proxy", "$q"];
+            ExpensesService.serviceId = "expensesService";
+            return ExpensesService;
+        })();
+        Web.ExpensesService = ExpensesService;
+        timeRecorder.service(ExpensesService.serviceId, ExpensesService);
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+/// <reference path="services/iauthenticationservice.ts" />
 /// <reference path="services/timebookingservice.ts" />
 /// <reference path="services/userservice.ts" />
 /// <reference path="services/notificationservice.ts" />
@@ -2636,6 +4241,7 @@ var TimeRecorder;
 /// <reference path="services/personalmessageservice.ts" />
 /// <reference path="services/searchservice.ts" />
 /// <reference path="services/projectservice.ts" />
+/// <reference path="services/expensesservice.ts" />
 var TimeRecorder;
 (function (TimeRecorder) {
     var Web;
@@ -2755,7 +4361,7 @@ var TimeRecorder;
                     }
                     return true;
                 };
-                authentication.hasClaim("web_users").then(function (hasClaim) {
+                authentication.hasClaimEnsureLoggedIn("web_users").then(function (hasClaim) {
                     if (hasClaim)
                         _this.init();
                     else
@@ -2816,7 +4422,7 @@ var TimeRecorder;
                 });
             };
             UserController.controllerId = "UserController";
-            UserController.$inject = [Web.AuthenticationService.serviceId, "$state", Web.UserService.serviceId, Web.NotificationServce.serviceId, Web.PersonService.serviceId, Web.LocationService.serviceId];
+            UserController.$inject = ['trAuthenticationService', "$state", Web.UserService.serviceId, Web.NotificationServce.serviceId, Web.PersonService.serviceId, Web.LocationService.serviceId];
             return UserController;
         })();
         Web.UserController = UserController;
@@ -2922,7 +4528,7 @@ var TimeRecorder;
                     }
                     return true;
                 };
-                authentication.hasClaim("web_roles").then(function (hasClaim) {
+                authentication.hasClaimEnsureLoggedIn("web_roles").then(function (hasClaim) {
                     if (hasClaim)
                         _this.init();
                     else
@@ -2989,7 +4595,7 @@ var TimeRecorder;
                 }
             };
             RoleController.controllerId = "RoleController";
-            RoleController.$inject = [Web.AuthenticationService.serviceId, "$state", Web.RoleService.serviceId, Web.NotificationServce.serviceId];
+            RoleController.$inject = ["trAuthenticationService", "$state", Web.RoleService.serviceId, Web.NotificationServce.serviceId];
             return RoleController;
         })();
         Web.RoleController = RoleController;
@@ -3052,7 +4658,7 @@ var TimeRecorder;
                 return "itms-services://?action=download-manifest&url=" + url;
             };
             DownloadController.controllerId = "DownloadController";
-            DownloadController.$inject = ["$proxy"];
+            DownloadController.$inject = ["$tr-proxy"];
             return DownloadController;
         })();
         Web.DownloadController = DownloadController;
@@ -3118,7 +4724,7 @@ var TimeRecorder;
                         _this.loading = false;
                     });
                 };
-                authentication.hasClaim("web_locations").then(function (hasClaim) {
+                authentication.hasClaimEnsureLoggedIn("web_locations").then(function (hasClaim) {
                     if (hasClaim)
                         _this.init();
                     else
@@ -3134,7 +4740,7 @@ var TimeRecorder;
                 this.selectedLocation = location;
                 this.showForm = true;
             };
-            LocationController.$inject = [Web.LocationService.serviceId, Web.NotificationServce.serviceId, Web.AuthenticationService.serviceId, "$state"];
+            LocationController.$inject = [Web.LocationService.serviceId, Web.NotificationServce.serviceId, "trAuthenticationService", "$state"];
             LocationController.controllerId = "LocationController";
             return LocationController;
         })();
@@ -3215,7 +4821,7 @@ var TimeRecorder;
                     }, function () {
                     });
                 };
-                authentication.hasClaim("web_persons").then(function (hasClaim) {
+                authentication.hasClaimEnsureLoggedIn("web_persons").then(function (hasClaim) {
                     if (hasClaim)
                         _this.init();
                     else
@@ -3261,7 +4867,7 @@ var TimeRecorder;
                 }
                 return "Keine Rolle";
             };
-            PersonController.$inject = [Web.PersonService.serviceId, Web.RoleService.serviceId, Web.NotificationServce.serviceId, Web.AuthenticationService.serviceId, "$state", "$proxy"];
+            PersonController.$inject = [Web.PersonService.serviceId, Web.RoleService.serviceId, Web.NotificationServce.serviceId, "trAuthenticationService", "$state", "$tr-proxy"];
             PersonController.controllerId = "PersonController";
             return PersonController;
         })();
@@ -3529,7 +5135,7 @@ var TimeRecorder;
                     _this.rawHtml = raw;
                     return raw;
                 };
-                authentication.hasClaim("web_globalMessages").then(function (hasClaim) {
+                authentication.hasClaimEnsureLoggedIn("web_globalMessages").then(function (hasClaim) {
                     if (hasClaim)
                         _this.init();
                     else
@@ -3542,7 +5148,7 @@ var TimeRecorder;
                 this.loadMessages();
             };
             MessageController.controllerId = "MessageController";
-            MessageController.$inject = ["$q", Web.GlobalMessageService.serviceId, Web.NotificationServce.serviceId, Web.AuthenticationService.serviceId, "$state"];
+            MessageController.$inject = ["$q", Web.GlobalMessageService.serviceId, Web.NotificationServce.serviceId, "trAuthenticationService", "$state"];
             return MessageController;
         })();
         Web.MessageController = MessageController;
@@ -3582,20 +5188,23 @@ var TimeRecorder;
                         var recipientIds = _this.recipients.map(function (r) {
                             return r.id;
                         });
-                        var authorId = _this.authentication.appUser.person ? _this.authentication.appUser.person.id : 0;
-                        var message = {
-                            head: _this.head,
-                            body: _this.body,
-                            authorId: authorId,
-                            recipientIds: recipientIds
-                        };
-                        _this.personalMessages.saveMessage(message).then(function () {
-                            _this.notification.info("Nachricht gesendet");
-                            _this.loadSentMessages();
-                            _this.recipients = [];
-                            _this.showForm = false;
-                            _this.body = "";
-                            _this.head = "";
+                        _this.authentication.getAppUser().then(function (appUser) {
+                            var authorId = appUser.person ? appUser.person.id : 0;
+                            var message = {
+                                head: _this.head,
+                                body: _this.body,
+                                authorId: authorId,
+                                recipientIds: recipientIds
+                            };
+                            _this.personalMessages.saveMessage(message).then(function () {
+                                _this.notification.info("Nachricht gesendet");
+                                _this.loadSentMessages();
+                                _this.recipients = [];
+                                _this.showForm = false;
+                                _this.body = "";
+                                _this.head = "";
+                            }, function () {
+                            });
                         }, function () {
                         });
                     }
@@ -3631,7 +5240,7 @@ var TimeRecorder;
                 this.validate = function () {
                     return angular.isString(_this.head) && angular.isString(_this.body) && _this.head.length > 0 && _this.body.length > 0 && _this.recipients.length > 0;
                 };
-                authentication.hasClaim("web_personalMessages").then(function (hasClaim) {
+                authentication.hasClaimEnsureLoggedIn("web_personalMessages").then(function (hasClaim) {
                     if (hasClaim)
                         _this.init();
                     else
@@ -3641,7 +5250,7 @@ var TimeRecorder;
                 });
                 this.init();
             }
-            PersonalMessageController.$inject = [Web.PersonalMessageService.serviceId, Web.PersonService.serviceId, Web.AuthenticationService.serviceId, Web.NotificationServce.serviceId, "$state"];
+            PersonalMessageController.$inject = [Web.PersonalMessageService.serviceId, Web.PersonService.serviceId, "trAuthenticationService", Web.NotificationServce.serviceId, "$state"];
             PersonalMessageController.controllerId = "PersonalMessageController";
             return PersonalMessageController;
         })();
@@ -3671,14 +5280,15 @@ var TimeRecorder;
     var Web;
     (function (Web) {
         var ConfigController = (function () {
-            function ConfigController(notification, authentication, $state, $proxy, $scope) {
+            function ConfigController(notification, authentication, $state, $proxy, $scope, trWebApiUrl) {
                 var _this = this;
                 this.notification = notification;
                 this.authentication = authentication;
                 this.$state = $state;
                 this.$proxy = $proxy;
                 this.$scope = $scope;
-                authentication.hasClaim("web_editConfig").then(function (hasClaim) {
+                this.trWebApiUrl = trWebApiUrl;
+                authentication.hasClaimEnsureLoggedIn("web_editConfig").then(function (hasClaim) {
                     if (hasClaim)
                         _this.init();
                     else
@@ -3695,7 +5305,7 @@ var TimeRecorder;
                 this.$proxy.Config.get().then(function (response) {
                     _this.config = response.data;
                     if (response.data.imageId) {
-                        _this.imgUrl = Data.Config.WebApiUrl + "/image/get/" + response.data.imageId;
+                        _this.imgUrl = _this.trWebApiUrl + "/image/get/" + response.data.imageId;
                         _this.hasImage = true;
                     }
                 }, function (e) {
@@ -3764,7 +5374,7 @@ var TimeRecorder;
             ConfigController.prototype.validate = function () {
                 return true;
             };
-            ConfigController.$inject = [Web.NotificationServce.serviceId, Web.AuthenticationService.serviceId, "$state", "$proxy", "$scope"];
+            ConfigController.$inject = [Web.NotificationServce.serviceId, "trAuthenticationService", "$state", "$tr-proxy", "$scope", "trWebApiUrl"];
             ConfigController.controllerId = "ConfigController";
             return ConfigController;
         })();
@@ -3792,7 +5402,7 @@ var TimeRecorder;
                 this.dateFormat = 'dd.MM.yyyy';
                 this.states = ["Fehlgeschlagen", "Erfolgreich"];
                 this.datepickerOptions = { currentText: "Heute", clearText: "Löschen", closeText: "Schliessen" };
-                authentication.hasClaim("web_entries").then(function (hasClaim) {
+                authentication.hasClaimEnsureLoggedIn("web_entries").then(function (hasClaim) {
                     if (hasClaim)
                         _this.init();
                     else
@@ -3946,7 +5556,7 @@ var TimeRecorder;
                 return true;
             };
             EntryController.controllerId = "EntryController";
-            EntryController.$inject = [Web.SearchService.serviceId, Web.AuthenticationService.serviceId, "$state", Web.PersonService.serviceId, Web.LocationService.serviceId, "$proxy", Web.NotificationServce.serviceId];
+            EntryController.$inject = [Web.SearchService.serviceId, "trAuthenticationService", "$state", Web.PersonService.serviceId, Web.LocationService.serviceId, "$tr-proxy", Web.NotificationServce.serviceId];
             return EntryController;
         })();
         Web.EntryController = EntryController;
@@ -3978,7 +5588,7 @@ var TimeRecorder;
                 this.stateValue = null;
                 this.personValue = null;
                 this.typeValue = null;
-                authentication.hasClaim("web_timebookings").then(function (hasClaim) {
+                authentication.hasClaimEnsureLoggedIn("web_timebookings").then(function (hasClaim) {
                     if (hasClaim)
                         _this.init();
                     else
@@ -4012,7 +5622,7 @@ var TimeRecorder;
             };
             TimeBookingController.controllerId = "TimeBookingController";
             TimeBookingController.$inject = [
-                Web.AuthenticationService.serviceId,
+                "trAuthenticationService",
                 Web.TimeBookingService.serviceId,
                 "$state"
             ];
@@ -4028,15 +5638,16 @@ var TimeRecorder;
     (function (Web) {
         var TimeBookingFormController = (function () {
             // constructor
-            function TimeBookingFormController(service, authentication, $state, $stateParams) {
+            function TimeBookingFormController($scope, service, authentication, $state, $stateParams) {
                 var _this = this;
+                this.$scope = $scope;
                 this.service = service;
                 this.authentication = authentication;
                 this.$state = $state;
                 this.$stateParams = $stateParams;
                 this.idValue = this.$stateParams["id"];
                 var claim = this.isNew() ? "web_timebookings_add" : "web_timebookings_edit";
-                authentication.hasClaim(claim).then(function (hasClaim) {
+                authentication.hasClaimEnsureLoggedIn(claim).then(function (hasClaim) {
                     if (hasClaim)
                         _this.init();
                     else
@@ -4053,13 +5664,19 @@ var TimeRecorder;
                         _this.service.getDetail(_this.idValue).then(function (response) {
                             var entry = response.data;
                             _this.idValue = entry.id;
-                            _this.personValue = entry.personId;
-                            _this.projectValue = entry.projectId;
-                            _this.typeValue = entry.timeEntryTypeId;
                             _this.fromValue = entry.start;
+                            _this.fromTimeValue = new Date(entry.start.getTime());
                             _this.toValue = entry.stop;
+                            _this.toTimeValue = new Date(entry.stop.getTime());
+                            _this.person = data.persons.toEnumerable().firstOrDefault(function (p) { return p.id === entry.personId; });
+                            _this.project = data.projects.toEnumerable().firstOrDefault(function (p) { return p.id === entry.projectId; });
+                            _this.entryType = data.types.toEnumerable().firstOrDefault(function (et) { return et.id === entry.timeEntryTypeId; });
                         }, function () {
                         });
+                    }
+                    else {
+                        _this.fromValue = new Date();
+                        _this.toValue = new Date();
                     }
                 }, function () {
                 });
@@ -4080,21 +5697,23 @@ var TimeRecorder;
             // save
             TimeBookingFormController.prototype.save = function () {
                 var _this = this;
-                // TODO: check if all fields are correctly filled
-                //console.log(this.personValue);
-                //console.log(this.projectValue);
-                console.log("type " + this.typeValue);
-                //console.log(this.fromValue);
-                //console.log(this.toValue);
+                this.triggerValidation = true;
+                if (this.$scope.timebookingForm.$invalid) {
+                    return;
+                }
                 var data = {
                     id: this.idValue,
-                    personId: this.personValue,
-                    projectId: this.projectValue,
+                    personId: this.person.id,
+                    projectId: this.project.id,
                     start: this.fromValue,
                     stop: this.toValue,
-                    timeEntryTypeId: this.typeValue,
+                    timeEntryTypeId: this.entryType.id,
                     state: 0 /* Open */
                 };
+                data.start.setHours(this.fromTimeValue.getHours());
+                data.start.setMinutes(this.fromTimeValue.getMinutes());
+                data.stop.setHours(this.toTimeValue.getHours());
+                data.stop.setMinutes(this.toTimeValue.getMinutes());
                 // save & redirect
                 this.service.save(data).then(function (response) {
                     if (_this.isNew() && response.data.id != null)
@@ -4104,8 +5723,9 @@ var TimeRecorder;
             };
             TimeBookingFormController.controllerId = "TimeBookingFormController";
             TimeBookingFormController.$inject = [
+                "$scope",
                 Web.TimeBookingService.serviceId,
-                Web.AuthenticationService.serviceId,
+                "trAuthenticationService",
                 "$state",
                 "$stateParams"
             ];
@@ -4291,7 +5911,7 @@ var TimeRecorder;
                 return (project.bookable ? 1 : 0) | (project.explicit ? 2 : 0) | (project.planningUnit ? 4 : 0);
             };
             ProjectController.controllerId = "ProjectController";
-            ProjectController.$inject = ["project", "$proxy", "notification"];
+            ProjectController.$inject = ["project", "$tr-proxy", "notification"];
             return ProjectController;
         })();
         Web.ProjectController = ProjectController;
@@ -4344,460 +5964,155 @@ var TimeRecorder;
 (function (TimeRecorder) {
     var Web;
     (function (Web) {
-        var Business;
-        (function (Business) {
-            var TimesheetEntryTypeVm = (function () {
-                function TimesheetEntryTypeVm(cm) {
-                    this.cm = cm;
-                }
-                Object.defineProperty(TimesheetEntryTypeVm.prototype, "id", {
-                    get: function () {
-                        return this.cm().id;
-                    },
-                    enumerable: true,
-                    configurable: true
+        var ExpensesController = (function () {
+            // constructor
+            function ExpensesController(authentication, service, expensesDataController, $state) {
+                var _this = this;
+                this.authentication = authentication;
+                this.service = service;
+                this.expensesDataController = expensesDataController;
+                this.$state = $state;
+                // form values
+                this.fromValue = null;
+                this.toValue = null;
+                this.stateValue = null;
+                this.personValue = null;
+                this.typeValue = null;
+                authentication.hasClaimEnsureLoggedIn("web_expenses").then(function (hasClaim) {
+                    if (hasClaim)
+                        _this.init();
+                    else
+                        _this.$state.transitionTo("login");
+                }, function () {
+                    _this.$state.transitionTo("login");
                 });
-                Object.defineProperty(TimesheetEntryTypeVm.prototype, "abbreviation", {
-                    get: function () {
-                        return this.cm().abbreviation;
-                    },
-                    enumerable: true,
-                    configurable: true
+            }
+            // init view
+            ExpensesController.prototype.init = function () {
+                this.search();
+                //this.service.getMetaData(false).then((response) => {
+                //  this.search();
+                //},() => { });
+            };
+            ExpensesController.prototype.getValue = function (entry) {
+                return "CHF" + entry.value;
+            };
+            // search
+            ExpensesController.prototype.search = function () {
+                var _this = this;
+                this.expensesDataController.search().then(function (expenses) {
+                    _this.searchResult = expenses;
                 });
-                Object.defineProperty(TimesheetEntryTypeVm.prototype, "name", {
-                    get: function () {
-                        return this.cm().name;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return TimesheetEntryTypeVm;
-            })();
-            Business.TimesheetEntryTypeVm = TimesheetEntryTypeVm;
-        })(Business = Web.Business || (Web.Business = {}));
+                //var params = <Data.ITimeBookingSearchParams>{
+                //  Person: this.personValue,
+                //  State: this.service.getStateById(this.stateValue),
+                //  TimeEntryTypeId: this.typeValue,
+                //  From: this.fromValue,
+                //  To: this.toValue
+                //};
+                //return this.service.search(params).then((response) => {
+                //  this.searchResult = response.data;
+                //},() => { });
+            };
+            ExpensesController.controllerId = "ExpensesController";
+            ExpensesController.$inject = [
+                "trAuthenticationService",
+                Web.ExpensesService.serviceId,
+                Web.Business.ExpenseDataController.serviceId,
+                "$state"
+            ];
+            return ExpensesController;
+        })();
+        Web.ExpensesController = ExpensesController;
+        timeRecorder.controller(ExpensesController.controllerId, ExpensesController);
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
 var TimeRecorder;
 (function (TimeRecorder) {
     var Web;
     (function (Web) {
-        var Business;
-        (function (Business) {
-            var TimesheetAvailabilityTimeEntryVm = (function () {
-                function TimesheetAvailabilityTimeEntryVm(cm, entryType) {
-                    this.cm = cm;
-                    this.entryType = entryType;
-                }
-                Object.defineProperty(TimesheetAvailabilityTimeEntryVm.prototype, "entryTypeId", {
-                    get: function () {
-                        return this.cm().entryTypeId;
-                    },
-                    enumerable: true,
-                    configurable: true
+        var ExpensesFormController = (function () {
+            // constructor
+            function ExpensesFormController(service, authentication, $state, $stateParams) {
+                var _this = this;
+                this.service = service;
+                this.authentication = authentication;
+                this.$state = $state;
+                this.$stateParams = $stateParams;
+                this.idValue = this.$stateParams["id"];
+                var claim = this.isNew() ? "web_expenses_add" : "web_expenses_edit";
+                authentication.hasClaimEnsureLoggedIn(claim).then(function (hasClaim) {
+                    if (hasClaim)
+                        _this.init();
+                    else
+                        _this.$state.transitionTo("login");
+                }, function () {
+                    _this.$state.transitionTo("login");
                 });
-                Object.defineProperty(TimesheetAvailabilityTimeEntryVm.prototype, "mins", {
-                    get: function () {
-                        return this.cm().mins;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetAvailabilityTimeEntryVm.prototype, "abbreviation", {
-                    get: function () {
-                        return this.entryType().abbreviation;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetAvailabilityTimeEntryVm.prototype, "name", {
-                    get: function () {
-                        return this.entryType().name;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return TimesheetAvailabilityTimeEntryVm;
-            })();
-            Business.TimesheetAvailabilityTimeEntryVm = TimesheetAvailabilityTimeEntryVm;
-        })(Business = Web.Business || (Web.Business = {}));
+            }
+            // init view
+            ExpensesFormController.prototype.init = function () {
+                //this.service.getMetaData(false).then((data) => {
+                //  if (!this.isNew()) {
+                //    this.service.getDetail(this.idValue).then((response) => {
+                //      var entry = response.data;
+                //      this.idValue = entry.Id;
+                //      this.personValue = entry.PersonId;
+                //      this.projectValue = entry.ProjectId;
+                //      this.typeValue = entry.TimeEntryTypeId;
+                //      this.fromValue = entry.Start;
+                //      this.toValue = entry.Stop;
+                //    },() => { });
+                //  }
+                //},() => { });
+            };
+            // add or edit context?
+            ExpensesFormController.prototype.isNew = function () {
+                return this.idValue == null;
+            };
+            // delete
+            ExpensesFormController.prototype.remove = function () {
+                //this.service.remove(this.idValue).then((response) => {
+                //  if (response)
+                //    this.$state.transitionTo("timebookings");
+                //},() => { });
+            };
+            // save
+            ExpensesFormController.prototype.save = function () {
+                // TODO: check if all fields are correctly filled
+                //console.log(this.personValue);
+                //console.log(this.projectValue);
+                console.log("type " + this.typeValue);
+                //console.log(this.fromValue);
+                //console.log(this.toValue);
+                //var data = <Data.ITimeBookingCm> {
+                //  Id: this.idValue,
+                //  PersonId: this.personValue,
+                //  ProjectId: this.projectValue,
+                //  Start: this.fromValue,
+                //  Stop: this.toValue,
+                //  TimeEntryTypeId: this.typeValue,
+                //  State: Data.ETimeBookingState.Open
+                //}
+                //// save & redirect
+                //this.service.save(data).then((response) => {
+                //  if (this.isNew() && response.data.Id != null)
+                //    this.$state.transitionTo("timebookingsEdit", { id: response.data.Id });
+                //},() => { });
+            };
+            ExpensesFormController.controllerId = "ExpensesFormController";
+            ExpensesFormController.$inject = [
+                Web.ExpensesService.serviceId,
+                "trAuthenticationService",
+                "$state",
+                "$stateParams"
+            ];
+            return ExpensesFormController;
+        })();
+        Web.ExpensesFormController = ExpensesFormController;
+        timeRecorder.controller(ExpensesFormController.controllerId, ExpensesFormController);
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
-var TimeRecorder;
-(function (TimeRecorder) {
-    var Web;
-    (function (Web) {
-        var Business;
-        (function (Business) {
-            var TimeEntryVm = (function () {
-                function TimeEntryVm(cm, availabilityEntryTypes) {
-                    var _this = this;
-                    this.cm = cm;
-                    this.availabilityEntryTypes = availabilityEntryTypes;
-                    this._totalUnavalable = null;
-                    this._availabilityTimeEntries = cm().availabilityTimeEntries.toEnumerable().select(function (te) {
-                        return new Business.TimesheetAvailabilityTimeEntryVm(function () { return te; }, function () { return _this.availabilityEntryTypes().toEnumerable().firstOrDefault(function (t) { return t.id === te.entryTypeId; }); });
-                    }).toArray();
-                    // fill in the missing availability time entries for drawing
-                    var entriesSet = this._availabilityTimeEntries.toEnumerable().select(function (te) { return te.entryTypeId; }).toArray();
-                    var unsetEntries = this.availabilityEntryTypes().toEnumerable().where(function (et) { return !entriesSet.contains(et.id); }).toArray();
-                    this._availabilityTimeEntries.addRange(unsetEntries.toEnumerable().select(function (e) { return new Business.TimesheetAvailabilityTimeEntryVm(function () {
-                        return {
-                            entryTypeId: e.id,
-                            mins: null
-                        };
-                    }, function () { return e; }); }).toArray());
-                }
-                Object.defineProperty(TimeEntryVm.prototype, "date", {
-                    get: function () {
-                        return this.cm().date;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimeEntryVm.prototype, "planned", {
-                    get: function () {
-                        return this.cm().plannedMins;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimeEntryVm.prototype, "done", {
-                    get: function () {
-                        // unavailabilities get added to the total done value
-                        return this.cm().doneMins + this.totalAvailability;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimeEntryVm.prototype, "availabilityTimeEntries", {
-                    get: function () {
-                        return this._availabilityTimeEntries;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimeEntryVm.prototype, "totalAvailability", {
-                    get: function () {
-                        if (Triarc.hasValue(this._totalUnavalable))
-                            return this._totalUnavalable;
-                        var totalUnavailability = 0;
-                        this.cm().availabilityTimeEntries.forEach(function (a) {
-                            totalUnavailability += angular.isNumber(a.mins) ? a.mins : 0;
-                        });
-                        return totalUnavailability;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return TimeEntryVm;
-            })();
-            Business.TimeEntryVm = TimeEntryVm;
-        })(Business = Web.Business || (Web.Business = {}));
-    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
-})(TimeRecorder || (TimeRecorder = {}));
-//    get sickLeave() {
-//      return this.cm().sickLeave;
-//    }
-//
-//    get sicknessWaitingPeriod() {
-//      return this.cm().sicknessWaitingPeriod;
-//    }
-//
-//    get dailySicknessAllowence() {
-//      return this.cm().dailySicknessAllowence;
-//    }
-//
-//    get accidentWaiting() {
-//      return this.cm().accidentWaiting;
-//    }
-//
-//    get accidentDailyAllowence() {
-//      return this.cm().accidentDailyAllowence;
-//    }
-//
-//    get holiday() {
-//      return this.cm().holiday;
-//    }
-//
-//    get maternityLeave() {
-//      return this.cm().maternityLeave;
-//    }
-//
-//    get absent() {
-//      return this.cm().absent;
-//    }
-//
-//
-//    get absentWithoutPay() {
-//      return this.cm().absentWithoutPay;
-//    }
-//
-//    get regionalHoliday() {
-//      return this.cm().regionalHoliday;
-//    } 
-var TimeRecorder;
-(function (TimeRecorder) {
-    var Web;
-    (function (Web) {
-        var Business;
-        (function (Business) {
-            var TimesheetEmployeeVm = (function () {
-                function TimesheetEmployeeVm(cm, availabilityEntryTypes) {
-                    this.cm = cm;
-                    this.availabilityEntryTypes = availabilityEntryTypes;
-                    this._totalMonthPlanned = null;
-                    this._totalMonthDone = null;
-                    this._totalMonthUnAvailable = null;
-                }
-                Object.defineProperty(TimesheetEmployeeVm.prototype, "id", {
-                    get: function () {
-                        return this.cm().id;
-                    },
-                    set: function (id) {
-                        this.cm().id = id;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetEmployeeVm.prototype, "name", {
-                    get: function () {
-                        return this.firstName + " " + this.lastName;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetEmployeeVm.prototype, "firstName", {
-                    get: function () {
-                        return this.cm().firstName;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetEmployeeVm.prototype, "lastName", {
-                    get: function () {
-                        return this.cm().lastName;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetEmployeeVm.prototype, "timeEntries", {
-                    get: function () {
-                        var _this = this;
-                        if (angular.isArray(this._dayEntries))
-                            return this._dayEntries;
-                        this._dayEntries = [];
-                        this._dayEntries = this.cm().timeEntries.toEnumerable().select(function (te) { return new Business.TimeEntryVm(function () { return te; }, function () { return _this.availabilityEntryTypes(); }); }).toArray();
-                        return this._dayEntries;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                TimesheetEmployeeVm.prototype.timeEntry = function (date) {
-                    return this.timeEntries.toEnumerable().firstOrDefault(function (te) { return moment(te.date).isSame(moment(date), "day"); });
-                };
-                Object.defineProperty(TimesheetEmployeeVm.prototype, "totalMonthPlanned", {
-                    get: function () {
-                        if (Triarc.hasValue(this._totalMonthPlanned))
-                            return this._totalMonthPlanned;
-                        var totalPlanned = 0;
-                        var timeEntries = this.timeEntries;
-                        timeEntries.forEach(function (te) {
-                            totalPlanned += angular.isNumber(te.planned) ? te.planned : 0;
-                        });
-                        return totalPlanned;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetEmployeeVm.prototype, "totalMonthDone", {
-                    get: function () {
-                        if (Triarc.hasValue(this._totalMonthDone))
-                            return this._totalMonthDone;
-                        var totalDone = 0;
-                        var timeEntries = this.timeEntries;
-                        timeEntries.forEach(function (te) {
-                            totalDone += angular.isNumber(te.done) ? te.done : 0;
-                        });
-                        return totalDone;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetEmployeeVm.prototype, "totalMonthAvailabilityEntries", {
-                    get: function () {
-                        if (Triarc.hasValue(this._totalMonthUnAvailable))
-                            return this._totalMonthUnAvailable;
-                        var totalUnAvailability = 0;
-                        var timeEntries = this.timeEntries;
-                        timeEntries.forEach(function (te) {
-                            totalUnAvailability += angular.isNumber(te.totalAvailability) ? te.totalAvailability : 0;
-                        });
-                        return totalUnAvailability;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                TimesheetEmployeeVm.prototype.totalMonthAvailabilityFor = function (availabilityEntryType) {
-                    var totalUnAvailability = 0;
-                    var timeEntries = this.timeEntries;
-                    timeEntries.forEach(function (te) {
-                        te.availabilityTimeEntries.forEach(function (unAvailability) {
-                            if (unAvailability.entryTypeId === availabilityEntryType.id) {
-                                totalUnAvailability += angular.isNumber(unAvailability.mins) ? unAvailability.mins : 0;
-                            }
-                        });
-                    });
-                    return totalUnAvailability;
-                };
-                TimesheetEmployeeVm.prototype.update = function (cm) {
-                };
-                TimesheetEmployeeVm.prototype.reset = function () {
-                };
-                TimesheetEmployeeVm.prototype.toCm = function () {
-                    var cm = this.cm();
-                    return cm;
-                };
-                return TimesheetEmployeeVm;
-            })();
-            Business.TimesheetEmployeeVm = TimesheetEmployeeVm;
-            ;
-        })(Business = Web.Business || (Web.Business = {}));
-    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
-})(TimeRecorder || (TimeRecorder = {}));
-var TimeRecorder;
-(function (TimeRecorder) {
-    var Web;
-    (function (Web) {
-        var Business;
-        (function (Business) {
-            var TimesheetVm = (function () {
-                function TimesheetVm(cm) {
-                    this.cm = cm;
-                }
-                Object.defineProperty(TimesheetVm.prototype, "timeSheetEmployees", {
-                    get: function () {
-                        var _this = this;
-                        if (angular.isArray(this._timeSheetEmployees))
-                            return this._timeSheetEmployees;
-                        this._timeSheetEmployees = [];
-                        this._timeSheetEmployees.addRange(this.cm().timesheetEmployees.toEnumerable().select(function (e) { return new Business.TimesheetEmployeeVm(function () { return e; }, function () { return _this._availabilityEntryTypes; }); }).toArray());
-                        return this._timeSheetEmployees;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetVm.prototype, "thresholds", {
-                    get: function () {
-                        if (angular.isArray(this._thresholds))
-                            return this._thresholds;
-                        this._thresholds = [];
-                        this._thresholds.addRange(this.cm().thresholds.toEnumerable().select(function (t) { return new Business.TimesheetThresholdVm(function () { return t; }); }).toArray());
-                        return this._thresholds;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetVm.prototype, "availabilityEntryTypes", {
-                    get: function () {
-                        if (angular.isArray(this._availabilityEntryTypes))
-                            return this._availabilityEntryTypes;
-                        this._availabilityEntryTypes = [];
-                        this._availabilityEntryTypes.addRange(this.cm().timeEntryTypeCms.toEnumerable().select(function (t) { return new Business.TimesheetEntryTypeVm(function () { return t; }); }).toArray());
-                        return this._availabilityEntryTypes;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                TimesheetVm.prototype.update = function (cm) {
-                };
-                TimesheetVm.prototype.reset = function () {
-                };
-                TimesheetVm.prototype.toCm = function () {
-                    var cm = this.cm();
-                    return cm;
-                };
-                return TimesheetVm;
-            })();
-            Business.TimesheetVm = TimesheetVm;
-            ;
-        })(Business = Web.Business || (Web.Business = {}));
-    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
-})(TimeRecorder || (TimeRecorder = {}));
-var TimeRecorder;
-(function (TimeRecorder) {
-    var Web;
-    (function (Web) {
-        var Business;
-        (function (Business) {
-            var TimesheetThresholdVm = (function () {
-                function TimesheetThresholdVm(cm) {
-                    this.cm = cm;
-                }
-                Object.defineProperty(TimesheetThresholdVm.prototype, "fromMins", {
-                    get: function () {
-                        return this.cm().fromMins;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetThresholdVm.prototype, "toMins", {
-                    get: function () {
-                        return this.cm().toMins;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetThresholdVm.prototype, "color", {
-                    get: function () {
-                        return this.cm().colorCode;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(TimesheetThresholdVm.prototype, "type", {
-                    get: function () {
-                        return this.cm().type;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                return TimesheetThresholdVm;
-            })();
-            Business.TimesheetThresholdVm = TimesheetThresholdVm;
-        })(Business = Web.Business || (Web.Business = {}));
-    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
-})(TimeRecorder || (TimeRecorder = {}));
-/// <reference path="timesheetimeentrytypevm.ts" />
-/// <reference path="TimesheetAvailabilityTimeEntryVm.ts" />
-/// <reference path="TimesheetEntryVm.ts" />
-/// <reference path="timesheetemployeevm.ts" />
-/// <reference path="timesheetvm.ts" />
-/// <reference path="timesheetthreshold.ts" />
-/// <reference path="timesheet/_timesheet_vm_references.ts" />
-// Update the most local relative references and declare this service.
-var TimeRecorder;
-(function (TimeRecorder) {
-    var Web;
-    (function (Web) {
-        var Business;
-        (function (Business) {
-            var TimeSheetDataController = (function () {
-                function TimeSheetDataController($q, $proxy) {
-                    this.$q = $q;
-                    this.$proxy = $proxy;
-                }
-                TimeSheetDataController.serviceId = "$TimeSheetDataController";
-                TimeSheetDataController.$inject = ["$q", "$proxy"];
-                return TimeSheetDataController;
-            })();
-            Business.TimeSheetDataController = TimeSheetDataController;
-            // declare correct angularjs module
-            timeRecorder.service(TimeSheetDataController.serviceId, TimeSheetDataController);
-        })(Business = Web.Business || (Web.Business = {}));
-    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
-})(TimeRecorder || (TimeRecorder = {}));
-/// <reference path="viewmodels/_viewmodel_references.ts" />
-/// <reference path="timesheetdatacontroller.ts" />
 // Update the most local relative references and declare this controller.
 // Install the angularjs.TypeScript.DefinitelyTyped NuGet package to resolve the .d.ts reference paths,
 var TimeRecorder;
@@ -4805,11 +6120,13 @@ var TimeRecorder;
     var Web;
     (function (Web) {
         var TimeSheetController = (function () {
-            function TimeSheetController($scope, blockUi, $proxy, $timeSheetDataController) {
+            function TimeSheetController($scope, blockUi, $proxy, $timeSheetDataController, $projectDataController) {
                 this.$scope = $scope;
                 this.blockUi = blockUi;
                 this.$proxy = $proxy;
                 this.$timeSheetDataController = $timeSheetDataController;
+                this.$projectDataController = $projectDataController;
+                this.isSearchingProjects = false;
                 this.datePickerStates = {
                     "opened1": false,
                     "opened2": false
@@ -4826,9 +6143,11 @@ var TimeRecorder;
             TimeSheetController.prototype.searchProjects = function (searchValue) {
                 var _this = this;
                 if (Triarc.strNotEmpty(searchValue)) {
+                    this.isSearchingProjects = true;
                     this.searchedProjects = [];
-                    this.$proxy.Project.searchProjectsMultiple({ searchValue: searchValue, take: 10, skip: 0 }).then(function (response) {
-                        _this.searchedProjects = response.data;
+                    this.$projectDataController.search(searchValue, 10, 0).then(function (response) {
+                        _this.searchedProjects = response;
+                        _this.isSearchingProjects = false;
                     }, angular.noop);
                 }
             };
@@ -4856,7 +6175,6 @@ var TimeRecorder;
             ////
             TimeSheetController.prototype.selectDate = function (date) {
                 this.selectedDate = date;
-                this.tryLoadData();
             };
             TimeSheetController.prototype.openDatepicker = function ($event, opened) {
                 $event.preventDefault();
@@ -4891,7 +6209,7 @@ var TimeRecorder;
             TimeSheetController.prototype.getTotalMonthThresholds = function () {
                 return this.timesheetData.thresholdMap.get(1 /* TotalMonthDone */);
             };
-            TimeSheetController.$inject = ["$scope", "blockUI", "$proxy", Web.Business.TimeSheetDataController.serviceId];
+            TimeSheetController.$inject = ["$scope", "blockUI", "$tr-proxy", Web.Business.TimeSheetDataController.serviceId, Web.Business.ProjectDataController.serviceId];
             TimeSheetController.controllerId = "TimeSheetController";
             TimeSheetController.onDirectiveExpansionRowEvent = "onDirectiveRowEvent";
             return TimeSheetController;
@@ -5221,6 +6539,25 @@ var TimeRecorder;
 /// <reference path="directives/tltimesheetdaycelldirective.ts" />
 /// <reference path="directives/tltimesheetemployeecelldirective.ts" />
 /// <reference path="directives/tltimesheettotalcelldirective.ts" />
+// Update the most local relative references and declare this controller.
+// Install the angularjs.TypeScript.DefinitelyTyped NuGet package to resolve the .d.ts reference paths,
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var InvoiceReportController = (function () {
+            function InvoiceReportController($scope) {
+                this.$scope = $scope;
+            }
+            InvoiceReportController.$inject = ['$scope'];
+            InvoiceReportController.controllerId = "InvoiceReportController";
+            return InvoiceReportController;
+        })();
+        Web.InvoiceReportController = InvoiceReportController;
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+// Update the app1 variable name to be that of your module variable
+timeRecorder.controller(TimeRecorder.Web.InvoiceReportController.controllerId, TimeRecorder.Web.InvoiceReportController);
 /// <reference path="controllers/usercontroller.ts" />
 /// <reference path="controllers/rolecontroller.ts" />
 /// <reference path="controllers/downloadcontroller.ts" />
@@ -5233,10 +6570,12 @@ var TimeRecorder;
 /// <reference path="controllers/timebookingcontroller.ts" />
 /// <reference path="controllers/timebookingformcontroller.ts" />
 /// <reference path="controllers/projectcontroller.ts" />
-// data controllers
-/// <reference path="datacontrollers/datacontroller_references.ts" />
+/// <reference path="controllers/expensescontroller.ts" />
+/// <reference path="controllers/expensesformcontroller.ts" />
 // timesheet 
 /// <reference path="controllers/timesheet/_timesheet_references.ts" />
+// employee
+/// <reference path="controllers/employee/invoicereportcontroller.ts" /> 
 var TimeRecorder;
 (function (TimeRecorder) {
     var Web;
@@ -5439,9 +6778,11 @@ timeRecorder.filter('minsToHours', function ($filter) { return function (input) 
 /// <reference path="directives/projecttree.ts" />
 /// <reference path="directives/multiselect.ts" />
 /// <reference path="directives/minstohours.ts" />
-/// <reference path="Client/data/Config.ts" />
 /// <reference path="client/data/data.ts" />
 /// <reference path="Client/timeRecorder.ts" /> 
+/// <reference path="client/datacontrollers/viewmodels/_viewmodel_references.ts" />
+/// <reference path="client/datarepositories/_repositories_references.ts" />
+/// <reference path="client/datacontrollers/datacontroller_references.ts" />
 /// <reference path="Client/_services.ts" />
 /// <reference path="Client/_controllers.ts" />
 /// <reference path="client/directives.ts" />
@@ -5458,8 +6799,51 @@ timeRecorder.filter('minsToHours', function ($filter) { return function (input) 
   );
 
 
+  $templateCache.put('Client/Views/employee/employeeInvoiceReport.html',
+    "<div ng-controller=\"InvoiceReportController as ctrl\"><div><div ng-repeat=\"expence in ctrl.employeeExpences\"></div></div></div>"
+  );
+
+
   $templateCache.put('Client/Views/entries.html',
     "<div ng-controller=\"EntryController as ctrl\"><h2>Buchungen</h2><hr><div ng-hide=\"ctrl.editMode\"><div class=\"row\"><div class=\"col-md-12\"><div class=\"row\"><div class=\"col-md-3\"><input type=\"text\" placeholder=\"Person\" ng-model=\"ctrl.search.personSearch\" typeahead-on-select=\"ctrl.selected($item, $model, $label)\" typeahead=\"p.label as p.label for p in ctrl.persons | filter:$viewValue | limitTo:8\" class=\"form-control\"></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Von\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.search.from\" is-open=\"ctrl.fromOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.open($event,1)\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Bis\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.search.to\" is-open=\"ctrl.toOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.open($event, 2)\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><select class=\"form-control\" ng-model=\"ctrl.search.type\" ng-options=\"t as t for t in ctrl.types\"><option value=\"\">Typ wählen</option></select></div><div class=\"col-md-2\"><select class=\"form-control\" ng-model=\"ctrl.search.state\" ng-options=\"s as s for s in ctrl.states\"><option value=\"\">Status Wählen</option></select></div></div><div class=\"row\"><div class=\"col-md-1\"><div class=\"btn btn-default\" ng-click=\"ctrl.search.search();\">Suchen</div></div><div class=\"col-md-2\"><div class=\"btn btn-default\" ng-click=\"ctrl.newEntry();\">Buchung Erstellen</div></div></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-md-12 tr-list-head\"><div class=\"row\"><div class=\"col-md-1\">Status</div><div class=\"col-md-1\">Badge</div><div class=\"col-md-2\">Person</div><div class=\"col-md-2\">Buchungszeitpunkt</div><div class=\"col-md-1\">Typ</div><div class=\"col-md-2\">Standort</div><div class=\"col-md-1\">TerminalId</div><div class=\"col-md-2\">AuftragId</div></div></div><div infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\" class=\"tr-list\"><div ng-repeat=\"entry in ctrl.search.currentResult\" class=\"col-md-12 tr-list-item\"><div class=\"row\" style=\"cursor: pointer\" ng-click=\"ctrl.selectEntry(entry)\"><div class=\"col-md-1\"><div class=\"tr-success-indicator\" ng-class=\"{'tr-success' : entry.transmitted, 'tr-fail' : !entry.transmitted}\"></div></div><div class=\"col-md-1\">{{entry.badgeId}}</div><div class=\"col-md-2 tr-ellipsis\">{{entry.employeeName}}</div><div class=\"col-md-2\">{{entry.bookedTime | date : 'dd.MM.yyyy - H:mm'}}</div><div class=\"col-md-1\">{{entry.type}}</div><div class=\"col-md-2 tr-ellipsis\">{{entry.locationName}}</div><div class=\"col-md-1\">{{entry.terminalId}}</div><div class=\"col-md-2 tr-ellipsis\">{{entry.objectId}}</div><div class=\"tr-list-selector-left\"></div><div class=\"tr-list-selector-right\"></div></div></div></div></div></div><div ng-show=\"ctrl.editMode\"><div class=\"row\"><div class=\"col-md-12\"><h4 class=\"tr-col-form-title tr-ellipsis\">Buchung Editieren</h4><div class=\"row\" ng-show=\"ctrl.minDate !=null && !ctrl.selectedEntry.canEdit && ctrl.selectedEntry.errorCode == 0\"><div class=\"col-md-12\"><p class=\"tr-warning-text\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span>&nbsp; <span>Diese Buchung ist bereits verrechnet und nicht mehr editierbar</span></p></div></div><div class=\"row\" ng-show=\"!ctrl.webServiceAvailable && !ctrl.newMode\"><div class=\"col-md-12\"><p class=\"tr-warning-text\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span>&nbsp; <span>Der plustime Webservice ist zurzeit nicht erreichbar</span></p></div></div><div class=\"row\" ng-show=\"ctrl.selectedEntry.errorCode != 0\"><div class=\"col-md-12\"><p class=\"tr-error-text\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> &nbsp; <span>Fehler bei der übertragung zu plustime: {{ctrl.selectedEntry.errorMessage}}</span></p></div></div><div class=\"row\" ng-show=\"ctrl.minDate == null && ctrl.selectedEntry.employeeId\"><div class=\"col-md-12\"><p class=\"tr-warning-text\"><span class=\"glyphicon glyphicon-exclamation-sign\"></span> &nbsp; <span>Für diesen Benutzer ist keine Berechnungssperre definiert, Buchungen können nicht editiert werden.</span></p></div></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"person\">Person</label><div class=\"col-md-3\"><select id=\"person\" class=\"form-control\" ng-change=\"ctrl.personChanged()\" ng-disabled=\"!ctrl.selectedEntry.canEdit\" ng-model=\"ctrl.selectedEntry.employeeId\"><option value=\"0\">Wählen...</option><option value=\"{{p.id}}\" ng-repeat=\"p in ctrl.people\">{{p.firstName}} {{p.lastName}}</option></select></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"location\">Terminal</label><div class=\"col-md-3\"><select id=\"location\" class=\"form-control\" ng-disabled=\"!ctrl.selectedEntry.canEdit\" ng-model=\"ctrl.selectedEntry.locationId\"><option value=\"0\">Wählen...</option><option value=\"{{l.key}}\" ng-repeat=\"l in ctrl.locations\">{{l.name}}</option></select></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"id\">Datum</label><div class=\"col-md-3\"><div class=\"input-group\"><input type=\"text\" class=\"form-control\" min-date=\"ctrl.minDate\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" ng-disabled=\"!ctrl.selectedEntry.CanEdit\" placeholder=\"Datum\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.selectedEntry.bookedTime\" is-open=\"ctrl.editOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.open($event, 3)\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></div></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"id\">Zeit</label><div class=\"col-md-3\" ng-show=\"ctrl.selectedEntry.canEdit\"><timepicker ng-model=\"ctrl.selectedEntry.bookedTime\" ng-change=\"ctrl.timechange();\" hour-step=\"1\" minute-step=\"1\" show-meridian=\"false\"></timepicker></div><div class=\"col-md-3\" ng-hide=\"ctrl.selectedEntry.canEdit\">{{ctrl.selectedEntry.BookedTime | date : 'HH:mm'}} Uhr</div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"id\">Typ</label><div class=\"col-md-3\"><select class=\"form-control\" ng-model=\"ctrl.selectedEntry.type\" ng-disabled=\"!ctrl.selectedEntry.canEdit\" ng-options=\"t as t for t in ctrl.types\"><option value=\"\">Typ wählen</option></select></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"id\">Objekt</label><div class=\"col-md-3\"><input class=\"form-control\" id=\"id\" type=\"text\" ng-disabled=\"!ctrl.selectedEntry.canEdit\" ng-model=\"ctrl.selectedEntry.objectId\"></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-md-12\"><div class=\"btn btn-default pull-left\" ng-show=\"ctrl.canEdit();\" ng-click=\"ctrl.save();\">Speichern</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-show=\"ctrl.canEdit() && !ctrl.newMode\" ng-click=\"ctrl.delete();\">Löschen</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.cancelEdit();\">Zurück</div></div></div></div></div></div></div>"
+  );
+
+
+  $templateCache.put('Client/Views/expenses.form.html',
+    "<div ng-controller=\"ExpensesFormController as ctrl\"><h2>{{ ctrl.isNew() ? 'Add an expense' : 'Edit expense' }}</h2><hr><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-md-12\"><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"person\">Person*</label><div class=\"col-md-3\"><select id=\"person\" class=\"tr-dropdown\" ui-select2 ng-model=\"ctrl.personValue\"><option value=\"0\">Wählen...</option><option value=\"{{p.Id}}\" ng-repeat=\"p in ctrl.service.metaData.Persons\">{{p.FirstName}} {{p.LastName}}</option></select></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"project\">Projekt*</label><div class=\"col-md-3\"><select id=\"project\" class=\"tr-dropdown\" ui-select2 ng-model=\"ctrl.projectValue\"><option value=\"0\">Wählen...</option><option value=\"{{p.Id}}\" ng-repeat=\"p in ctrl.service.metaData.Projects\">{{p.Name}}</option></select></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"type\">Typ*</label><div class=\"col-md-3\"><select id=\"type\" class=\"tr-dropdown\" ui-select2 ng-model=\"ctrl.typeValue\"><option value=\"0\">Wählen...</option><option value=\"{{t.Id}}\" ng-repeat=\"t in ctrl.service.metaData.Types\">{{t.Name}}</option></select></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"from\">Von*</label><div class=\"col-md-3\"><div class=\"input-group\"><input id=\"from\" ng-model=\"ctrl.fromValue\" type=\"text\" class=\"form-control\" min-date=\"ctrl.minDate\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" placeholder=\"Datum\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.selectedEntry.BookedTime\" is-open=\"ctrl.service.calendarSettings.fromIsOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.service.openCalendar($event, 'from')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></div></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"to\">Bis</label><div class=\"col-md-3\"><div class=\"input-group\"><input id=\"to\" ng-model=\"ctrl.toValue\" type=\"text\" class=\"form-control\" min-date=\"ctrl.minDate\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" placeholder=\"Datum\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.selectedEntry.BookedTime\" is-open=\"ctrl.service.calendarSettings.toIsOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.service.openCalendar($event, 'to')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></div></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-md-12\"><div class=\"btn btn-default pull-left\" ui-sref=\"expenses\">Zurück</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.save();\">Speichern</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.remove();\" ng-hide=\"ctrl.isNew()\">Löschen</div></div></div></div></div></div>"
+  );
+
+
+  $templateCache.put('Client/Views/expenses.html',
+    "<div ng-controller=\"ExpensesController as ctrl\" class=\"expenses\"><hr><div class=\"row\"><h1 class=\"col-md-9\">Spesen</h1><div class=\"col-md-3\"><span ui-sref=\"expensesAdd\" class=\"center-block glyphicon glyphicon-plus\"></span></div></div><div class=\"row\"><form class=\"col-md-12\" ng-submit=\"ctrl.search()\"><div class=\"row\"><div class=\"col-md-3\"><input type=\"text\" placeholder=\"Person\" ng-model=\"ctrl.personValue\" typeahead-on-select=\"ctrl.selected($item, $model, $label)\" typeahead=\"p.label as p.label for p in ctrl.persons | filter:$viewValue | limitTo:8\" class=\"form-control\"></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Von\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.fromValue\" is-open=\"ctrl.service.calendarSettings.fromIsOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.service.openCalendar($event, 'from')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Bis\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.toValue\" is-open=\"ctrl.service.calendarSettings.toIsOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.service.openCalendar($event, 'to')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><select class=\"form-control\" ng-model=\"ctrl.typeValue\" ng-options=\"t.Id as t.Name for t in ctrl.service.metaData.Types\"><option value=\"\">Typ wählen</option></select></div><div class=\"col-md-2\"><select class=\"form-control\" ng-model=\"ctrl.stateValue\" ng-options=\"s.Id as s.Name for s in ctrl.service.metaData.States\"><option value=\"\">Status Wählen</option></select></div></div><div class=\"row\"><div class=\"col-md-1\"><button type=\"submit\" class=\"btn btn-default\">Suchen</button></div><div class=\"col-md-1\"><div class=\"btn btn-default\" ui-sref=\"expensesAdd\">Erstellen</div></div></div></form></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"tr-list\"><!--infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\"--><div ng-repeat=\"entry in ctrl.searchResult\" class=\"col-md-12\"><div class=\"row\"><ng-include src=\"'expenses.row'\"></ng-include></div><!--ng-click=\"ctrl.selectEntry(entry)\" ui-sref=\"expensesEdit({id:entry.Id})\"--><!--<div class=\"row\" style=\"cursor: pointer;\" ng-click=\"ctrl.selectEntry(entry)\" ui-sref=\"expensesEdit({id:entry.Id})\">\r" +
+    "\n" +
+    "            <div class=\"col-md-3 tr-ellipsis\">{{ctrl.service.getPersonNameById(entry.PersonId)}}</div>\r" +
+    "\n" +
+    "            <div class=\"tr-list-selector-left\">\r" +
+    "\n" +
+    "            </div>\r" +
+    "\n" +
+    "            <div class=\"tr-list-selector-right\">\r" +
+    "\n" +
+    "            </div>\r" +
+    "\n" +
+    "          </div>--></div></div></div><script type=\"text/ng-template\" id=\"expenses.row\"><div class=\"col-md-1\"></div>\r" +
+    "\n" +
+    "      <div class=\"col-md-5 tr-ellipsis\">{{entry.description}}</div>\r" +
+    "\n" +
+    "      <div class=\"col-md-2\">{{ctrl.getValue(entry)}}</div>\r" +
+    "\n" +
+    "      <div class=\"col-md-2 tr-ellipsis\">{{ctrl.service.getTypeNameById(entry.TimeEntryTypeId)}}</div>\r" +
+    "\n" +
+    "      <div class=\"col-md-1\"></div>\r" +
+    "\n" +
+    "      <div class=\"col-md-1\">\r" +
+    "\n" +
+    "        <span ui-sref=\"expensesEdit({id:entry.Id})\" class=\"center-block glyphicon glyphicon-edit\"></span>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "      </div></script></div>"
   );
 
 
@@ -5624,7 +7008,7 @@ timeRecorder.filter('minsToHours', function ($filter) { return function (input) 
 
 
   $templateCache.put('Client/Views/timebookings.form.html',
-    "<div ng-controller=\"TimeBookingFormController as ctrl\"><h2>{{ ctrl.isNew() ? 'Arbeitszeit erfassen' : 'Arbeitszeit bearbeiten' }}</h2><hr><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-md-12\"><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"person\">Person*</label><div class=\"col-md-3\"><select id=\"person\" class=\"form-control\" ng-model=\"ctrl.personValue\"><option value=\"0\">Wählen...</option><option value=\"{{p.id}}\" ng-repeat=\"p in ctrl.service.metaData.persons\">{{p.firstName}} {{p.lastName}}</option></select></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"project\">Projekt*</label><div class=\"col-md-3\"><select id=\"project\" class=\"form-control\" ng-model=\"ctrl.projectValue\"><option value=\"0\">Wählen...</option><option value=\"{{p.id}}\" ng-repeat=\"p in ctrl.service.metaData.projects\">{{p.name}}</option></select></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"type\">Typ*</label><div class=\"col-md-3\"><select id=\"type\" class=\"form-control\" ng-model=\"ctrl.typeValue\"><option value=\"0\">Wählen...</option><option value=\"{{t.id}}\" ng-repeat=\"t in ctrl.service.metaData.types\">{{t.name}}</option></select></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"from\">Von*</label><div class=\"col-md-3\"><div class=\"input-group\"><input id=\"from\" ng-model=\"ctrl.fromValue\" type=\"text\" class=\"form-control\" min-date=\"ctrl.minDate\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" placeholder=\"Datum\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.selectedEntry.bookedTime\" is-open=\"ctrl.service.calendarSettings.fromIsOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.service.openCalendar($event, 'from')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></div></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"form-group\"><label class=\"col-md-1 control-label\" for=\"to\">Bis</label><div class=\"col-md-3\"><div class=\"input-group\"><input id=\"to\" ng-model=\"ctrl.toValue\" type=\"text\" class=\"form-control\" min-date=\"ctrl.minDate\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" placeholder=\"Datum\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.selectedEntry.bookedTime\" is-open=\"ctrl.service.calendarSettings.toIsOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.service.openCalendar($event, 'to')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></div></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-md-12\"><div class=\"btn btn-default pull-left\" ui-sref=\"timebookings\">Zurück</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.save();\">Speichern</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.remove();\" ng-hide=\"ctrl.isNew()\">Löschen</div></div></div></div></div></div>"
+    "<div ng-controller=\"TimeBookingFormController as ctrl\" class=\"timebookings-edit\"><h2>{{ ctrl.isNew() ? 'Arbeitszeit erfassen' : 'Arbeitszeit bearbeiten' }}</h2><hr><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><form name=\"timebookingForm\" class=\"form-horizontal\" novalidate><div class=\"row\"><div class=\"col-xs-4\"><div class=\"row\"><tl-validate target=\"timebookingForm.person\" label-text=\"'Person' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"person\" ng-model=\"ctrl.person\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.firstName}}&nbsp;{{$select.selected.lastName}}</ui-select-match><ui-select-choices repeat=\"person in ctrl.service.metaData.persons\"><div ng-bind-html=\"person.firstName + ' ' + person.lastName  | highlight: $select.search\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"timebookingForm.project\" label-text=\"'Projekt' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"project\" ng-model=\"ctrl.project\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.Name}}</ui-select-match><ui-select-choices repeat=\"project in ctrl.service.metaData.projects\"><div ng-bind-html=\"project.name | highlight: $select.search\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"timebookingForm.entryType\" label-text=\"'Typ' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"entryType\" ng-model=\"ctrl.entryType\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"entryType in ctrl.service.metaData.types\"><div ng-bind-html=\"entryType.name | highlight: $select.search\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.fromDate\" label-text=\"'Von' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><div class=\"input-group\"><input id=\"from\" name=\"fromDate\" ng-model=\"ctrl.fromValue\" type=\"text\" class=\"form-control date\" min-date=\"ctrl.minDate\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" placeholder=\"Datum\" datepicker-popup view-format required is-open=\"ctrl.service.calendarSettings.fromIsOpen\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.service.openCalendar($event, 'from')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></div></tl-validate><div class=\"time-picker\"><timepicker ng-model=\"ctrl.fromTimeValue\" show-meridian=\"false\"></timepicker></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.toDate\" label-text=\"'Bis' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><div class=\"input-group\"><input id=\" to\" name=\"toDate\" ng-model=\"ctrl.toValue\" type=\"text\" class=\"form-control date\" min-date=\"ctrl.minDate\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" placeholder=\"Datum\" datepicker-popup view-format required is-open=\"ctrl.service.calendarSettings.toIsOpen\"> <button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.service.openCalendar($event, 'to')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></div></tl-validate><div class=\"time-picker\"><timepicker ng-model=\"ctrl.toTimeValue\" show-meridian=\"false\"></timepicker></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn btn-default pull-left\" ui-sref=\"timebookings\">Zurück</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.save();\">Speichern</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.remove();\" ng-hide=\"ctrl.isNew()\">Löschen</div></div></div></div></div></form></div>"
   );
 
 
@@ -5634,7 +7018,7 @@ timeRecorder.filter('minsToHours', function ($filter) { return function (input) 
 
 
   $templateCache.put('Client/Views/timesheet/templates/timesheetAvailabilities.html',
-    "<div class=\"unavailability-section\"><span ng-if=\"!isOpen\" ng-click=\"toggleExpand()\" class=\"glyphicon glyphicon-plus-sign expansioon-button\" aria-hidden=\"true\"></span> <span ng-if=\"isOpen\" ng-click=\"toggleExpand()\" class=\"glyphicon glyphicon-minus-sign expansioon-button\" aria-hidden=\"true\"></span> <span class=\"expansion-label\" translate>Details</span> <span></span><div class=\"un-availabilities\" ng-repeat=\"unAvailability in availabilityEntryTypes | orderBy:'abbreviation'\"><span>{{unAvailability.abbreviation}}</span></div></div>"
+    "<div class=\"unavailability-section\"><span ng-if=\"!isOpen\" ng-click=\"toggleExpand()\" class=\"glyphicon glyphicon-plus-sign expansioon-button\" aria-hidden=\"true\"></span> <span ng-if=\"isOpen\" ng-click=\"toggleExpand()\" class=\"glyphicon glyphicon-minus-sign expansioon-button\" aria-hidden=\"true\"></span> <span class=\"expansion-label\" translate>Details</span> <span></span><div class=\"un-availabilities\" ng-repeat=\"unAvailability in availabilityEntryTypes | orderBy:'abbreviation'\"><span>{{unAvailability.name}}</span></div></div>"
   );
 
 
@@ -5654,7 +7038,7 @@ timeRecorder.filter('minsToHours', function ($filter) { return function (input) 
 
 
   $templateCache.put('Client/Views/timesheet/timesheet.html',
-    "<div ng-controller=\"TimeSheetController as ctrl\" class=\"timesheet\"><div class=\"project-search\"><div class=\"project-search-details\" ng-style=\"{'width': ctrl.timesheetData.employeeColumnWidth + 'px'}\"><div class=\"projectName\"><span translate>Projectname</span> <span translate>Monat</span></div></div><div class=\"project-search-criteria\"><div class=\"row\"><div class=\"col-md-4\"><ui-select ng-model=\"ctrl.selectedProject\" ng-change=\"ctrl.tryLoadData()\" class=\"\"><ui-select-match placeholder=\"{{'Suche...' | translate}}\">{{$select.selected.Name}}</ui-select-match><ui-select-choices repeat=\"project in ctrl.searchedProjects track by $index\" refresh=\"ctrl.searchProjects($select.search)\"><div ng-bind-html=\"project.name  | highlight: $select.search\"></div></ui-select-choices></ui-select></div></div><!----><div class=\"row\"><div class=\"col-md-4\"><div class=\"input-group\"><input name=\"date\" type=\"text\" ng-model=\"ctrl.selectedDate\" class=\"form-control datepicker\" datepicker-popup=\"MM.yyyy\" view-format=\"MM.yyyy\" is-open=\"ctrl.datePickerStates['opened1']\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" date-disabled=\"day\" min-mode=\"'month'\" datepicker-mode=\"'month'\" datepicker-options=\"{minMode: 'month',datepickerMode: 'month'}\" ng-change=\"ctrl.selectDate(ctrl.selectedDate)\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openDatepicker($event, 'opened1')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></div></div></div></div></div><div class=\"row timesheet-data\" tl-window-height=\"150\" tl-window-height-container-class=\".timesheet\" block-ui=\"timesheetGrid\"><div ng-if=\"ctrl.timesheetData.timesheet\" class=\"col-md-12 timesheet-data-container\" scroll-manager scroll-sender><div class=\"timesheet-employees\" ng-style=\"{'min-width': ctrl.timesheetData.employeeColumnWidth + 'px'}\"><div class=\"header-column\"><span>{{'Mitarbeiter' | translate}}</span></div><div class=\"verticle-scrollable\" vertical-scroll-receiver tl-window-height=\"190\" tl-window-height-container-class=\".timesheet\"><div ng-class=\"'timesheet-row-' + {{$index}}\" class=\"timesheet-employee-row timesheet-row\" ng-repeat=\"employee in ctrl.timesheetData.timesheet.timeSheetEmployees track by $index\" ng-style=\"{'height': ctrl.timesheetData.rowHeight + 'px'}\"><timesheet-employee-cell employee=\"employee\" column-width=\"ctrl.timesheetData.employeeColumnWidth\" availability-entry-types=\"ctrl.timesheetData.timesheet.availabilityEntryTypes\" row-height=\"ctrl.timesheetData.rowHeight\" row-height-expanded=\"ctrl.timesheetData.rowHeightExpanded\" row-number=\"$index\" external-scope=\"ctrl.$scope\"></timesheet-employee-cell></div></div></div><div class=\"timesheet-days\"><div class=\"header-column\" ng-style=\"{'min-width': ctrl.timesheetData.dayColumnWidth + 'px', 'background-color' : dayColumn.color}\" ng-repeat=\"dayColumn in ctrl.timesheetData.dayColumns\"><span>{{dayColumn.date | date:'EEE dd'}}</span></div><div class=\"horizontal-scrollable\" vertical-scroll-receiver tl-window-height=\"190\" tl-window-height-container-class=\".timesheet\"><div ng-class=\"'timesheet-row-' + {{$index}}\" class=\"timesheet-days-row timesheet-row\" ng-repeat=\"employee in ctrl.timesheetData.timesheet.timeSheetEmployees\" ng-style=\"{'height': ctrl.timesheetData.rowHeight + 'px'}\"><timesheet-day-cell time-entry=\"employee.timeEntry(dayColumn.date)\" is-weekend=\"ctrl.isWeekend($index + 1)\" column-width=\"ctrl.timesheetData.dayColumnWidth\" thresholds=\"ctrl.getDayThresholds()\" ng-repeat=\"dayColumn in ctrl.timesheetData.dayColumns track by $index\"></timesheet-day-cell></div></div></div><div class=\"timesheet-totals\" ng-style=\"{'min-width': ctrl.timesheetData.totalColumnWidth + 'px'}\"><div class=\"header-column\"><span>{{'Total' | translate}}</span></div><div class=\"verticle-scrollable\" vertical-scroll-receiver tl-window-height=\"190\" tl-window-height-container-class=\".timesheet\"><div ng-class=\"'timesheet-row-' + {{$index}}\" class=\"timesheet-total-row timesheet-row\" ng-repeat=\"employee in ctrl.timesheetData.timesheet.timeSheetEmployees\" ng-style=\"{'height': ctrl.timesheetData.rowHeight + 'px'}\"><timesheet-total-cell employee=\"employee\" column-width=\"ctrl.timesheetData.totalColumnWidth\" thresholds=\"ctrl.getTotalMonthThresholds()\" availability-entry-types=\"ctrl.timesheetData.timesheet.availabilityEntryTypes\"></timesheet-total-cell></div></div></div><div scroll-sender tl-full-height style=\"width: 17px; position: absolute; right: 0; z-index: 100; overflow-y: auto\" tl-window-height=\"150\" tl-window-height-container-class=\".timesheet\"><div tl-height-of=\".verticle-scrollable\" tl-height-of-on-event=\"ctrl.rowExpansionEventName()\" tl-height-of-offset=\"20\" style=\"width: 17px\"></div></div></div></div></div><!-- ui-grid-pinning-->"
+    "<div ng-controller=\"TimeSheetController as ctrl\" class=\"timesheet\"><div class=\"project-search\"><div class=\"project-search-details\" ng-style=\"{'width': ctrl.timesheetData.employeeColumnWidth + 'px'}\"><div class=\"projectName\"><span translate>Projektname</span> <span translate>Monat</span></div></div><div class=\"project-search-criteria\"><div class=\"row\"><div class=\"col-md-4\"><ui-select ng-model=\"ctrl.selectedProject\"><ui-select-match placeholder=\"{{'Suche...' | translate}}\">{{$select.selected.Name}}</ui-select-match><ui-select-choices repeat=\"project in ctrl.searchedProjects track by $index\" refresh=\"ctrl.searchProjects($select.search)\"><div ng-bind-html=\"project.name  | highlight: $select.search\"></div></ui-select-choices></ui-select></div><div class=\"col-md-3 search\"><div ng-show=\"ctrl.isSearchingProjects\" class=\"ui-select-searching\"></div><button ng-click=\"ctrl.tryLoadData()\" class=\"btn btn-default search-button\">Suchen</button></div></div><!----><div class=\"row\"><div class=\"col-md-4\"><div class=\"input-group\"><input name=\"date\" type=\"text\" ng-model=\"ctrl.selectedDate\" class=\"form-control datepicker\" datepicker-popup=\"MM.yyyy\" view-format=\"MM.yyyy\" is-open=\"ctrl.datePickerStates['opened1']\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" date-disabled=\"day\" min-mode=\"'month'\" datepicker-mode=\"'month'\" datepicker-options=\"{minMode: 'month',datepickerMode: 'month'}\" ng-change=\"ctrl.selectDate(ctrl.selectedDate)\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openDatepicker($event, 'opened1')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></div></div></div></div></div><div class=\"row timesheet-data\" tl-window-height=\"150\" tl-window-height-container-class=\".timesheet\" block-ui=\"timesheetGrid\"><div ng-if=\"ctrl.timesheetData.timesheet\" class=\"col-md-12 timesheet-data-container\" scroll-manager scroll-sender><div class=\"timesheet-employees\" ng-style=\"{'min-width': ctrl.timesheetData.employeeColumnWidth + 'px'}\"><div class=\"header-column\"><span>{{'Mitarbeiter' | translate}}</span></div><div class=\"verticle-scrollable\" vertical-scroll-receiver tl-window-height=\"190\" tl-window-height-container-class=\".timesheet\"><div ng-class=\"'timesheet-row-' + {{$index}}\" class=\"timesheet-employee-row timesheet-row\" ng-repeat=\"employee in ctrl.timesheetData.timesheet.timeSheetEmployees track by $index\" ng-style=\"{'height': ctrl.timesheetData.rowHeight + 'px'}\"><timesheet-employee-cell employee=\"employee\" column-width=\"ctrl.timesheetData.employeeColumnWidth\" availability-entry-types=\"ctrl.timesheetData.timesheet.availabilityEntryTypes\" row-height=\"ctrl.timesheetData.rowHeight\" row-height-expanded=\"ctrl.timesheetData.rowHeightExpanded\" row-number=\"$index\" external-scope=\"ctrl.$scope\"></timesheet-employee-cell></div></div></div><div class=\"timesheet-days\"><div class=\"header-column\" ng-style=\"{'min-width': ctrl.timesheetData.dayColumnWidth + 'px', 'background-color' : dayColumn.color}\" ng-repeat=\"dayColumn in ctrl.timesheetData.dayColumns\"><span>{{dayColumn.date | date:'EEE dd'}}</span></div><div class=\"horizontal-scrollable\" vertical-scroll-receiver tl-window-height=\"190\" tl-window-height-container-class=\".timesheet\"><div ng-class=\"'timesheet-row-' + {{$index}}\" class=\"timesheet-days-row timesheet-row\" ng-repeat=\"employee in ctrl.timesheetData.timesheet.timeSheetEmployees\" ng-style=\"{'height': ctrl.timesheetData.rowHeight + 'px'}\"><timesheet-day-cell time-entry=\"employee.timeEntry(dayColumn.date)\" is-weekend=\"ctrl.isWeekend($index + 1)\" column-width=\"ctrl.timesheetData.dayColumnWidth\" thresholds=\"ctrl.getDayThresholds()\" ng-repeat=\"dayColumn in ctrl.timesheetData.dayColumns track by $index\"></timesheet-day-cell></div></div></div><div class=\"timesheet-totals\" ng-style=\"{'min-width': ctrl.timesheetData.totalColumnWidth + 'px'}\"><div class=\"header-column\"><span>{{'Total' | translate}}</span></div><div class=\"verticle-scrollable\" vertical-scroll-receiver tl-window-height=\"190\" tl-window-height-container-class=\".timesheet\"><div ng-class=\"'timesheet-row-' + {{$index}}\" class=\"timesheet-total-row timesheet-row\" ng-repeat=\"employee in ctrl.timesheetData.timesheet.timeSheetEmployees\" ng-style=\"{'height': ctrl.timesheetData.rowHeight + 'px'}\"><timesheet-total-cell employee=\"employee\" column-width=\"ctrl.timesheetData.totalColumnWidth\" thresholds=\"ctrl.getTotalMonthThresholds()\" availability-entry-types=\"ctrl.timesheetData.timesheet.availabilityEntryTypes\"></timesheet-total-cell></div></div></div><div scroll-sender tl-full-height style=\"width: 17px; position: absolute; right: 0; z-index: 100; overflow-y: auto\" tl-window-height=\"150\" tl-window-height-container-class=\".timesheet\"><div tl-height-of=\".verticle-scrollable\" tl-height-of-on-event=\"ctrl.rowExpansionEventName()\" tl-height-of-offset=\"20\" style=\"width: 17px\"></div></div></div></div></div><!-- ui-grid-pinning-->"
   );
 
 
