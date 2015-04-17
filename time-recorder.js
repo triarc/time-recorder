@@ -2726,23 +2726,9 @@ var TimeRecorder;
                     enumerable: true,
                     configurable: true
                 });
-                Object.defineProperty(ExpenseTypeVm.prototype, "default", {
+                Object.defineProperty(ExpenseTypeVm.prototype, "amountBased", {
                     get: function () {
-                        return this.cm().default;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(ExpenseTypeVm.prototype, "fixed", {
-                    get: function () {
-                        return this.cm().fixed;
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-                Object.defineProperty(ExpenseTypeVm.prototype, "needAmount", {
-                    get: function () {
-                        return this.cm().needAmount;
+                        return this.cm().amountBased;
                     },
                     enumerable: true,
                     configurable: true
@@ -3156,6 +3142,9 @@ var TimeRecorder;
                     this.$proxy = $proxy;
                     this.$q = $q;
                 }
+                ExpenseTypeRepository.prototype.getAllExpenses = function () {
+                    return this.$proxy.Expenses.getExpenseTypesMultiple({}).then(function (res) { return res.data; });
+                };
                 ExpenseTypeRepository.$inject = [
                     "$tr-proxy",
                     "$q"
@@ -3225,7 +3214,7 @@ var TimeRecorder;
                     "$tr-proxy",
                     "$q"
                 ];
-                ProjectRepository.serviceId = "ProjectRepository";
+                ProjectRepository.serviceId = "trProjectRepository";
                 return ProjectRepository;
             })();
             Business.ProjectRepository = ProjectRepository;
@@ -3284,7 +3273,7 @@ var TimeRecorder;
                 EmployeeRepository.$inject = [
                     "$tr-proxy"
                 ];
-                EmployeeRepository.serviceId = "EmployeeRepository";
+                EmployeeRepository.serviceId = "trEmployeeRepository";
                 return EmployeeRepository;
             })();
             Business.EmployeeRepository = EmployeeRepository;
@@ -3329,10 +3318,13 @@ var TimeRecorder;
                     this.$q = $q;
                     this.expenseTypeRepository = expenseTypeRepository;
                 }
+                ExpenseTypeDataController.prototype.getAllExpenses = function () {
+                    return this.expenseTypeRepository.getAllExpenses().then(function (expenseTypes) { return expenseTypes.toEnumerable().select(function (et) { return new Business.ExpenseTypeVm(function () { return et; }); }).toArray(); });
+                };
                 ExpenseTypeDataController.serviceId = "ExpenseTypeDataController";
                 ExpenseTypeDataController.$inject = [
                     "$q",
-                    Business.ExpenseRepository.serviceId
+                    Business.ExpenseTypeRepository.serviceId
                 ];
                 return ExpenseTypeDataController;
             })();
@@ -3460,12 +3452,32 @@ var TimeRecorder;
         })(Business = Web.Business || (Web.Business = {}));
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var TimeBookingDataControllerService = (function () {
+                function TimeBookingDataControllerService() {
+                }
+                TimeBookingDataControllerService.serviceId = "$TimeBookingDataControllerService";
+                TimeBookingDataControllerService.$inject = [];
+                return TimeBookingDataControllerService;
+            })();
+            Business.TimeBookingDataControllerService = TimeBookingDataControllerService;
+            // declare correct angularjs module
+            timeRecorder.service(TimeBookingDataControllerService.serviceId, TimeBookingDataControllerService);
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
 /// <reference path="timesheetdatacontroller.ts" />
 /// <reference path="expensetypedatacontroller.ts" />
 /// <reference path="expensedatacontroller.ts" />
 /// <reference path="projectdatacontroller.ts" />
 /// <reference path="people/peopledatacontroller.ts" />
 /// <reference path="people/employeedatacontroller.ts" />
+/// <reference path="timebookingdatacontroller.ts" />
 var TimeRecorder;
 (function (TimeRecorder) {
     var Web;
@@ -5966,18 +5978,14 @@ var TimeRecorder;
     (function (Web) {
         var ExpensesController = (function () {
             // constructor
-            function ExpensesController(authentication, service, expensesDataController, $state) {
+            function ExpensesController(authentication, service, expensesDataController, expenseTypeDataController, $state) {
                 var _this = this;
                 this.authentication = authentication;
                 this.service = service;
                 this.expensesDataController = expensesDataController;
+                this.expenseTypeDataController = expenseTypeDataController;
                 this.$state = $state;
-                // form values
-                this.fromValue = null;
-                this.toValue = null;
-                this.stateValue = null;
-                this.personValue = null;
-                this.typeValue = null;
+                this.currentWeek = new Date();
                 authentication.hasClaimEnsureLoggedIn("web_expenses").then(function (hasClaim) {
                     if (hasClaim)
                         _this.init();
@@ -5989,7 +5997,11 @@ var TimeRecorder;
             }
             // init view
             ExpensesController.prototype.init = function () {
-                this.search();
+                var _this = this;
+                this.expenseTypeDataController.getAllExpenses().then(function (expenseTypes) {
+                    _this.expenseTypes = expenseTypes;
+                    _this.search();
+                });
                 //this.service.getMetaData(false).then((response) => {
                 //  this.search();
                 //},() => { });
@@ -6019,6 +6031,7 @@ var TimeRecorder;
                 "trAuthenticationService",
                 Web.ExpensesService.serviceId,
                 Web.Business.ExpenseDataController.serviceId,
+                Web.Business.ExpenseTypeDataController.serviceId,
                 "$state"
             ];
             return ExpensesController;
@@ -6815,35 +6828,79 @@ timeRecorder.filter('minsToHours', function ($filter) { return function (input) 
 
 
   $templateCache.put('Client/Views/expenses.html',
-    "<div ng-controller=\"ExpensesController as ctrl\" class=\"expenses\"><hr><div class=\"row\"><h1 class=\"col-md-9\">Spesen</h1><div class=\"col-md-3\"><span ui-sref=\"expensesAdd\" class=\"center-block glyphicon glyphicon-plus\"></span></div></div><div class=\"row\"><form class=\"col-md-12\" ng-submit=\"ctrl.search()\"><div class=\"row\"><div class=\"col-md-3\"><input type=\"text\" placeholder=\"Person\" ng-model=\"ctrl.personValue\" typeahead-on-select=\"ctrl.selected($item, $model, $label)\" typeahead=\"p.label as p.label for p in ctrl.persons | filter:$viewValue | limitTo:8\" class=\"form-control\"></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Von\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.fromValue\" is-open=\"ctrl.service.calendarSettings.fromIsOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.service.openCalendar($event, 'from')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Bis\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.toValue\" is-open=\"ctrl.service.calendarSettings.toIsOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.service.openCalendar($event, 'to')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><select class=\"form-control\" ng-model=\"ctrl.typeValue\" ng-options=\"t.Id as t.Name for t in ctrl.service.metaData.Types\"><option value=\"\">Typ wählen</option></select></div><div class=\"col-md-2\"><select class=\"form-control\" ng-model=\"ctrl.stateValue\" ng-options=\"s.Id as s.Name for s in ctrl.service.metaData.States\"><option value=\"\">Status Wählen</option></select></div></div><div class=\"row\"><div class=\"col-md-1\"><button type=\"submit\" class=\"btn btn-default\">Suchen</button></div><div class=\"col-md-1\"><div class=\"btn btn-default\" ui-sref=\"expensesAdd\">Erstellen</div></div></div></form></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"tr-list\"><!--infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\"--><div ng-repeat=\"entry in ctrl.searchResult\" class=\"col-md-12\"><div class=\"row\"><ng-include src=\"'expenses.row'\"></ng-include></div><!--ng-click=\"ctrl.selectEntry(entry)\" ui-sref=\"expensesEdit({id:entry.Id})\"--><!--<div class=\"row\" style=\"cursor: pointer;\" ng-click=\"ctrl.selectEntry(entry)\" ui-sref=\"expensesEdit({id:entry.Id})\">\r" +
+    "<div ng-controller=\"ExpensesController as ctrl\" class=\"expenses\"><hr><div class=\"row\"><h1 class=\"col-md-9\">Spesen</h1><div class=\"col-md-offset-1 col-md-2 text-right\"><span ui-sref=\"expensesAdd\" class=\"glyphicon glyphicon-plus\"></span></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row tr-list-head\"></div><div class=\"row\"><div class=\"tr-list\"><!--infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\"--><div class=\"row\"><div class=\"col-md-2\"><ng-include src=\"'expenses.weeklabel'\"></ng-include></div><div class=\"col-md-10\"><ng-include src=\"'expenses.row'\"></ng-include></div></div><!--ng-click=\"ctrl.selectEntry(entry)\" ui-sref=\"expensesEdit({id:entry.Id})\"--><!--<div class=\"row\" style=\"cursor: pointer;\" ng-click=\"ctrl.selectEntry(entry)\" ui-sref=\"expensesEdit({id:entry.Id})\">\r" +
     "\n" +
-    "            <div class=\"col-md-3 tr-ellipsis\">{{ctrl.service.getPersonNameById(entry.PersonId)}}</div>\r" +
+    "        <div class=\"col-md-3 tr-ellipsis\">{{ctrl.service.getPersonNameById(entry.PersonId)}}</div>\r" +
     "\n" +
-    "            <div class=\"tr-list-selector-left\">\r" +
+    "        <div class=\"tr-list-selector-left\">\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "        <div class=\"tr-list-selector-right\">\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "      </div>--></div></div><script type=\"text/ng-template\" id=\"expenses.row\"><div ng-repeat=\"entry in ctrl.searchResult\" class=\"col-md-12\">\r" +
+    "\n" +
+    "      <div class=\"row\">\r" +
+    "\n" +
+    "        <div class=\"col-md-2\">{{entry.timestamp | date:\"dd.MM\"}} </div>\r" +
+    "\n" +
+    "        <div class=\"col-md-6 tr-ellipsis\">          \r" +
+    "\n" +
+    "          <div class=\"row\">\r" +
+    "\n" +
+    "            <div class=\"col-md-12\">\r" +
+    "\n" +
+    "              Expense type name\r" +
     "\n" +
     "            </div>\r" +
     "\n" +
-    "            <div class=\"tr-list-selector-right\">\r" +
+    "          </div>\r" +
+    "\n" +
+    "          <div class=\"row\">\r" +
+    "\n" +
+    "            <div class=\"col-md-12\">\r" +
+    "\n" +
+    "              {{entry.description}}\r" +
     "\n" +
     "            </div>\r" +
     "\n" +
-    "          </div>--></div></div></div><script type=\"text/ng-template\" id=\"expenses.row\"><div class=\"col-md-1\"></div>\r" +
+    "          </div>\r" +
     "\n" +
-    "      <div class=\"col-md-5 tr-ellipsis\">{{entry.description}}</div>\r" +
+    "        </div>\r" +
     "\n" +
-    "      <div class=\"col-md-2\">{{ctrl.getValue(entry)}}</div>\r" +
+    "        <div class=\"col-md-2\">{{ctrl.getValue(entry)}}</div>\r" +
     "\n" +
-    "      <div class=\"col-md-2 tr-ellipsis\">{{ctrl.service.getTypeNameById(entry.TimeEntryTypeId)}}</div>\r" +
+    "        <!--<div class=\"col-md-2 tr-ellipsis\">{{ctrl.service.getTypeNameById(entry.TimeEntryTypeId)}}</div>-->\r" +
     "\n" +
-    "      <div class=\"col-md-1\"></div>\r" +
+    "        <div class=\"col-md-2 text-right\">\r" +
     "\n" +
-    "      <div class=\"col-md-1\">\r" +
+    "          <span ui-sref=\"expensesEdit({id:entry.Id})\" class=\"glyphicon glyphicon-edit\"></span>\r" +
     "\n" +
-    "        <span ui-sref=\"expensesEdit({id:entry.Id})\" class=\"center-block glyphicon glyphicon-edit\"></span>\r" +
+    "        </div>\r" +
     "\n" +
-    "\r" +
+    "      </div>\r" +
     "\n" +
-    "      </div></script></div>"
+    "    </div></script><script type=\"text/ng-template\" id=\"expenses.weeklabel\"><div class=\"row\">\r" +
+    "\n" +
+    "      <div class=\"col-md-12 tr-ellipsis\">\r" +
+    "\n" +
+    "        {{ctrl.currentWeek | date:\"MMMM\"}}\r" +
+    "\n" +
+    "      </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "    <div class=\"row\">\r" +
+    "\n" +
+    "      <div class=\"col-md-12 tr-ellipsis\">\r" +
+    "\n" +
+    "        KW {{ctrl.currentWeek | date:\"w\"}}\r" +
+    "\n" +
+    "      </div>\r" +
+    "\n" +
+    "    </div></script></div>"
   );
 
 
