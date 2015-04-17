@@ -217,7 +217,7 @@ declare module TimeRecorder.Web.Data {
     }
     interface IExpenseCm {
         id?: number;
-        value?: number;
+        value: number;
         timestamp?: Date;
         description: string;
         expenseTypeId: number;
@@ -231,9 +231,7 @@ declare module TimeRecorder.Web.Data {
         description: string;
         validFrom: Date;
         validTo: Date;
-        default?: number;
-        fixed: boolean;
-        needAmount: boolean;
+        amountBased: boolean;
     }
     interface IExpensesSearchCm {
         skip?: number;
@@ -1573,9 +1571,7 @@ declare module TimeRecorder.Web.Business {
         description: string;
         validFrom: Date;
         validTo: Date;
-        default: number;
-        fixed: boolean;
-        needAmount: boolean;
+        amountBased: boolean;
     }
 }
 declare module TimeRecorder.Web.Bu {
@@ -1661,6 +1657,7 @@ declare module TimeRecorder.Web.Business {
         static $inject: string[];
         static serviceId: string;
         constructor($proxy: Data.ProxyContainer, $q: ng.IQService);
+        getAllExpenses(): ng.IPromise<Data.IExpenseTypeCm[]>;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -1722,6 +1719,7 @@ declare module TimeRecorder.Web.Business {
         static serviceId: string;
         static $inject: string[];
         constructor($q: ng.IQService, expenseTypeRepository: ExpenseTypeRepository);
+        getAllExpenses(): ng.IPromise<ExpenseTypeVm[]>;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -1767,6 +1765,13 @@ declare module TimeRecorder.Web.Business {
         constructor($q: ng.IQService, employeeRepository: EmployeeRepository);
         getAllPersons(): ng.IPromise<Business.EmployeeVm[]>;
         getById(id: string): ng.IPromise<Business.EmployeeVm>;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class TimeBookingDataControllerService {
+        static serviceId: string;
+        static $inject: any[];
+        constructor();
     }
 }
 declare module TimeRecorder.Web {
@@ -2435,16 +2440,14 @@ declare module TimeRecorder.Web {
         private authentication;
         service: ExpensesService;
         private expensesDataController;
+        private expenseTypeDataController;
         private $state;
         static controllerId: string;
         static $inject: string[];
         searchResult: Business.ExpenseVm[];
-        fromValue: Date;
-        toValue: Date;
-        stateValue: number;
-        personValue: string;
-        typeValue: number;
-        constructor(authentication: IAuthenticationService, service: ExpensesService, expensesDataController: Business.ExpenseDataController, $state: any);
+        expenseTypes: Business.ExpenseTypeVm[];
+        currentWeek: Date;
+        constructor(authentication: IAuthenticationService, service: ExpensesService, expensesDataController: Business.ExpenseDataController, expenseTypeDataController: Business.ExpenseTypeDataController, $state: any);
         private init();
         getValue(entry: Business.ExpenseVm): string;
         search(): void;
