@@ -63,7 +63,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 VersionResource.prototype.getLatestPlistRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Version/GetLatestPlist";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Version/GetLatestPlist";
                     if (angular.isDefined(params.versionCode1)) {
                         url = Triarc.Data.appendUrlParameter(url, "versionCode1", encodeURIComponent(params.versionCode1));
                     }
@@ -81,7 +81,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 VersionResource.prototype.getLatestVersionNumberRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Version/GetLatestVersionNumber";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Version/GetLatestVersionNumber";
                     if (angular.isDefined(params.includeBetas)) {
                         url = Triarc.Data.appendUrlParameter(url, "includeBetas", encodeURIComponent(params.includeBetas));
                     }
@@ -96,7 +96,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 VersionResource.prototype.getServerVersionRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Version/GetServerVersion";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Version/GetServerVersion";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Version", "string", false);
                     return dataRequest;
                 };
@@ -105,7 +105,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 VersionResource.prototype.getVersionsMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Version/GetVersions";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Version/GetVersions";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -137,7 +137,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 ImageResource.prototype.getRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Image/Get";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Image/Get";
                     if (angular.isDefined(params.id)) {
                         url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
                     }
@@ -157,7 +157,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 EmployeeResource.prototype.getEmployeeByIdRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Employee/GetEmployeeById";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Employee/GetEmployeeById";
                     if (angular.isDefined(params.id)) {
                         url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
                     }
@@ -169,7 +169,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 EmployeeResource.prototype.getMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Employee/Get";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Employee/Get";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -190,7 +190,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 EmployeeResource.prototype.searchMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Employee/Search";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Employee/Search";
                     if (angular.isDefined(params.search)) {
                         url = Triarc.Data.appendUrlParameter(url, "search", encodeURIComponent(params.search));
                     }
@@ -220,7 +220,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 EmployeeResource.prototype.putRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Employee/Put";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Employee/Put";
                     var dataRequest = new Triarc.Data.DataRequest("PUT", url, data, "Employee", "any", true);
                     return dataRequest;
                 };
@@ -229,7 +229,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 EmployeeResource.prototype.deleteRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Employee/Delete";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Employee/Delete";
                     if (angular.isDefined(params.id)) {
                         url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
                     }
@@ -258,7 +258,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 AddressResource.prototype.searchAddressesMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Address/SearchAddresses";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Address/SearchAddresses";
                     if (angular.isDefined(params.searchString)) {
                         url = Triarc.Data.appendUrlParameter(url, "searchString", encodeURIComponent(params.searchString));
                     }
@@ -282,7 +282,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AddressResource.prototype.getMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Address/Get";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Address/Get";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -303,7 +303,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AddressResource.prototype.getRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Address/Get";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Address/Get";
                     if (angular.isDefined(params.id)) {
                         url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
                     }
@@ -326,7 +326,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 TimesheetResource.prototype.getTimesheetRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Timesheet/GetTimesheet";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Timesheet/GetTimesheet";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Timesheet", "ITimesheetCm", true);
                     return dataRequest;
                 };
@@ -349,7 +349,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 OperationResource.prototype.triggerImportPersonalDataRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Operation/TriggerImportPersonalData";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Operation/TriggerImportPersonalData";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Operation", "any", false);
                     return dataRequest;
                 };
@@ -358,7 +358,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 OperationResource.prototype.triggerImportObjectDataRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Operation/TriggerImportObjectData";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Operation/TriggerImportObjectData";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Operation", "any", false);
                     return dataRequest;
                 };
@@ -375,7 +375,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 TimeBookingResource.prototype.searchMultipleRequest = function (params, data) {
-                    var url = this.$requestSender.getUrl() + "/TimeBooking/Search";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeBooking/Search";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -396,7 +396,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeBookingResource.prototype.saveRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/TimeBooking/Save";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeBooking/Save";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeBooking", "ITimeBookingCm", true);
                     return dataRequest;
                 };
@@ -405,7 +405,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeBookingResource.prototype.getRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/TimeBooking/Get";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeBooking/Get";
                     if (angular.isDefined(params.id)) {
                         url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
                     }
@@ -417,7 +417,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeBookingResource.prototype.getAvailableEntryTypesMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/TimeBooking/GetAvailableEntryTypes";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeBooking/GetAvailableEntryTypes";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -438,7 +438,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeBookingResource.prototype.getMetaDataRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/TimeBooking/GetMetaData";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeBooking/GetMetaData";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "TimeBooking", "ITimeBookingMetaDataVm", false);
                     return dataRequest;
                 };
@@ -447,7 +447,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeBookingResource.prototype.deleteRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/TimeBooking/Delete";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeBooking/Delete";
                     if (angular.isDefined(params.id)) {
                         url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
                     }
@@ -479,7 +479,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 AdminResource.prototype.seedDatabaseRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Admin/SeedDatabase";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Admin/SeedDatabase";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "any", false);
                     return dataRequest;
                 };
@@ -488,7 +488,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AdminResource.prototype.webServiceEnabledRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Admin/WebServiceEnabled";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Admin/WebServiceEnabled";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "boolean", false);
                     return dataRequest;
                 };
@@ -497,7 +497,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AdminResource.prototype.webServiceAvailableRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Admin/WebServiceAvailable";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Admin/WebServiceAvailable";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "boolean", false);
                     return dataRequest;
                 };
@@ -506,7 +506,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AdminResource.prototype.triggerPersonImportRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Admin/TriggerPersonImport";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Admin/TriggerPersonImport";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "boolean", false);
                     return dataRequest;
                 };
@@ -515,7 +515,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AdminResource.prototype.triggerProjectImportRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Admin/TriggerProjectImport";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Admin/TriggerProjectImport";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "boolean", false);
                     return dataRequest;
                 };
@@ -524,7 +524,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AdminResource.prototype.fetchOrderDataRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Admin/FetchOrderData";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Admin/FetchOrderData";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "any", false);
                     return dataRequest;
                 };
@@ -533,7 +533,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AdminResource.prototype.getServerVersionRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Admin/GetServerVersion";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Admin/GetServerVersion";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "string", false);
                     return dataRequest;
                 };
@@ -542,7 +542,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AdminResource.prototype.getConfigsMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Admin/GetConfigs";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Admin/GetConfigs";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -563,7 +563,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AdminResource.prototype.echoServiceRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Admin/EchoService";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Admin/EchoService";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Admin", "boolean", false);
                     return dataRequest;
                 };
@@ -583,7 +583,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 GlobalMessageResource.prototype.getDailyGlobalMessageRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/GlobalMessage/GetDailyGlobalMessage";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/GlobalMessage/GetDailyGlobalMessage";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "GlobalMessage", "IGlobalMessageVm", false);
                     return dataRequest;
                 };
@@ -592,7 +592,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 GlobalMessageResource.prototype.getMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/GlobalMessage/Get";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/GlobalMessage/Get";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -613,7 +613,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 GlobalMessageResource.prototype.putRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/GlobalMessage/Put";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/GlobalMessage/Put";
                     var dataRequest = new Triarc.Data.DataRequest("PUT", url, data, "GlobalMessage", "any", true);
                     return dataRequest;
                 };
@@ -622,7 +622,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 GlobalMessageResource.prototype.deleteRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/GlobalMessage/Delete";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/GlobalMessage/Delete";
                     if (angular.isDefined(params.id)) {
                         url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
                     }
@@ -648,7 +648,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 PersonResource.prototype.getPersonByIdRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Person/GetPersonById";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Person/GetPersonById";
                     if (angular.isDefined(params.id)) {
                         url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
                     }
@@ -660,7 +660,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 PersonResource.prototype.searchClientsMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Person/SearchClients";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Person/SearchClients";
                     if (angular.isDefined(params.searchString)) {
                         url = Triarc.Data.appendUrlParameter(url, "searchString", encodeURIComponent(params.searchString));
                     }
@@ -684,7 +684,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 PersonResource.prototype.getClientRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Person/GetClient";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Person/GetClient";
                     if (angular.isDefined(params.clientId)) {
                         url = Triarc.Data.appendUrlParameter(url, "clientId", encodeURIComponent(params.clientId));
                     }
@@ -696,7 +696,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 PersonResource.prototype.getContactsForClientMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Person/GetContactsForClient";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Person/GetContactsForClient";
                     if (angular.isDefined(params.clientId)) {
                         url = Triarc.Data.appendUrlParameter(url, "clientId", encodeURIComponent(params.clientId));
                     }
@@ -720,7 +720,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 PersonResource.prototype.searchPeopleMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Person/SearchPeople";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Person/SearchPeople";
                     if (angular.isDefined(params.searchString)) {
                         url = Triarc.Data.appendUrlParameter(url, "searchString", encodeURIComponent(params.searchString));
                     }
@@ -744,7 +744,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 PersonResource.prototype.getContactRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Person/GetContact";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Person/GetContact";
                     if (angular.isDefined(params.contactId)) {
                         url = Triarc.Data.appendUrlParameter(url, "contactId", encodeURIComponent(params.contactId));
                     }
@@ -756,7 +756,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 PersonResource.prototype.getPersonRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Person/GetPerson";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Person/GetPerson";
                     if (angular.isDefined(params.personId)) {
                         url = Triarc.Data.appendUrlParameter(url, "personId", encodeURIComponent(params.personId));
                     }
@@ -785,7 +785,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 ProjectResource.prototype.getAllPersonsMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Project/GetAllPersons";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Project/GetAllPersons";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -806,7 +806,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ProjectResource.prototype.getAllLocationsMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Project/GetAllLocations";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Project/GetAllLocations";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -827,7 +827,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ProjectResource.prototype.searchProjectsMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Project/SearchProjects";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Project/SearchProjects";
                     if (angular.isDefined(params.searchValue)) {
                         url = Triarc.Data.appendUrlParameter(url, "searchValue", encodeURIComponent(params.searchValue));
                     }
@@ -857,7 +857,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ProjectResource.prototype.getRootProjectsMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Project/GetRootProjects";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Project/GetRootProjects";
                     if (angular.isDefined(params.search)) {
                         url = Triarc.Data.appendUrlParameter(url, "search", encodeURIComponent(params.search));
                     }
@@ -887,7 +887,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ProjectResource.prototype.getChildrenMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Project/GetChildren";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Project/GetChildren";
                     if (angular.isDefined(params.projectId)) {
                         url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
                     }
@@ -911,7 +911,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ProjectResource.prototype.putProjectDescriptionRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Project/PutProjectDescription";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Project/PutProjectDescription";
                     if (angular.isDefined(params.description)) {
                         url = Triarc.Data.appendUrlParameter(url, "description", encodeURIComponent(params.description));
                     }
@@ -926,7 +926,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ProjectResource.prototype.putPersonAssignmentRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Project/PutPersonAssignment";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Project/PutPersonAssignment";
                     if (angular.isDefined(params.projectId)) {
                         url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
                     }
@@ -944,7 +944,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ProjectResource.prototype.getProjectByIdRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Project/GetProjectById";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Project/GetProjectById";
                     if (angular.isDefined(params.projectId)) {
                         url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
                     }
@@ -956,7 +956,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ProjectResource.prototype.putLocationAssignmentRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Project/PutLocationAssignment";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Project/PutLocationAssignment";
                     if (angular.isDefined(params.projectId)) {
                         url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
                     }
@@ -974,7 +974,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ProjectResource.prototype.setFlagsRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Project/SetFlags";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Project/SetFlags";
                     if (angular.isDefined(params.projectId)) {
                         url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
                     }
@@ -1009,7 +1009,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 ExpensesResource.prototype.addOrUpdateExpenseRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Expenses/AddOrUpdateExpense";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Expenses/AddOrUpdateExpense";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Expenses", "IExpenseCm", true);
                     return dataRequest;
                 };
@@ -1018,7 +1018,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ExpensesResource.prototype.searchMultipleRequest = function (params, data) {
-                    var url = this.$requestSender.getUrl() + "/Expenses/Search";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Expenses/Search";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -1039,7 +1039,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ExpensesResource.prototype.getExpenseTypesMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Expenses/GetExpenseTypes";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Expenses/GetExpenseTypes";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -1077,7 +1077,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 ConfigResource.prototype.getRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Config/Get";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Config/Get";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Config", "IConfigVm", false);
                     return dataRequest;
                 };
@@ -1086,7 +1086,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ConfigResource.prototype.putRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Config/Put";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Config/Put";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Config", "any", true);
                     return dataRequest;
                 };
@@ -1109,7 +1109,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 ConfigurationProfileResource.prototype.getConfigsMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/ConfigurationProfile/GetConfigs";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/ConfigurationProfile/GetConfigs";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -1130,7 +1130,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ConfigurationProfileResource.prototype.deleteRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/ConfigurationProfile/Delete";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/ConfigurationProfile/Delete";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "ConfigurationProfile", "any", true);
                     return dataRequest;
                 };
@@ -1139,7 +1139,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 ConfigurationProfileResource.prototype.saveRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/ConfigurationProfile/Save";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/ConfigurationProfile/Save";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "ConfigurationProfile", "any", true);
                     return dataRequest;
                 };
@@ -1159,7 +1159,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 WorkReportResource.prototype.getRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/WorkReport/Get";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/WorkReport/Get";
                     if (angular.isDefined(params.externalWorkReportId)) {
                         url = Triarc.Data.appendUrlParameter(url, "externalWorkReportId", encodeURIComponent(params.externalWorkReportId));
                     }
@@ -1182,7 +1182,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 ClaimResource.prototype.getClaimsMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Claim/GetClaims";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Claim/GetClaims";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -1214,7 +1214,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 SaldoResource.prototype.getByIdRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Saldo/GetById";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Saldo/GetById";
                     if (angular.isDefined(params.employeeId)) {
                         url = Triarc.Data.appendUrlParameter(url, "employeeId", encodeURIComponent(params.employeeId));
                     }
@@ -1237,7 +1237,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 WorkObjectResource.prototype.getProjectsForLocationMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/WorkObject/GetProjectsForLocation";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/WorkObject/GetProjectsForLocation";
                     if (angular.isDefined(params.locationId)) {
                         url = Triarc.Data.appendUrlParameter(url, "locationId", encodeURIComponent(params.locationId));
                     }
@@ -1272,7 +1272,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 AccountResource.prototype.getAppUserRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Account/GetAppUser";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/GetAppUser";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Account", "IAppUser", false);
                     return dataRequest;
                 };
@@ -1281,7 +1281,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.loginRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Account/Login";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/Login";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
                     return dataRequest;
                 };
@@ -1290,7 +1290,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.getUsersMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Account/GetUsers";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/GetUsers";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -1311,7 +1311,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.searchMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Account/Search";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/Search";
                     if (angular.isDefined(params.search)) {
                         url = Triarc.Data.appendUrlParameter(url, "search", encodeURIComponent(params.search));
                     }
@@ -1341,7 +1341,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.createUserRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Account/CreateUser";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/CreateUser";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
                     return dataRequest;
                 };
@@ -1350,7 +1350,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.editUserRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Account/EditUser";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/EditUser";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
                     return dataRequest;
                 };
@@ -1359,7 +1359,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.resetPasswordRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Account/ResetPassword";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/ResetPassword";
                     if (angular.isDefined(params.userId)) {
                         url = Triarc.Data.appendUrlParameter(url, "userId", encodeURIComponent(params.userId));
                     }
@@ -1371,7 +1371,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.deleteRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Account/Delete";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/Delete";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
                     return dataRequest;
                 };
@@ -1380,7 +1380,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.pingRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Account/Ping";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/Ping";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Account", "any", false);
                     return dataRequest;
                 };
@@ -1389,7 +1389,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.logoutRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Account/Logout";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/Logout";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, {}, "Account", "any", false);
                     return dataRequest;
                 };
@@ -1398,7 +1398,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.getUserInfoRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/Account/GetUserInfo";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/GetUserInfo";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Account", "IUserInfoViewModel", false);
                     return dataRequest;
                 };
@@ -1407,7 +1407,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.getManageInfoRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Account/GetManageInfo";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/GetManageInfo";
                     if (angular.isDefined(params.returnUrl)) {
                         url = Triarc.Data.appendUrlParameter(url, "returnUrl", encodeURIComponent(params.returnUrl));
                     }
@@ -1422,7 +1422,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.changePasswordRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Account/ChangePassword";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/ChangePassword";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
                     return dataRequest;
                 };
@@ -1431,7 +1431,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.setPasswordRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Account/SetPassword";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/SetPassword";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
                     return dataRequest;
                 };
@@ -1440,7 +1440,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.addExternalLoginRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Account/AddExternalLogin";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/AddExternalLogin";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
                     return dataRequest;
                 };
@@ -1449,7 +1449,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.removeLoginRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Account/RemoveLogin";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/RemoveLogin";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
                     return dataRequest;
                 };
@@ -1458,7 +1458,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.getExternalLoginRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Account/GetExternalLogin";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/GetExternalLogin";
                     if (angular.isDefined(params.provider)) {
                         url = Triarc.Data.appendUrlParameter(url, "provider", encodeURIComponent(params.provider));
                     }
@@ -1473,7 +1473,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.getExternalLoginsMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Account/GetExternalLogins";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/GetExternalLogins";
                     if (angular.isDefined(params.returnUrl)) {
                         url = Triarc.Data.appendUrlParameter(url, "returnUrl", encodeURIComponent(params.returnUrl));
                     }
@@ -1500,7 +1500,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.registerRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Account/Register";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/Register";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
                     return dataRequest;
                 };
@@ -1509,7 +1509,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 AccountResource.prototype.registerExternalRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Account/RegisterExternal";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Account/RegisterExternal";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Account", "any", true);
                     return dataRequest;
                 };
@@ -1571,7 +1571,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 PersonalMessageResource.prototype.getLatestMessagesMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/PersonalMessage/GetLatestMessages";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/PersonalMessage/GetLatestMessages";
                     if (angular.isDefined(params.employeeId)) {
                         url = Triarc.Data.appendUrlParameter(url, "employeeId", encodeURIComponent(params.employeeId));
                     }
@@ -1595,7 +1595,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 PersonalMessageResource.prototype.saveMessageRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/PersonalMessage/SaveMessage";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/PersonalMessage/SaveMessage";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "PersonalMessage", "any", true);
                     return dataRequest;
                 };
@@ -1604,7 +1604,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 PersonalMessageResource.prototype.markAsReadRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/PersonalMessage/MarkAsRead";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/PersonalMessage/MarkAsRead";
                     if (angular.isDefined(params.messageId)) {
                         url = Triarc.Data.appendUrlParameter(url, "messageId", encodeURIComponent(params.messageId));
                     }
@@ -1619,7 +1619,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 PersonalMessageResource.prototype.getSentMessagesMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/PersonalMessage/GetSentMessages";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/PersonalMessage/GetSentMessages";
                     if (angular.isDefined(params.personId)) {
                         url = Triarc.Data.appendUrlParameter(url, "personId", encodeURIComponent(params.personId));
                     }
@@ -1660,7 +1660,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 LocationResource.prototype.getLocationByIdRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Location/GetLocationById";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Location/GetLocationById";
                     if (angular.isDefined(params.id)) {
                         url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
                     }
@@ -1672,7 +1672,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 LocationResource.prototype.getMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Location/Get";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Location/Get";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -1693,7 +1693,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 LocationResource.prototype.putRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/Location/Put";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Location/Put";
                     var dataRequest = new Triarc.Data.DataRequest("PUT", url, data, "Location", "any", true);
                     return dataRequest;
                 };
@@ -1702,7 +1702,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 LocationResource.prototype.deleteRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/Location/Delete";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Location/Delete";
                     if (angular.isDefined(params.id)) {
                         url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
                     }
@@ -1725,7 +1725,7 @@ var TimeRecorder;
                     this.$requestSender = $requestSender;
                 }
                 TimeEntryResource.prototype.postSingleRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/TimeEntry/PostSingle";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/PostSingle";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "any", true);
                     return dataRequest;
                 };
@@ -1734,7 +1734,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeEntryResource.prototype.postMultipleRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/TimeEntry/PostMultiple";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/PostMultiple";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "any", true);
                     return dataRequest;
                 };
@@ -1743,7 +1743,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeEntryResource.prototype.validateUserRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/TimeEntry/ValidateUser";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/ValidateUser";
                     if (angular.isDefined(params.persNr)) {
                         url = Triarc.Data.appendUrlParameter(url, "persNr", encodeURIComponent(params.persNr));
                     }
@@ -1755,7 +1755,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeEntryResource.prototype.putRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/TimeEntry/Put";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/Put";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "boolean", true);
                     return dataRequest;
                 };
@@ -1764,7 +1764,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeEntryResource.prototype.deleteRequest = function (data) {
-                    var url = this.$requestSender.getUrl() + "/TimeEntry/Delete";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/Delete";
                     var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "boolean", true);
                     return dataRequest;
                 };
@@ -1773,7 +1773,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeEntryResource.prototype.validateWorkObjectRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/TimeEntry/ValidateWorkObject";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/ValidateWorkObject";
                     if (angular.isDefined(params.objectNumber)) {
                         url = Triarc.Data.appendUrlParameter(url, "objectNumber", encodeURIComponent(params.objectNumber));
                     }
@@ -1791,7 +1791,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeEntryResource.prototype.upateLegacyEntriesRequest = function () {
-                    var url = this.$requestSender.getUrl() + "/TimeEntry/UpateLegacyEntries";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/UpateLegacyEntries";
                     var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "TimeEntry", "any", false);
                     return dataRequest;
                 };
@@ -1800,7 +1800,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeEntryResource.prototype.searchTimeEntriesMultipleRequest = function (params, data) {
-                    var url = this.$requestSender.getUrl() + "/TimeEntry/SearchTimeEntries";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/SearchTimeEntries";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
@@ -1821,7 +1821,7 @@ var TimeRecorder;
                     return this.$requestSender.requestValue(request);
                 };
                 TimeEntryResource.prototype.getAvailableBookingTypesMultipleRequest = function (params) {
-                    var url = this.$requestSender.getUrl() + "/TimeEntry/GetAvailableBookingTypes";
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/GetAvailableBookingTypes";
                     if (angular.isDefined(params.$skip)) {
                         url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
                     }
