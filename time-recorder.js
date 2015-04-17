@@ -3277,6 +3277,7 @@ var TimeRecorder;
                 return EmployeeRepository;
             })();
             Business.EmployeeRepository = EmployeeRepository;
+            timeRecorder.service(EmployeeRepository.serviceId, EmployeeRepository);
         })(Business = Web.Business || (Web.Business = {}));
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
@@ -3440,7 +3441,7 @@ var TimeRecorder;
                 EmployeeDataController.prototype.getById = function (id) {
                     return this.employeeRepository.getById(id).then(function (p) { return new Business.EmployeeVm(function () { return p; }); });
                 };
-                EmployeeDataController.serviceId = "EmployeeDataController";
+                EmployeeDataController.serviceId = "trEmployeeDataController";
                 EmployeeDataController.$inject = [
                     "$q",
                     Business.EmployeeRepository.serviceId
