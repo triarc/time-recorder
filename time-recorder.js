@@ -502,6 +502,27 @@ var TimeRecorder;
                     var request = this.deleteRequest(params);
                     return this.$requestSender.requestValue(request);
                 };
+                TimeBookingResource.prototype.getTimeEntryTypesMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeBooking/GetTimeEntryTypes";
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "TimeBooking", "ITimeEntryTypeCm[]", false);
+                    return dataRequest;
+                };
+                TimeBookingResource.prototype.getTimeEntryTypesMultiple = function (params) {
+                    var request = this.getTimeEntryTypesMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
                 TimeBookingResource.prototype.getForMultipleRequest = function (params, data) {
                     var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeBooking/GetFor";
                     if (angular.isDefined(params.$skip)) {
@@ -521,6 +542,33 @@ var TimeRecorder;
                 };
                 TimeBookingResource.prototype.getForMultiple = function (params, data) {
                     var request = this.getForMultipleRequest(params, data);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeBookingResource.prototype.getUnBilledCompletedBookingsMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeBooking/GetUnBilledCompletedBookings";
+                    if (angular.isDefined(params.employeeId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "employeeId", encodeURIComponent(params.employeeId));
+                    }
+                    if (angular.isDefined(params.projectId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "projectId", encodeURIComponent(params.projectId));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "TimeBooking", "ITimeBookingCm[]", false);
+                    return dataRequest;
+                };
+                TimeBookingResource.prototype.getUnBilledCompletedBookingsMultiple = function (params) {
+                    var request = this.getUnBilledCompletedBookingsMultipleRequest(params);
                     return this.$requestSender.requestValue(request);
                 };
                 TimeBookingResource.prototype.newTimeBookingCm = function () {
@@ -821,6 +869,15 @@ var TimeRecorder;
                 };
                 PersonResource.prototype.getContact = function (params) {
                     var request = this.getContactRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
+                PersonResource.prototype.saveContactRequest = function (data) {
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Person/SaveContact";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Person", "number", true);
+                    return dataRequest;
+                };
+                PersonResource.prototype.saveContact = function (data) {
+                    var request = this.saveContactRequest(data);
                     return this.$requestSender.requestValue(request);
                 };
                 PersonResource.prototype.getPersonRequest = function (params) {
@@ -2181,7 +2238,7 @@ timeRecorder.config([
         $stateProvider.state("tr", {
             url: "/time",
             parent: TimeRecorder.routingParent,
-            template: "<ui-view></ui-view>"
+            template: "<ui-view class='time-recorder'></ui-view>"
         });
         $stateProvider.state("tr.home", {
             url: "/home",
@@ -2257,22 +2314,6 @@ timeRecorder.config([
             url: "/expenses/edit/:id",
             templateUrl: "Client/Views/expenses.form.html"
         });
-        $stateProvider.state("tr.searchEmployeeWorkReport", {
-            url: "/employeeWorkReport",
-            templateUrl: "Client/Views/employee/employeeSearchWorkReport.html",
-        });
-        $stateProvider.state("tr.editEmployeeWorkReport", {
-            url: "/editWorkReport/:id?",
-            templateUrl: "Client/Views/employee/employeeEditWorkReport.html",
-            // parent: TimeRecorder.routingParent,
-            controller: "EditWorkReportController as ctrl"
-        });
-        $stateProvider.state("tr.addEmployeeWorkReport", {
-            url: "/addWorkReport/:projectId?",
-            templateUrl: "Client/Views/employee/employeeEditWorkReport.html",
-            //parent: TimeRecorder.routingParent,
-            controller: "AddWorkReportController as ctrl"
-        });
         $stateProvider.state("tr.timebookings", {
             url: "/timebookings",
             templateUrl: "Client/Views/timebookings.html",
@@ -2313,6 +2354,46 @@ timeRecorder.config([
                     angular.element(".body-content").removeClass("container-full-width");
                 }, 100);
             }
+        });
+        // work report states
+        $stateProvider.state("tr.employeeWorkReport", {
+            url: "/employeeWorkReport",
+            template: "<ui-view></ui-view>",
+            abstract: true
+        });
+        $stateProvider.state("tr.employeeWorkReport.add.side", {
+            templateUrl: "Client/Views/sidePage.html",
+            controller: "WorkReportSideController as side",
+            abstract: true
+        });
+        $stateProvider.state("tr.employeeWorkReport.add.side.contactDetails", {
+            url: "/contactDetails/:id",
+            templateUrl: "Client/Views/employee/contactDetails.html"
+        });
+        $stateProvider.state("tr.employeeWorkReport.edit.side.contactDetails", {
+            url: "/contactDetails/:contactId?saveEvt?clientId",
+            templateUrl: "Client/Views/employee/contactDetails.html"
+        });
+        $stateProvider.state("tr.employeeWorkReport.search", {
+            url: "/search",
+            templateUrl: "Client/Views/employee/employeeSearchWorkReport.html"
+        });
+        $stateProvider.state("tr.employeeWorkReport.edit", {
+            url: "/edit/:workReportId",
+            templateUrl: "Client/Views/employee/employeeEditWorkReport.html",
+            // parent: TimeRecorder.routingParent,
+            controller: "EditWorkReportController as ctrl"
+        });
+        $stateProvider.state("tr.employeeWorkReport.edit.side", {
+            templateUrl: "Client/Views/sidePage.html",
+            controller: "WorkReportSideController as side",
+            abstract: true
+        });
+        $stateProvider.state("tr.employeeWorkReport.add", {
+            url: "/add/:projectId/:clientId",
+            templateUrl: "Client/Views/employee/employeeEditWorkReport.html",
+            //parent: TimeRecorder.routingParent,
+            controller: "AddWorkReportController as ctrl"
         });
     }
 ]);
@@ -3204,6 +3285,10 @@ var TimeRecorder;
                 };
                 PersonVm.prototype.reset = function () {
                 };
+                PersonVm.prototype.toCm = function () {
+                    var cm = this.cm();
+                    return cm;
+                };
                 return PersonVm;
             })();
             Bu.PersonVm = PersonVm;
@@ -3329,6 +3414,13 @@ var TimeRecorder;
                     enumerable: true,
                     configurable: true
                 });
+                Object.defineProperty(ProjectVm.prototype, "clientId", {
+                    get: function () {
+                        return this.cm().clientId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 return ProjectVm;
             })();
             Business.ProjectVm = ProjectVm;
@@ -3420,8 +3512,9 @@ var TimeRecorder;
         var Business;
         (function (Business) {
             var TimeBookingVm = (function () {
-                function TimeBookingVm(cm) {
+                function TimeBookingVm(cm, timeBookingDc) {
                     this.cm = cm;
+                    this.timeBookingDc = timeBookingDc;
                 }
                 Object.defineProperty(TimeBookingVm.prototype, "id", {
                     get: function () {
@@ -3468,6 +3561,16 @@ var TimeRecorder;
                 Object.defineProperty(TimeBookingVm.prototype, "typeId", {
                     get: function () {
                         return this.cm().timeEntryTypeId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimeBookingVm.prototype, "type", {
+                    get: function () {
+                        if (Triarc.hasValue(this._type))
+                            return this._type;
+                        this._type = this.timeBookingDc().container.timeEntryTypeDc.getTimeEntryTypesMap().get(this.cm().timeEntryTypeId);
+                        return this._type;
                     },
                     enumerable: true,
                     configurable: true
@@ -3539,8 +3642,9 @@ var TimeRecorder;
         var Business;
         (function (Business) {
             var ExternalWorkReportVm = (function () {
-                function ExternalWorkReportVm(cm) {
+                function ExternalWorkReportVm(cm, projectCm) {
                     this.cm = cm;
+                    this.projectCm = projectCm;
                 }
                 Object.defineProperty(ExternalWorkReportVm.prototype, "id", {
                     get: function () {
@@ -3602,9 +3706,11 @@ var TimeRecorder;
                 });
                 Object.defineProperty(ExternalWorkReportVm.prototype, "project", {
                     get: function () {
+                        var _this = this;
                         if (Triarc.hasValue(this._project))
-                            return this.project;
-                        return null;
+                            return this._project;
+                        this._project = new Business.ProjectVm(function () { return _this.projectCm(); });
+                        return this._project;
                     },
                     enumerable: true,
                     configurable: true
@@ -3678,16 +3784,19 @@ var TimeRecorder;
         var Business;
         (function (Business) {
             var WorkReportVm = (function () {
-                function WorkReportVm(cm, externalWorkReportDc) {
+                function WorkReportVm(cm, timeBookingVms, projectCm, externalWorkReportDc) {
                     this.cm = cm;
+                    this.timeBookingVms = timeBookingVms;
+                    this.projectCm = projectCm;
                     this.externalWorkReportDc = externalWorkReportDc;
+                    this._timeBookings = timeBookingVms();
                 }
                 Object.defineProperty(WorkReportVm.prototype, "externalWorkReport", {
                     get: function () {
                         var _this = this;
                         if (Triarc.hasValue(this._externalWorkReport))
                             return this._externalWorkReport;
-                        this._externalWorkReport = new Business.ExternalWorkReportVm(function () { return _this.cm().externalWorkReport; });
+                        this._externalWorkReport = new Business.ExternalWorkReportVm(function () { return _this.cm().externalWorkReport; }, function () { return _this.projectCm(); });
                         return this._externalWorkReport;
                     },
                     enumerable: true,
@@ -3695,13 +3804,6 @@ var TimeRecorder;
                 });
                 Object.defineProperty(WorkReportVm.prototype, "timeBookings", {
                     get: function () {
-                        var _this = this;
-                        if (Triarc.hasValue(this._timeBookings))
-                            return this._timeBookings;
-                        this._timeBookings = [];
-                        this.externalWorkReportDc().container.timeBookingDc.resolveFor(this.cm().timeBookingIds).then(function (timeBookings) {
-                            _this._timeBookings = timeBookings;
-                        });
                         return this._timeBookings;
                     },
                     enumerable: true,
@@ -3839,21 +3941,27 @@ var TimeRecorder;
     (function (Web) {
         var Business;
         (function (Business) {
-            var PersonVm = Web.Bu.PersonVm;
             var PeopleRepository = (function () {
                 function PeopleRepository($proxy) {
                     this.$proxy = $proxy;
                 }
                 PeopleRepository.prototype.getContactsForClient = function (clientId, isLiveData) {
-                    return this.$proxy.Person.getContactsForClientMultiple({ clientId: clientId }).then(function (response) {
-                        return response.data.toEnumerable().select(function (p) { return new PersonVm(function () { return p; }); }).toArray();
-                    });
+                    return this.$proxy.Person.getContactsForClientMultiple({ clientId: clientId }).then(function (response) { return response.data; });
                 };
                 PeopleRepository.prototype.getPerson = function (id, isLiveData) {
                     return this.$proxy.Person.getContact({ contactId: id }).then(function (response) { return response.data; });
                 };
                 PeopleRepository.prototype.searchPeople = function (searchString) {
                     return this.$proxy.Person.searchPeopleMultiple({ searchString: searchString }).then(function (response) { return response.data; });
+                };
+                PeopleRepository.prototype.getClient = function (id) {
+                    return this.$proxy.Person.getClient({ clientId: id }).then(function (response) { return response.data; });
+                };
+                PeopleRepository.prototype.getContact = function (id) {
+                    return this.$proxy.Person.getContact({ contactId: id }).then(function (response) { return response.data; });
+                };
+                PeopleRepository.prototype.saveContact = function (contact) {
+                    return this.$proxy.Person.saveContact(contact).then(function (response) { return response.data; });
                 };
                 PeopleRepository.$inject = [
                     "$tr-proxy"
@@ -3865,6 +3973,7 @@ var TimeRecorder;
         })(Business = Web.Business || (Web.Business = {}));
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
+timeRecorder.service(TimeRecorder.Web.Business.PeopleRepository.serviceId, TimeRecorder.Web.Business.PeopleRepository);
 var TimeRecorder;
 (function (TimeRecorder) {
     var Web;
@@ -3918,6 +4027,9 @@ var TimeRecorder;
                         return response.data;
                     });
                 };
+                TimeEntryTypeRepository.prototype.loadTypes = function () {
+                    return this.$proxy.TimeBooking.getTimeEntryTypesMultiple({}).then(function (reponse) { return reponse.data; });
+                };
                 TimeEntryTypeRepository.prototype.getTypesById = function (ids) {
                     return this.$proxy.TimeEntryType.getTypesByIdMultiple({}, { ids: ids }).then(function (t) { return t.data; });
                 };
@@ -3945,10 +4057,10 @@ var TimeRecorder;
                     this.$q = $q;
                 }
                 TimeBookingRepository.prototype.getDetail = function (id) {
-                    return this.$proxy.TimeBooking.get({ id: id }).then(function (response) { return new Business.TimeBookingVm(function () { return response.data; }); });
+                    return this.$proxy.TimeBooking.get({ id: id }).then(function (response) { return response.data; });
                 };
                 TimeBookingRepository.prototype.search = function (data) {
-                    return this.$proxy.TimeBooking.searchMultiple({}, data).then(function (response) { return response.data.toEnumerable().select(function (t) { return new Business.TimeBookingVm(function () { return t; }); }).toArray(); });
+                    return this.$proxy.TimeBooking.searchMultiple({}, data).then(function (response) { return response.data; });
                 };
                 TimeBookingRepository.prototype.save = function (data) {
                     return this.$proxy.TimeBooking.save(data);
@@ -3958,6 +4070,9 @@ var TimeRecorder;
                 };
                 TimeBookingRepository.prototype.resolveFor = function (ids) {
                     return this.$proxy.TimeBooking.getForMultiple({}, { ids: ids });
+                };
+                TimeBookingRepository.prototype.getUnBilledCompletedBookings = function (employeeId, projectId) {
+                    return this.$proxy.TimeBooking.getUnBilledCompletedBookingsMultiple({ employeeId: employeeId, projectId: projectId }).then(function (response) { return response.data; });
                 };
                 TimeBookingRepository.serviceId = "$TimeBookingRepository";
                 TimeBookingRepository.$inject = [
@@ -4139,7 +4254,10 @@ var TimeRecorder;
                     this.peopleRepository = peopleRepository;
                 }
                 PeopleDataController.prototype.getContactsForClient = function (clientId, isLiveData) {
-                    return this.peopleRepository.getContactsForClient(clientId, isLiveData);
+                    if (isLiveData === void 0) { isLiveData = false; }
+                    return this.peopleRepository.getContactsForClient(clientId, isLiveData).then(function (cms) {
+                        return cms.toEnumerable().select(function (p) { return new Web.Bu.ContactVm(function () { return p; }); }).toArray();
+                    });
                 };
                 PeopleDataController.prototype.getPerson = function (id, isLiveData) {
                     return this.peopleRepository.getPerson(id, isLiveData);
@@ -4148,6 +4266,19 @@ var TimeRecorder;
                     return this.peopleRepository.searchPeople(searchString).then(function (people) {
                         return people.toEnumerable().select(function (p) { return new PersonVm(function () { return p; }); }).toArray();
                     });
+                };
+                PeopleDataController.prototype.getClient = function (id) {
+                    return this.peopleRepository.getClient(id).then(function (cm) {
+                        return new Business.ClientVm(function () { return cm; });
+                    });
+                };
+                PeopleDataController.prototype.getContact = function (id) {
+                    return this.peopleRepository.getContact(id).then(function (cm) {
+                        return new Web.Bu.ContactVm(function () { return cm; });
+                    });
+                };
+                PeopleDataController.prototype.saveContact = function (contact) {
+                    return this.peopleRepository.saveContact(contact.toCm());
                 };
                 PeopleDataController.serviceId = "$PersonDataController";
                 PeopleDataController.$inject = [
@@ -4211,10 +4342,14 @@ var TimeRecorder;
                     return entry.state == null || entry.state === 0 /* Open */;
                 };
                 TimeBookingDataController.prototype.getDetail = function (id) {
-                    return this.repository.getDetail(id);
+                    var _this = this;
+                    return this.repository.getDetail(id).then(function (cm) { return new Business.TimeBookingVm(function () { return cm; }, function () { return _this; }); });
                 };
                 TimeBookingDataController.prototype.search = function (data) {
-                    return this.repository.search(data);
+                    var _this = this;
+                    return this.repository.search(data).then(function (cms) {
+                        return cms.toEnumerable().select(function (t) { return new Business.TimeBookingVm(function () { return t; }, function () { return _this; }); }).toArray();
+                    });
                 };
                 TimeBookingDataController.prototype.save = function (data) {
                     return this.repository.save(data);
@@ -4223,8 +4358,15 @@ var TimeRecorder;
                     return this.repository.remove(id);
                 };
                 TimeBookingDataController.prototype.resolveFor = function (ids) {
+                    var _this = this;
                     return this.repository.resolveFor(ids).then(function (response) {
-                        return response.data.toEnumerable().select(function (tb) { return new Business.TimeBookingVm(function () { return tb; }); }).toArray();
+                        return response.data.toEnumerable().select(function (tb) { return new Business.TimeBookingVm(function () { return tb; }, function () { return _this; }); }).toArray();
+                    });
+                };
+                TimeBookingDataController.prototype.getUnBilledCompletedBookings = function (employeeId, projectId) {
+                    var _this = this;
+                    return this.repository.getUnBilledCompletedBookings(employeeId, projectId).then(function (timeBookings) {
+                        return timeBookings.toEnumerable().select(function (tb) { return new Business.TimeBookingVm(function () { return tb; }, function () { return _this; }); }).toArray();
                     });
                 };
                 TimeBookingDataController.serviceId = "$TimeBookingDataController";
@@ -4250,6 +4392,18 @@ var TimeRecorder;
                     this.$q = $q;
                     this.repository = repository;
                 }
+                TimeEntryTypeDataController.prototype.ensureLoaded = function () {
+                    var _this = this;
+                    return this.repository.loadTypes().then(function (cms) {
+                        _this.timeEntryTypesMap = new Map();
+                        cms.forEach(function (cm) {
+                            _this.timeEntryTypesMap.set(cm.id, new Business.TimeEntryTypeVm(function () { return cm; }));
+                        });
+                    });
+                };
+                TimeEntryTypeDataController.prototype.getTimeEntryTypesMap = function () {
+                    return this.timeEntryTypesMap;
+                };
                 TimeEntryTypeDataController.prototype.search = function (searchValue, skip, take) {
                     return this.repository.search(searchValue, skip, take).then(function (types) { return types.toEnumerable().select(function (p) { return new Business.TimeEntryTypeVm(function () { return p; }); }).toArray(); });
                 };
@@ -4306,7 +4460,13 @@ var TimeRecorder;
                 }
                 ExternalWorkReportDataController.prototype.get = function (id) {
                     var _this = this;
-                    return this.repository.get(id).then(function (cm) { return new Business.WorkReportVm(function () { return cm; }, function () { return _this; }); });
+                    return this.repository.get(id).then(function (cm) {
+                        return _this.container.timeBookingDc.resolveFor(cm.timeBookingIds).then(function (timeBookings) {
+                            return _this.container.projectDc.getProjectById(cm.externalWorkReport.projectId).then(function (projectCm) {
+                                return new Business.WorkReportVm(function () { return cm; }, function () { return timeBookings; }, function () { return projectCm; }, function () { return _this; });
+                            });
+                        });
+                    });
                 };
                 ExternalWorkReportDataController.prototype.save = function (workReport) {
                     return this.repository.save(workReport).then(function (cm) { return workReport.externalWorkReport.update(function () { return cm; }); });
@@ -4317,8 +4477,27 @@ var TimeRecorder;
                     });
                 };
                 ExternalWorkReportDataController.prototype.createNewWorkReport = function (employeeId, projectId) {
-                    var workReport = new Business.WorkReportVm(function () { return null; }, function () { return null; });
-                    return workReport;
+                    var _this = this;
+                    return this.container.timeBookingDc.getUnBilledCompletedBookings(employeeId, projectId).then(function (timeBookings) {
+                        var cm = {
+                            externalWorkReport: {
+                                id: null,
+                                from: null,
+                                to: null,
+                                employeeSignatureImage: null,
+                                customerSignatureImage: null,
+                                projectCompleted: false,
+                                projectId: projectId,
+                                employeeId: employeeId
+                            }
+                        };
+                        cm.externalWorkReport.from = moment(timeBookings.toEnumerable().min(function (t) { return t.start.getTime(); })).toDate();
+                        cm.externalWorkReport.to = moment(timeBookings.toEnumerable().max(function (t) { return t.stop.getTime(); })).toDate();
+                        cm.timeBookingIds = timeBookings.toEnumerable().select(function (tb) { return tb.id; }).toArray();
+                        return _this.container.projectDc.getProjectById(cm.externalWorkReport.projectId).then(function (projectCm) {
+                            return new Business.WorkReportVm(function () { return cm; }, function () { return timeBookings; }, function () { return projectCm; }, function () { return _this; });
+                        });
+                    });
                 };
                 ExternalWorkReportDataController.serviceId = "$ExternalWorkReportDataController";
                 ExternalWorkReportDataController.$inject = [
@@ -4340,7 +4519,7 @@ var TimeRecorder;
         var Business;
         (function (Business) {
             var DataControllerContainer = (function () {
-                function DataControllerContainer(expencesDc, expenceTypeDc, externalWorkReportDc, projectDc, timeBookingDc, timeEntryTypeDc, timeSheetDc) {
+                function DataControllerContainer(expencesDc, expenceTypeDc, externalWorkReportDc, projectDc, timeBookingDc, timeEntryTypeDc, timeSheetDc, employeeDc, peopleDc) {
                     this.expencesDc = expencesDc;
                     this.expenceTypeDc = expenceTypeDc;
                     this.externalWorkReportDc = externalWorkReportDc;
@@ -4348,6 +4527,8 @@ var TimeRecorder;
                     this.timeBookingDc = timeBookingDc;
                     this.timeEntryTypeDc = timeEntryTypeDc;
                     this.timeSheetDc = timeSheetDc;
+                    this.employeeDc = employeeDc;
+                    this.peopleDc = peopleDc;
                 }
                 DataControllerContainer.prototype.initialize = function () {
                     this.expencesDc.container = this;
@@ -4357,6 +4538,8 @@ var TimeRecorder;
                     this.timeBookingDc.container = this;
                     this.timeEntryTypeDc.container = this;
                     this.timeSheetDc.container = this;
+                    this.employeeDc.container = this;
+                    this.peopleDc.container = this;
                 };
                 DataControllerContainer.serviceId = "$DataControllerContainer";
                 DataControllerContainer.$inject = [
@@ -4366,7 +4549,9 @@ var TimeRecorder;
                     Business.ProjectDataController.serviceId,
                     Business.TimeBookingDataController.serviceId,
                     Business.TimeEntryTypeDataController.serviceId,
-                    Business.TimeSheetDataController.serviceId
+                    Business.TimeSheetDataController.serviceId,
+                    Business.EmployeeDataController.serviceId,
+                    Business.PeopleDataController.serviceId
                 ];
                 return DataControllerContainer;
             })();
@@ -7720,80 +7905,39 @@ var TimeRecorder;
     var Web;
     (function (Web) {
         var WorkReportController = (function () {
-            function WorkReportController($scope, workReportDataController) {
-                //      var workReport = {
-                //        externalWorkReport: <IExternalWorkReport>{
-                //          id: 0,
-                //          from: new Date,
-                //          to: new Date(),
-                //          projectCompleted: false,
-                //          projectId: 10,
-                //          signatureImage: "",
-                //          signatureTimestamp: new Date(),
-                //          signedClientId: 1
-                //        },
-                //        timeBookings: []
-                //      }
-                //
-                //      var fromDate = new Date();
-                //      var toDate = new Date(fromDate.getTime());
-                //      for (var i = 0; i < 10; i++) {
-                //
-                //        fromDate.setHours(7);
-                //        fromDate.setMinutes(0);
-                //        fromDate.setSeconds(0);
-                //
-                //        toDate.setHours(fromDate.getHours() + 4);
-                //        toDate.setMinutes(20);
-                //        toDate.setSeconds(0);
-                //        workReport.timeBookings.add({
-                //          from: new Date(fromDate.getTime()),
-                //          to: new Date(toDate.getTime()),
-                //          name: "Reise",
-                //          comments: "These are some very long comments so I can see if they reall fit on the screen and you can seem them if they go over the end of the row"
-                //        });
-                //
-                //        fromDate.setHours(toDate.getHours());
-                //        toDate.setHours(fromDate.getHours() + 4);
-                //
-                //        workReport.timeBookings.add({
-                //          from: new Date(fromDate.getTime()),
-                //          to: new Date(toDate.getTime()),
-                //          name: "Reise",
-                //          comments: "These are some very long comments so I can see if they reall fit on the screen and you can seem them if they go over the end of the row"
-                //        });
-                //
-                //
-                //        fromDate.setDate(fromDate.getDate() + 1);
-                //        toDate.setDate(fromDate.getDate() + 1);
-                //      }
+            function WorkReportController($scope, dataControllers, $q) {
                 var _this = this;
                 this.$scope = $scope;
-                this.workReportDataController = workReportDataController;
+                this.dataControllers = dataControllers;
+                this.$q = $q;
+                this.saveContactEvent = "WorkReportContactSavedEvt";
                 this.setEmployeeSignatureImage = function (image) {
                     _this.employeeSignatureImage = image;
                 };
                 this.setCustomerSignatureImage = function (image) {
                     _this.customerSignatureImage = image;
                 };
-                //      this.workReport = workReport;
-                //      this.dayContainers = [];
-                //      this.dayContainers = this.workReport.timeBookings.toEnumerable().groupBy(d => moment(d.start).startOf("day").toDate().getTime())
-                //        .select(g => {
-                //        return <IDayContainer>{
-                //          date: new Date(g.key()),
-                //          timeBookings: g.toArray()
-                //        };
-                //      }).toArray();
+                this.requiredDataQ = this.$q.all([
+                    this.dataControllers.timeEntryTypeDc.ensureLoaded()
+                ]);
+                this.$scope.$on(this.saveContactEvent, function (evt, saveEvt) {
+                    _this.loadContactsForClient(_this.client.id).then(function () {
+                        _this.dataControllers.peopleDc.getContact(saveEvt.id).then(function (newContact) {
+                            _this.selectedContact = newContact;
+                        });
+                    });
+                });
             }
             WorkReportController.prototype.save = function () {
+                var _this = this;
                 if (this.employeeSignatureImage) {
                     this.workReport.externalWorkReport.employeeSignatureImage = this.employeeSignatureImage.split(",")[1];
                 }
                 if (this.customerSignatureImage) {
                     this.workReport.externalWorkReport.customerSignatureImage = this.customerSignatureImage.split(",")[1];
                 }
-                this.workReportDataController.save(this.workReport).then(function () {
+                this.dataControllers.externalWorkReportDc.save(this.workReport).then(function () {
+                    _this.projectCompleted = _this.workReport.externalWorkReport.projectCompleted;
                     toastr.info("Saved");
                 });
             };
@@ -7814,6 +7958,19 @@ var TimeRecorder;
                 clone.find(".hidden-from-print").remove();
                 bodyParent.appendChild(clone[0]);
                 // this.$proxy.PdfGenerator.generatePdf({ html: $(htmlParent)[0].outerHTML });
+            };
+            WorkReportController.prototype.loadClient = function (clientId) {
+                var _this = this;
+                this.dataControllers.peopleDc.getClient(clientId).then(function (client) {
+                    _this.client = client;
+                });
+                this.loadContactsForClient(clientId);
+            };
+            WorkReportController.prototype.loadContactsForClient = function (clientId) {
+                var _this = this;
+                return this.dataControllers.peopleDc.getContactsForClient(clientId).then(function (contacts) {
+                    _this.clientContacts = contacts;
+                });
             };
             WorkReportController.prototype.getWorkedMins = function (from, to) {
                 var duration = moment.duration(moment(to).diff(moment(from)));
@@ -7843,7 +8000,10 @@ var TimeRecorder;
             WorkReportController.prototype.getMaxTimeBookingDate = function () {
                 return moment(this.workReport.timeBookings.toEnumerable().max(function (t) { return t.stop.getTime(); })).toDate();
             };
-            WorkReportController.$inject = ['$scope', Web.Business.ExternalWorkReportDataController.serviceId];
+            WorkReportController.prototype.openContactDetails = function (contactId) {
+                throw "Developer Error: openAddContactDetails not implemented in extending controller of WorkReportController!";
+            };
+            WorkReportController.$inject = ['$scope', Web.Business.ExternalWorkReportDataController.serviceId, "$q"];
             WorkReportController.controllerId = "WorkReportController";
             return WorkReportController;
         })();
@@ -7858,27 +8018,37 @@ var TimeRecorder;
     (function (Web) {
         var AddWorkReportController = (function (_super) {
             __extends(AddWorkReportController, _super);
-            function AddWorkReportController($scope, $stateParams, //: ng.ui.IStateParamsService,
-                workReportDataController, timeBookingDataController, authService) {
-                _super.call(this, $scope, workReportDataController);
+            function AddWorkReportController($scope, $state, $stateParams, //: ng.ui.IStateParamsService,
+                $q, dataControllers, authService) {
+                _super.call(this, $scope, dataControllers, $q);
                 this.$scope = $scope;
+                this.$state = $state;
                 this.$stateParams = $stateParams;
-                this.workReportDataController = workReportDataController;
-                this.timeBookingDataController = timeBookingDataController;
+                this.$q = $q;
+                this.dataControllers = dataControllers;
                 this.authService = authService;
                 this.createNewReport(this.$stateParams["projectId"]);
+                this.loadClient(this.$stateParams["clientId"]);
             }
             AddWorkReportController.prototype.createNewReport = function (projectId) {
                 var _this = this;
                 this.authService.getAppUser().then(function (appUser) {
-                    _this.workReport = _this.workReportDataController.createNewWorkReport(appUser.person.id, projectId);
+                    _this.requiredDataQ.then(function () {
+                        _this.dataControllers.externalWorkReportDc.createNewWorkReport(appUser.person.id, projectId).then(function (workReport) {
+                            _this.workReport = workReport;
+                        });
+                    });
                 });
+            };
+            AddWorkReportController.prototype.openContactDetails = function (contactId) {
+                this.$state.go("tr.employeeWorkReport.add.side.contactDetails", { contactId: contactId, clientId: this.client.id, saveEvt: this.saveContactEvent });
             };
             AddWorkReportController.$inject = [
                 '$scope',
+                "$state",
                 "$stateParams",
-                Web.Business.ExternalWorkReportDataController.serviceId,
-                Web.Business.TimeBookingDataController.serviceId,
+                "$q",
+                Web.Business.DataControllerContainer.serviceId,
                 Web.AuthenticationService.serviceId
             ];
             AddWorkReportController.controllerId = "AddWorkReportController";
@@ -7897,20 +8067,24 @@ var TimeRecorder;
     (function (Web) {
         var EditWorkReportController = (function (_super) {
             __extends(EditWorkReportController, _super);
-            function EditWorkReportController($scope, $stateParams, // : ng.ui.IStateParamsService,
-                workReportDataController) {
-                _super.call(this, $scope, workReportDataController);
+            function EditWorkReportController($scope, $state, $stateParams, dataControllers, $q) {
+                _super.call(this, $scope, dataControllers, $q);
                 this.$scope = $scope;
+                this.$state = $state;
                 this.$stateParams = $stateParams;
-                this.workReportDataController = workReportDataController;
-                this.loadReport(this.$stateParams["id"]);
+                this.dataControllers = dataControllers;
+                this.$q = $q;
+                if (Triarc.strNotEmpty(this.$stateParams["workReportId"]))
+                    this.loadReport(this.$stateParams["workReportId"]);
             }
             EditWorkReportController.prototype.loadReport = function (id) {
                 var _this = this;
-                this.workReportDataController.get(id).then(function (workReport) {
-                    _this.workReport = workReport;
-                    _this.dayContainers = null;
-                    _this.$scope.$watch("ctrl.workReport.timeBookings", function () {
+                this.requiredDataQ.then(function () {
+                    _this.dataControllers.externalWorkReportDc.get(id).then(function (workReport) {
+                        _this.workReport = workReport;
+                        _this.projectCompleted = _this.workReport.externalWorkReport.projectCompleted;
+                        _this.loadClient(_this.workReport.externalWorkReport.project.clientId);
+                        _this.dayContainers = null;
                         if (Triarc.arrayHasValues(_this.workReport.timeBookings)) {
                             _this.dayContainers = _this.workReport.timeBookings.toEnumerable().groupBy(function (d) { return moment(d.start).startOf("day").toDate().getTime(); }).select(function (g) {
                                 return {
@@ -7922,7 +8096,10 @@ var TimeRecorder;
                     });
                 });
             };
-            EditWorkReportController.$inject = ['$scope', "$stateParams", Web.Business.ExternalWorkReportDataController.serviceId];
+            EditWorkReportController.prototype.openContactDetails = function (contactId) {
+                this.$state.go("tr.employeeWorkReport.edit.side.contactDetails", { contactId: contactId, clientId: this.client.id, workReportId: this.workReport.externalWorkReport.id, saveEvt: this.saveContactEvent });
+            };
+            EditWorkReportController.$inject = ['$scope', "$state", "$stateParams", Web.Business.DataControllerContainer.serviceId, "$q"];
             EditWorkReportController.controllerId = "EditWorkReportController";
             return EditWorkReportController;
         })(Web.WorkReportController);
@@ -7958,10 +8135,84 @@ var TimeRecorder;
 })(TimeRecorder || (TimeRecorder = {}));
 // Update the app1 variable name to be that of your module variable
 timeRecorder.controller(TimeRecorder.Web.SearchWorkReportController.controllerId, TimeRecorder.Web.SearchWorkReportController);
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var WorkReportSideController = (function () {
+            function WorkReportSideController($location) {
+                this.$location = $location;
+            }
+            WorkReportSideController.prototype.close = function () {
+                window.history.back();
+            };
+            WorkReportSideController.$inject = ['$state'];
+            WorkReportSideController.controllerId = "WorkReportSideController";
+            return WorkReportSideController;
+        })();
+        Web.WorkReportSideController = WorkReportSideController;
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+timeRecorder.controller(TimeRecorder.Web.WorkReportSideController.controllerId, TimeRecorder.Web.WorkReportSideController);
+// Update the most local relative references and declare this controller.
+// Install the angularjs.TypeScript.DefinitelyTyped NuGet package to resolve the .d.ts reference paths,
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var ContactDetailsController = (function () {
+            function ContactDetailsController($scope, $stateParams, peopleDataDc) {
+                this.$scope = $scope;
+                this.$stateParams = $stateParams;
+                this.peopleDataDc = peopleDataDc;
+                this.saveEvt = this.$stateParams["saveEvt"];
+                this.clientId = this.$stateParams["clientId"];
+                if (Triarc.strNotEmpty(this.$stateParams["contactId"])) {
+                    this.loadContact(this.$stateParams["contactId"]);
+                }
+                else {
+                    var cm = {};
+                    this.contact = new Web.Bu.ContactVm(function () { return cm; });
+                }
+            }
+            ContactDetailsController.prototype.loadContact = function (contactId) {
+                var _this = this;
+                this.peopleDataDc.getContact(contactId).then(function (contact) {
+                    _this.contact = contact;
+                });
+            };
+            ContactDetailsController.prototype.save = function () {
+                var _this = this;
+                this.triggerValidation = true;
+                if (this.$scope.contactForm.$invalid)
+                    return;
+                this.contact.clientId = this.clientId;
+                this.peopleDataDc.saveContact(this.contact).then(function (id) {
+                    if (Triarc.strNotEmpty(_this.saveEvt)) {
+                        _this.$scope.$root.$broadcast(_this.saveEvt, { id: id });
+                    }
+                    window.history.back();
+                });
+            };
+            ContactDetailsController.$inject = [
+                '$scope',
+                "$stateParams",
+                Web.Business.PeopleDataController.serviceId
+            ];
+            ContactDetailsController.controllerId = "ContactDetailsController";
+            return ContactDetailsController;
+        })();
+        Web.ContactDetailsController = ContactDetailsController;
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+// Update the app1 variable name to be that of your module variable
+timeRecorder.controller(TimeRecorder.Web.ContactDetailsController.controllerId, TimeRecorder.Web.ContactDetailsController);
 /// <reference path="workreportcontroller.ts" />
 /// <reference path="addworkreportcontroller.ts" />
 /// <reference path="editworkreportcontroller.ts" />
 /// <reference path="searchworkreportcontroller.ts" />
+/// <reference path="workreportsidecontroller.ts" />
+/// <reference path="contactdetailscontroller.ts" />
 /// <reference path="controllers/usercontroller.ts" />
 /// <reference path="controllers/rolecontroller.ts" />
 /// <reference path="controllers/downloadcontroller.ts" />
@@ -8366,8 +8617,13 @@ sig.directive("tlSignature", [function () {
   );
 
 
+  $templateCache.put('Client/Views/employee/contactDetails.html',
+    "<div ng-controller=\"ContactDetailsController as ctrl\"><form name=\"contactForm\" class=\"form-horizontal\" novalidate><div class=\"row\"><div class=\"col-xs-8\"><div class=\"row\"><tl-validate target=\"contactForm.firstName\" label-text=\"'Vorname' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><input class=\"form-control\" name=\"firstName\" type=\"text\" ng-model=\"ctrl.contact.firstName\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.lastName\" label-text=\"'Nachname' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><input class=\"form-control\" name=\"lastName\" type=\"text\" ng-model=\"ctrl.contact.lastName\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.email\" label-text=\"'Email' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><input class=\"form-control\" name=\"lastName\" type=\"text\" ng-model=\"ctrl.contact.email\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.telephone\" label-text=\"'Telefon' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"telephone\" type=\"text\" ng-model=\"ctrl.contact.telephone\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.street\" label-text=\"'Street' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"street\" type=\"text\" ng-model=\"ctrl.contact.street\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.streetNumber\" label-text=\"'Street Number' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"street\" type=\"text\" ng-model=\"ctrl.contact.streetNumber\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.city\" label-text=\"'City' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"city\" type=\"text\" ng-model=\"ctrl.contact.city\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.country\" label-text=\"'Country' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"country\" type=\"text\" ng-model=\"ctrl.contact.country\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.countryCode\" label-text=\"'Country Code' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"countryCode\" type=\"text\" ng-model=\"ctrl.contact.countryCode\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn btn-default pull-left\" ng-click=\"side.close()\">Zurück</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.save();\">Speichern</div></div></div></div></div></form></div>"
+  );
+
+
   $templateCache.put('Client/Views/employee/employeeEditWorkReport.html',
-    "<div id=\"workReport\" class=\"work-report container\" style=\"overflow: visible width:100%; height: 100%\"><ng-include include-replace src=\"'header.section.template.html'\"></ng-include><ng-include include-replace src=\"'timeBooking.section.template.html'\"></ng-include><ng-include include-replace src=\"'options.section.template.html'\"></ng-include><ng-include include-replace src=\"'signature.section.template.html'\"></ng-include><button class=\"btn btn-success hidden-from-print\" ng-click=\"ctrl.savePdf()\" translate>Save Pdf</button></div><script type=\"text/ng-template\" id=\"header.section.template.html\"><div class=\"row\">\r" +
+    "<div id=\"workReport\" class=\"work-report container\"><ui-view class=\"detail-slide\"></ui-view><ng-include include-replace src=\"'header.section.template.html'\"></ng-include><ng-include include-replace src=\"'timeBooking.section.template.html'\"></ng-include><ng-include include-replace src=\"'options.section.template.html'\"></ng-include><ng-include include-replace src=\"'signature.section.template.html'\"></ng-include><button class=\"btn btn-success hidden-from-print\" ng-click=\"ctrl.savePdf()\" translate>Save Pdf</button></div><script type=\"text/ng-template\" id=\"header.section.template.html\"><div class=\"row\">\r" +
     "\n" +
     "    <div class=\"col-xs-2 col-md-offset-10\">\r" +
     "\n" +
@@ -8459,9 +8715,9 @@ sig.directive("tlSignature", [function () {
     "\n" +
     "        <div class=\"col-xs-8\">\r" +
     "\n" +
-    "          <textarea ng-if=\"!ctrl.workReport.externalWorkReport.projectCompleted\" class=\"form-control hidden-from-print\" ng-model=\"ctrl.workReport.externalWorkReport.materials\"></textarea>\r" +
+    "          <textarea ng-if=\"!ctrl.projectCompleted\" class=\"form-control hidden-from-print\" ng-model=\"ctrl.workReport.externalWorkReport.materials\"></textarea>\r" +
     "\n" +
-    "          <span ng-if=\"ctrl.workReport.externalWorkReport.projectCompleted\" class=\"printable-element\">{{ctrl.workReport.externalWorkReport.materials}}</span>\r" +
+    "          <span ng-if=\"ctrl.projectCompleted\" class=\"printable-element\">{{ctrl.workReport.externalWorkReport.materials}}</span>\r" +
     "\n" +
     "        </div>\r" +
     "\n" +
@@ -8501,13 +8757,13 @@ sig.directive("tlSignature", [function () {
     "\n" +
     "                <div class=\"col-xs-2\">\r" +
     "\n" +
-    "                  {{timeBooking.name}}\r" +
+    "                  {{timeBooking.type.name}}\r" +
     "\n" +
     "                </div>\r" +
     "\n" +
     "                <div class=\"col-xs-8\">\r" +
     "\n" +
-    "                  {{timeBooking.comments}}\r" +
+    "                  {{timeBooking.comment}}\r" +
     "\n" +
     "                </div>\r" +
     "\n" +
@@ -8599,7 +8855,7 @@ sig.directive("tlSignature", [function () {
     "\n" +
     "    <div class=\"col-xs-5\">\r" +
     "\n" +
-    "      <label>{{ctrl.currentEmployee.firstName + ' ' + ctrl.currentEmployee.lastName}}</label>\r" +
+    "      <label>{{app.appUser.person.firstName + ' ' + app.appUser.person.lastName}}</label>\r" +
     "\n" +
     "      <tl-signature id=\"employeeSignatureCanvas\"\r" +
     "\n" +
@@ -8629,13 +8885,25 @@ sig.directive("tlSignature", [function () {
     "\n" +
     "        </ui-select-match>\r" +
     "\n" +
-    "        <ui-select-choices repeat=\"contact in ctrl.searchContacts track by $index\">\r" +
+    "        <ui-select-choices repeat=\"contact in ctrl.clientContacts track by $index\">\r" +
     "\n" +
-    "          <div ng-bind-html=\"contact.firstName + ' ' + contact.lastName  | highlight: $select.search\"></div>\r" +
+    "          <div ng-bind-html=\"contact.firstName + ' ' + contact.lastName\"></div>\r" +
     "\n" +
     "        </ui-select-choices>\r" +
     "\n" +
     "      </ui-select>\r" +
+    "\n" +
+    "      <button ng-click=\"ctrl.openContactDetails(null)\" class=\"btn btn-default\">\r" +
+    "\n" +
+    "        <i class=\"glyphicon glyphicon-plus\"></i>\r" +
+    "\n" +
+    "      </button>\r" +
+    "\n" +
+    "      <button ng-click=\"ctrl.openContactDetails(ctrl.selectedContact.id)\" ng-show=\"ctrl.selectedContact\" class=\"btn btn-default\">\r" +
+    "\n" +
+    "        <i class=\"glyphicon glyphicon-edit\"></i>\r" +
+    "\n" +
+    "      </button>\r" +
     "\n" +
     "      <span class=\"printable-element\">{{ctrl.selectedContact.firstName}}&nbsp;{{ctrl.selectedContact.lastName}}</span>\r" +
     "\n" +
@@ -8660,7 +8928,7 @@ sig.directive("tlSignature", [function () {
 
 
   $templateCache.put('Client/Views/employee/employeeSearchWorkReport.html',
-    "<div id=\"workReport\" ng-controller=\"SearchWorkReportController as ctrl\" class=\"search-work-report\"><h2>Arbeitsrapport</h2><hr><div class=\"row\"><form class=\"col-md-12\" ng-submit=\"ctrl.search()\"><div class=\"row\"><div class=\"col-md-3\"><input type=\"text\" placeholder=\"Person\" ng-model=\"ctrl.personValue\" typeahead-on-select=\"ctrl.selected($item, $model, $label)\" typeahead=\"p.label as p.label for p in ctrl.persons | filter:$viewValue | limitTo:8\" class=\"form-control\"></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Von\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.fromValue\" is-open=\"ctrl.calendarSettings.fromIsOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openCalendar($event, 'from')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Bis\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.toValue\" is-open=\"ctrl.calendarSettings.toIsOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openCalendar($event, 'to')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><select class=\"form-control\" ng-model=\"ctrl.typeFilter\" ng-options=\"t.id as t.name for t in ctrl.metaData.types\"><option value=\"\">Typ wählen</option></select></div><div class=\"col-md-2\"><select class=\"form-control\" ng-model=\"ctrl.stateFilter\" ng-options=\"s.id as s.name for s in ctrl.metaData.states\"><option value=\"\">Status Wählen</option></select></div></div><div class=\"row\"><div class=\"col-md-1\"><button type=\"submit\" class=\"btn btn-default\">Suchen</button></div><div class=\"col-md-1\"><div class=\"btn btn-default\" ui-sref=\"tr.timebookings.side.add\">Erstellen</div></div><div class=\"col-md-1\"><input type=\"checkbox\" ng-model=\"ctrl.showConfirmation\" name=\"visum\"> Visum</div></div></form></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-md-12 tr-list-head\"><div class=\"row\"><div class=\"col-md-1\">Person</div><div class=\"col-md-1\">Projekt</div><div class=\"col-md-2\">Start</div><div class=\"col-md-2\">Stop</div><div class=\"col-md-2\">Typ</div><div class=\"col-md-2\">Status</div><div class=\"col-md-1\"><span ng-show=\"ctrl.showConfirmation\">Visum</span></div><div class=\"col-md-1\"></div></div></div><div infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\" class=\"tr-list\"><div ng-repeat=\"entry in ctrl.searchResults\" class=\"col-md-12 tr-list-item\" ng-style=\"{'background': ctrl.getBookingBackground(entry) }\"><div class=\"row\" ng-click=\"ctrl.selectEntry(entry)\"><div class=\"col-md-1 tr-ellipsis\">{{entry.employeeName}}</div><div class=\"col-md-1 tr-ellipsis\">{{entry.project.name}}</div><div class=\"col-md-2\">{{entry.from | date : 'dd.MM.yyyy - H:mm'}}</div><div class=\"col-md-2\">{{entry.to | date : 'dd.MM.yyyy - H:mm'}}</div><div class=\"col-md-2\">{{entry.typeName}}</div><div class=\"col-md-2\" ng-style=\"{'color': ctrl.getStateColor(entry.state) }\">{{ctrl.getStateById(entry.state)}}</div><div class=\"col-md-1\"><input type=\"checkbox\" ng-show=\"ctrl.showConfirmation\" ng-model=\"entry.confirmed\" ng-change=\"ctrl.setConfirmed(entry)\"></div><div class=\"col-md-1\"><a ui-sref=\"tr.editEmployeeWorkReport({id:entry.id})\">Edit</a></div><div class=\"tr-list-selector-left\"></div><div class=\"tr-list-selector-right\"></div></div></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div></div>"
+    "<div id=\"workReport\" ng-controller=\"SearchWorkReportController as ctrl\" class=\"search-work-report\"><h2>Arbeitsrapport</h2><hr><div class=\"row\"><form class=\"col-md-12\" ng-submit=\"ctrl.search()\"><div class=\"row\"><div class=\"col-md-3\"><input type=\"text\" placeholder=\"Person\" ng-model=\"ctrl.personValue\" typeahead-on-select=\"ctrl.selected($item, $model, $label)\" typeahead=\"p.label as p.label for p in ctrl.persons | filter:$viewValue | limitTo:8\" class=\"form-control\"></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Von\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.fromValue\" is-open=\"ctrl.calendarSettings.fromIsOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openCalendar($event, 'from')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Bis\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup=\"{{ctrl.dateFormat}}\" ng-model=\"ctrl.toValue\" is-open=\"ctrl.calendarSettings.toIsOpen\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openCalendar($event, 'to')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><select class=\"form-control\" ng-model=\"ctrl.typeFilter\" ng-options=\"t.id as t.name for t in ctrl.metaData.types\"><option value=\"\">Typ wählen</option></select></div><div class=\"col-md-2\"><select class=\"form-control\" ng-model=\"ctrl.stateFilter\" ng-options=\"s.id as s.name for s in ctrl.metaData.states\"><option value=\"\">Status Wählen</option></select></div></div><div class=\"row\"><div class=\"col-md-1\"><button type=\"submit\" class=\"btn btn-default\">Suchen</button></div><div class=\"col-md-1\"><button ui-sref=\"tr.employeeWorkReport.add({projectId: 1, clientId: 7})\" class=\"btn btn-default\"><i class=\"glyphicon glyphicon-plus\"></i><span>Erstellen</span></button></div></div></form></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"></div><div class=\"row\"><div class=\"col-md-12 tr-list-head\"><div class=\"row\"><div class=\"col-md-1\">Person</div><div class=\"col-md-1\">Projekt</div><div class=\"col-md-2\">Start</div><div class=\"col-md-2\">Stop</div><div class=\"col-md-2\">Typ</div><div class=\"col-md-2\">Status</div><div class=\"col-md-1\"><span ng-show=\"ctrl.showConfirmation\">Visum</span></div><div class=\"col-md-1\"></div></div></div><div infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\" class=\"tr-list\"><div ng-repeat=\"entry in ctrl.searchResults\" class=\"col-md-12 tr-list-item\" ng-style=\"{'background': ctrl.getBookingBackground(entry) }\"><div class=\"row\" ng-click=\"ctrl.selectEntry(entry)\"><div class=\"col-md-1 tr-ellipsis\">{{entry.employeeName}}</div><div class=\"col-md-1 tr-ellipsis\">{{entry.project.name}}</div><div class=\"col-md-2\">{{entry.from | date : 'dd.MM.yyyy - H:mm'}}</div><div class=\"col-md-2\">{{entry.to | date : 'dd.MM.yyyy - H:mm'}}</div><div class=\"col-md-2\">{{entry.typeName}}</div><div class=\"col-md-2\" ng-style=\"{'color': ctrl.getStateColor(entry.state) }\">{{ctrl.getStateById(entry.state)}}</div><div class=\"col-md-1\"><input type=\"checkbox\" ng-show=\"ctrl.showConfirmation\" ng-model=\"entry.confirmed\" ng-change=\"ctrl.setConfirmed(entry)\"></div><div class=\"col-md-1\"><a ui-sref=\"tr.employeeWorkReport.edit({workReportId: entry.id})\">Edit</a></div><div class=\"tr-list-selector-left\"></div><div class=\"tr-list-selector-right\"></div></div></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div></div>"
   );
 
 
