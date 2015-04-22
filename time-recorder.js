@@ -1232,6 +1232,15 @@ var TimeRecorder;
                     var request = this.getExpenseTypesMultipleRequest(params);
                     return this.$requestSender.requestValue(request);
                 };
+                ExpensesResource.prototype.targetExpensesRequest = function (data) {
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Expenses/TargetExpenses";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "Expenses", "any", true);
+                    return dataRequest;
+                };
+                ExpensesResource.prototype.targetExpenses = function (data) {
+                    var request = this.targetExpensesRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
                 ExpensesResource.prototype.newExpenseCm = function () {
                     return {};
                 };
@@ -1239,6 +1248,9 @@ var TimeRecorder;
                     return {};
                 };
                 ExpensesResource.prototype.newExpensesSearchCm = function () {
+                    return {};
+                };
+                ExpensesResource.prototype.newExpenseTargetingCm = function () {
                     return {};
                 };
                 return ExpensesResource;
@@ -3888,8 +3900,12 @@ var TimeRecorder;
                     return this.$proxy.Expenses.get({ id: id }).then(function (response) { return response.data; });
                 };
                 ExpenseRepository.prototype.delete = function (id) {
-                    var _this = this;
-                    return this.$proxy.Expenses.delete({ id: id }).then(function () { return _this.$q.when(); });
+                    return this.$proxy.Expenses.delete({ id: id }).then(function () {
+                    });
+                };
+                ExpenseRepository.prototype.targetExpenses = function (ids) {
+                    return this.$proxy.Expenses.targetExpenses({ ids: ids }).then(function () {
+                    });
                 };
                 ExpenseRepository.$inject = [
                     "$tr-proxy",
@@ -4196,6 +4212,9 @@ var TimeRecorder;
                 };
                 ExpenseDataController.prototype.delete = function (id) {
                     return this.expenseRepository.delete(id);
+                };
+                ExpenseDataController.prototype.targetExpenses = function (ids) {
+                    return this.expenseRepository.targetExpenses(ids);
                 };
                 ExpenseDataController.serviceId = "ExpenseDataController";
                 ExpenseDataController.$inject = [
@@ -7174,26 +7193,34 @@ var TimeRecorder;
     var Web;
     (function (Web) {
         var ExpensesController = (function () {
-            function ExpensesController($scope, $q, $authentication, $expensesDataController, $expenseTypeDataController, $state) {
+            function ExpensesController($scope, $q, $authentication, $notifications, $expensesDataController, $expenseTypeDataController, $state) {
                 var _this = this;
                 this.$scope = $scope;
                 this.$q = $q;
                 this.$authentication = $authentication;
+                this.$notifications = $notifications;
                 this.$expensesDataController = $expensesDataController;
                 this.$expenseTypeDataController = $expenseTypeDataController;
                 this.$state = $state;
                 // current search result
                 this.searchResult = [];
-                this.date = new Date();
+                this.model = {
+                    targetingMode: false,
+                    date: new Date()
+                };
                 this.expenseTypesMap = new Map();
+                // whenver user selects an expense to target, it gets added to this map, with its id as key. Only candidates are in this map.
+                this.targeted = new Map();
                 this.getEntryPerDay = function (day) {
                     if (Triarc.hasNoValue(_this.searchResult) || Triarc.hasNoValue(_this.searchResult[day]))
                         return 0;
                     return _this.searchResult[day].length;
                 };
                 var authPromise = $authentication.hasClaimEnsureLoggedIn("web_expenses").then(function (hasClaim) {
-                    if (!hasClaim)
+                    if (!hasClaim) {
+                        _this.$notifications.info("Unauthorized access.");
                         throw "Unauthorized access.";
+                    }
                 });
                 var userIdPromise = $authentication.getAppUser().then(function (appUser) {
                     if (Triarc.hasValue(appUser.person))
@@ -7208,6 +7235,7 @@ var TimeRecorder;
                 this.$q.all(promises).then(function () {
                     _this.init();
                 }, function () {
+                    _this.$notifications.info("Server error.");
                     _this.$state.transitionTo("tr.login");
                 });
             }
@@ -7216,14 +7244,14 @@ var TimeRecorder;
                 var _this = this;
                 var dateParam = this.$state.params["date"];
                 if (Triarc.hasValue(dateParam)) {
-                    this.date = dateParam;
+                    this.model.date = dateParam;
                 }
-                this.$scope.$watch("ctrl.date", function () {
+                this.$scope.$watch("ctrl.model.date", function () {
                     _this.search(false);
                 }, true);
                 var date = this.$state.params["date"];
                 if (Triarc.hasValue(date)) {
-                    this.date = date;
+                    this.model.date = date;
                 }
                 this.$scope.$on("$stateChangeSuccess", function (event, toState, _, fromState) {
                     if (toState.name !== "tr.expenses")
@@ -7231,11 +7259,23 @@ var TimeRecorder;
                     if (fromState.name === "tr.expenses.side.add" || fromState.name === "tr.expenses.side.edit") {
                         var date = _this.$state.params["date"];
                         if (Triarc.hasValue(date)) {
-                            _this.date = date;
+                            _this.model.date = date;
                         }
                         _this.search(true);
                     }
                 });
+            };
+            ExpensesController.prototype.isTargetCandidate = function (entry) {
+                return this.targeted.has(entry.id);
+            };
+            ExpensesController.prototype.toggleTargetCandidature = function (entry) {
+                if (this.targeted.has(entry.id))
+                    this.targeted.delete(entry.id);
+                else
+                    this.targeted.set(entry.id, entry);
+            };
+            ExpensesController.prototype.isTargeted = function (entry) {
+                return Triarc.hasValue(entry.visaEmployeeId);
             };
             ExpensesController.prototype.getExpenseTypeName = function (entry) {
                 return this.expenseTypesMap.has(entry.expenseTypeId) ? this.expenseTypesMap.get(entry.expenseTypeId).name : "";
@@ -7250,7 +7290,7 @@ var TimeRecorder;
                 return entry.value.toString();
             };
             ExpensesController.prototype.refreshDisplayedExpenses = function () {
-                this.displayedExpenses = this.searchResult[this.date.getDay()];
+                this.displayedExpenses = this.searchResult[this.model.date.getDay()];
             };
             ExpensesController.prototype.getDayStart = function (time) {
                 return time.hour(0).minute(0).second(0).millisecond(0);
@@ -7258,7 +7298,7 @@ var TimeRecorder;
             // search. Ask server for new results if the week changed, otherwise just change displayed results.
             ExpensesController.prototype.search = function (force) {
                 var _this = this;
-                var monday = moment(this.date);
+                var monday = moment(this.model.date);
                 if (monday.day() === 0)
                     monday.day(-6);
                 else
@@ -7287,7 +7327,7 @@ var TimeRecorder;
             };
             ExpensesController.prototype.addButtonCallback = function () {
                 this.$state.go("tr.expenses.side.add", {
-                    date: this.date
+                    date: this.model.date
                 });
             };
             ExpensesController.prototype.okButtonCallback = function () {
@@ -7295,11 +7335,31 @@ var TimeRecorder;
             ExpensesController.prototype.getTotalEntries = function () {
                 return this.searchResult.toEnumerable().sum(function (expenses) { return expenses.length; });
             };
+            ExpensesController.prototype.editEntry = function (entry) {
+                if (!this.model.targetingMode && !this.isTargeted(entry))
+                    this.$state.go("tr.expenses.side.edit", { id: entry.id });
+            };
+            ExpensesController.prototype.targetStartButtonCallback = function () {
+                this.targeted.clear();
+            };
+            ExpensesController.prototype.targetConfirmButtonCallback = function () {
+                var _this = this;
+                var ids = this.targeted.getValues().toEnumerable().select(function (e) { return e.id; }).toArray();
+                this.$expensesDataController.targetExpenses(ids).then(function () {
+                    _this.model.targetingMode = false;
+                    _this.targeted.clear();
+                    _this.$notifications.info("Expenses successfully targeted.");
+                    _this.search(true);
+                }, function () {
+                    _this.$notifications.error("Failed to target expenses.");
+                });
+            };
             ExpensesController.controllerId = "ExpensesController";
             ExpensesController.$inject = [
                 "$scope",
                 "$q",
                 "trAuthenticationService",
+                Web.NotificationServce.serviceId,
                 Web.Business.ExpenseDataController.serviceId,
                 Web.Business.ExpenseTypeDataController.serviceId,
                 "$state"
@@ -8248,11 +8308,19 @@ var TimeRecorder;
                     controller: FilterHeaderController.controllerId,
                     templateUrl: "Client/Views/templates/FilterHeader.html",
                     scope: {
-                        date: "=",
+                        model: "=",
+                        // This button adds new object, e.g new Expense. Callback implementation should side menu.
                         addButtonText: "@",
                         addButtonCallback: "&",
-                        okButtonText: "@",
-                        okButtonCallback: "&",
+                        // This button starts mode, where user can checkbox objects (e.g expenses) to send to server (and abacus).
+                        targetStartButtonText: "@",
+                        targetStartButtonCallback: "&",
+                        // This button cancels targetting mode, callback implementation should not send anything and clear checkboxes.
+                        targetCancelButtonText: "@",
+                        targetCancelButtonCallback: "&",
+                        // This button confirms targetting mode, callback implementation should send objects to the server (and abacus in the end).
+                        targetConfirmButtonText: "@",
+                        targetConfirmButtonCallback: "&",
                         // function which returns number of entries per day is expected, where 0 is Sunday and 6 is Monday.
                         getEntryPerDay: "=",
                         getTotalEntries: "&"
@@ -8274,17 +8342,20 @@ var TimeRecorder;
                 this.$scope = $scope;
                 this.datepickerOpened = false;
             }
+            FilterHeaderController.prototype.date = function () {
+                return this.$scope.model.date;
+            };
             FilterHeaderController.prototype.previousWeek = function () {
-                this.$scope.date.setDate(this.$scope.date.getDate() - 7);
+                this.date().setDate(this.date().getDate() - 7);
             };
             FilterHeaderController.prototype.nextWeek = function () {
-                this.$scope.date.setDate(this.$scope.date.getDate() + 7);
+                this.date().setDate(this.date().getDate() + 7);
             };
             FilterHeaderController.prototype.today = function () {
-                this.$scope.date.setTime(new Date().getTime());
+                this.date().setTime(new Date().getTime());
             };
             FilterHeaderController.prototype.getCurrentWeekday = function () {
-                return this.$scope.date.getDay();
+                return this.date().getDay();
             };
             FilterHeaderController.prototype.openDatepicker = function ($event) {
                 $event.preventDefault();
@@ -8292,10 +8363,10 @@ var TimeRecorder;
                 this.datepickerOpened = true;
             };
             FilterHeaderController.prototype.goToDay = function (day) {
-                var currentDayOfWeek = (this.$scope.date.getDay() + 6) % 7;
+                var currentDayOfWeek = (this.date().getDay() + 6) % 7;
                 var selectedDayOfWeek = (day + 6) % 7;
                 var diff = selectedDayOfWeek - currentDayOfWeek;
-                this.$scope.date.setDate(this.$scope.date.getDate() + diff);
+                this.date().setDate(this.date().getDate() + diff);
             };
             FilterHeaderController.prototype.getDayName = function (day) {
                 switch (day) {
@@ -8321,7 +8392,6 @@ var TimeRecorder;
             return FilterHeaderController;
         })();
         Web.FilterHeaderController = FilterHeaderController;
-        // declare correct angularjs module
         timeRecorder.controller(FilterHeaderController.controllerId, FilterHeaderController);
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
@@ -8943,51 +9013,79 @@ sig.directive("tlSignature", [function () {
 
 
   $templateCache.put('Client/Views/expenses.html',
-    "<div ng-controller=\"ExpensesController as ctrl\" class=\"expenses\"><ui-view class=\"detail-slide\"></ui-view><div class=\"row\"><h1 class=\"col-md-9\">Spesen</h1></div><filter-header date=\"ctrl.date\" add-button-callback=\"ctrl.addButtonCallback()\" add-button-text=\"Add new expense\" ok-button-callback=\"ctrl.okButtonCallback()\" ok-button-text=\"Target all expenses\" get-entry-per-day=\"ctrl.getEntryPerDay\" get-total-entries=\"ctrl.getTotalEntries()\"></filter-header><hr><div class=\"row\"></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row tr-list-head\"></div><div class=\"row\"><div class=\"tr-list\"><!--infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\"--><ng-include src=\"'expenses.row'\"></ng-include></div><script type=\"text/ng-template\" id=\"expenses.row\"><div ng-repeat=\"entry in ctrl.displayedExpenses\" class=\"col-md-12\">\r" +
+    "<div ng-controller=\"ExpensesController as ctrl\" class=\"expenses\"><ui-view class=\"detail-slide\"></ui-view><div class=\"row\"><h1 class=\"col-md-9\">Spesen</h1></div><filter-header model=\"ctrl.model\" add-button-callback=\"ctrl.addButtonCallback()\" add-button-text=\"Add new expense\" target-start-button-callback=\"ctrl.targetStartButtonCallback()\" target-start-button-text=\"Target expenses\" target-cancel-button-callback=\"ctrl.targetCancelButtonCallback()\" target-cancel-button-text=\"Abbrechen\" target-confirm-button-callback=\"ctrl.targetConfirmButtonCallback()\" target-confirm-button-text=\"Ok\" get-entry-per-day=\"ctrl.getEntryPerDay\" get-total-entries=\"ctrl.getTotalEntries()\"></filter-header><div class=\"row\"></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row tr-list-head\"></div><div class=\"row\"><div class=\"tr-list col-md-12\"><!--infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\"--><ng-include src=\"'expenses.row'\"></ng-include><div ng-if=\"ctrl.displayedExpenses.length === 0\" class=\"row tr-list-item\"><div class=\"col-md-12\">No expenses are booked on this day.</div></div></div></div></div><script type=\"text/ng-template\" id=\"expenses.row\"><div ng-repeat=\"entry in ctrl.displayedExpenses\">\r" +
     "\n" +
-    "        <div class=\"row tr-list-item\">\r" +
+    "    <div class=\"row tr-list-item\">\r" +
     "\n" +
-    "          <div class=\"col-md-1 tr-ellipsis\">\r" +
+    "      <div class=\"col-md-1 tr-ellipsis\">\r" +
     "\n" +
-    "            {{$index + 1}}\r" +
+    "        {{$index + 1}}\r" +
     "\n" +
-    "          </div>\r" +
+    "      </div>\r" +
     "\n" +
-    "          <div class=\"col-md-6 tr-ellipsis\">\r" +
+    "      <div class=\"col-md-6 tr-ellipsis\">\r" +
     "\n" +
-    "            <div class=\"row\">\r" +
+    "        <div class=\"row\">\r" +
     "\n" +
-    "              <div class=\"col-md-12\">\r" +
+    "          <div class=\"col-md-12\">\r" +
     "\n" +
-    "                {{ctrl.getExpenseTypeName(entry)}}\r" +
-    "\n" +
-    "              </div>\r" +
-    "\n" +
-    "            </div>\r" +
-    "\n" +
-    "            <div class=\"row\">\r" +
-    "\n" +
-    "              <div class=\"col-md-12\">\r" +
-    "\n" +
-    "                {{entry.description}}\r" +
-    "\n" +
-    "              </div>\r" +
-    "\n" +
-    "            </div>\r" +
-    "\n" +
-    "          </div>\r" +
-    "\n" +
-    "          <div class=\"col-md-2\">{{ctrl.getValue(entry)}}</div>\r" +
-    "\n" +
-    "          <div class=\"col-md-2 text-right\">\r" +
-    "\n" +
-    "            <span ui-sref=\"tr.expenses.side.edit({id:entry.id})\" class=\"glyphicon glyphicon-edit\"></span>\r" +
+    "            {{ctrl.getExpenseTypeName(entry)}}\r" +
     "\n" +
     "          </div>\r" +
     "\n" +
     "        </div>\r" +
     "\n" +
-    "      </div></script></div></div>"
+    "        <div class=\"row\">\r" +
+    "\n" +
+    "          <div class=\"col-md-12\">\r" +
+    "\n" +
+    "            {{entry.description}}\r" +
+    "\n" +
+    "          </div>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "      </div>\r" +
+    "\n" +
+    "      <div class=\"col-md-2\">{{ctrl.getValue(entry)}}</div>\r" +
+    "\n" +
+    "      \r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "      <div class=\"col-md-1\">\r" +
+    "\n" +
+    "        <!--<button type=\"button\"  class=\"btn btn-primary\" ng-model=\"singleModel\" btn-checkbox btn-checkbox-true=\"1\" btn-checkbox-false=\"0\">-->\r" +
+    "\n" +
+    "        <span ng-show=\"ctrl.isTargeted(entry)\" \r" +
+    "\n" +
+    "           class=\"glyphicon glyphicon-check disabled\"></span>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "        <span ng-show=\"!ctrl.isTargeted(entry) && ctrl.model.targetingMode\"\r" +
+    "\n" +
+    "              ng-click=\"ctrl.toggleTargetCandidature(entry)\"\r" +
+    "\n" +
+    "              ng-class=\"{'glyphicon-check': ctrl.isTargetCandidate(entry), 'glyphicon-unchecked': !ctrl.isTargetCandidate(entry)}\"\r" +
+    "\n" +
+    "              class=\"glyphicon\">\r" +
+    "\n" +
+    "        </span>\r" +
+    "\n" +
+    "      </div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "      <div class=\"col-md-1 text-right\">\r" +
+    "\n" +
+    "        <span ng-class=\"{'disabled': ctrl.model.targetingMode || ctrl.isTargeted(entry)}\" ng-click=\"ctrl.editEntry(entry)\" class=\"glyphicon glyphicon-edit\"></span>\r" +
+    "\n" +
+    "      </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "  </div></script>"
   );
 
 
@@ -9142,7 +9240,7 @@ sig.directive("tlSignature", [function () {
 
 
   $templateCache.put('Client/Views/templates/FilterHeader.html',
-    "<div class=\"row filter-header\"><div class=\"col-md-3\"><h3 class=\"current-date\">{{date | date:'EEEE d. MMMM'}}</h3></div><div class=\"col-md-3 btn-group\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.previousWeek()\"><i class=\"glyphicon glyphicon-arrow-left glyphicon-wider\"></i></button> <button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.today()\">Heute</button> <button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.nextWeek()\"><i class=\"glyphicon glyphicon-arrow-right glyphicon-wider\"></i></button></div><div class=\"col-md-2\"><div class=\"input-group\"><input name=\"expensesForm.date\" type=\"text\" ng-model=\"date\" class=\"form-control datepicker\" datepicker-popup view-format ng-disabled=\"ctrl.isDisabled()\" is-open=\"ctrl.datepickerOpened\" close-text=\"{{'_close' | translate}}\" current-text=\"{{'_now' | translate}}\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openDatepicker($event)\"><i class=\"glyphicon glyphicon-wider glyphicon-th-list\"></i></button></span></div></div><div class=\"col-md-2\"><button ng-click=\"okButtonCallback()\" class=\"btn btn-default\"><i class=\"glyphicon glyphicon-ok\"></i><span>{{okButtonText}}</span></button></div><div class=\"col-md-2\"><button ng-click=\"addButtonCallback()\" class=\"btn btn-default pull-right\"><i class=\"glyphicon glyphicon-plus\"></i><span>{{addButtonText}}</span></button></div></div><div class=\"tr-v-spacer\"></div><div class=\"row filter-week\"><div class=\"col-md-12\"><div class=\"calendar-panel\"><div class=\"btn-group fill\"><button type=\"button\" ng-repeat=\"day in [1, 2, 3, 4, 5, 6, 0]\" class=\"btn btn-default day-btn\" ng-click=\"ctrl.goToDay(day)\" ng-class=\"{'day-btn-selected': ctrl.getCurrentWeekday() === day}\">{{ctrl.getDayName(day)}}<br><strong>{{getEntryPerDay(day)}}</strong></button><div class=\"total pull-right\">Total:<br><strong>{{getTotalEntries()}}</strong></div></div></div></div></div>"
+    "<div class=\"row filter-header\"><div class=\"col-md-3\"><h3 class=\"current-date\">{{model.date | date:'EEEE d. MMMM'}}</h3></div><div ng-if=\"!model.targetingMode\" class=\"col-md-3 btn-group\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.previousWeek()\"><span class=\"glyphicon glyphicon-arrow-left glyphicon-wider\"></span></button> <button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.today()\">Heute</button> <button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.nextWeek()\"><span class=\"glyphicon glyphicon-arrow-right glyphicon-wider\"></span></button></div><div ng-if=\"!model.targetingMode\" class=\"col-md-2\"><div class=\"input-group\"><input name=\"expensesForm.date\" type=\"text\" ng-model=\"model.date\" class=\"form-control datepicker\" datepicker-popup view-format ng-disabled=\"ctrl.isDisabled()\" is-open=\"ctrl.datepickerOpened\" close-text=\"{{'_close' | translate}}\" current-text=\"{{'_now' | translate}}\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openDatepicker($event)\"><span class=\"glyphicon glyphicon-wider glyphicon-th-list\"></span></button></span></div></div><div ng-if=\"!model.targetingMode\" class=\"col-md-2\"><button ng-click=\"model.targetingMode = true; targetStartButtonCallback();\" class=\"btn btn-default btn-min-width\"><span class=\"glyphicon glyphicon-ok glyphicon-ok-darkgreen\"></span><span>{{targetStartButtonText}}</span></button></div><div ng-if=\"!model.targetingMode\" class=\"col-md-2\"><button ng-click=\"addButtonCallback()\" class=\"btn btn-default btn-min-width pull-right\"><span class=\"glyphicon glyphicon-plus\"></span><span>{{addButtonText}}</span></button></div><div ng-if=\"model.targetingMode\" class=\"col-md-offset-5 col-md-2 btn-group\"><button ng-click=\"model.targetingMode = false; targetCancelButtonCallback()\" class=\"btn btn-danger btn-min-width\"><span>{{targetCancelButtonText}}</span></button></div><div ng-if=\"model.targetingMode\" class=\"col-md-2\"><button ng-click=\"targetConfirmButtonCallback()\" class=\"btn btn-success btn-min-width pull-right\"><span class=\"glyphicon glyphicon-ok glyphicon-ok-white\"></span><span>{{targetConfirmButtonText}}</span></button></div></div><div class=\"tr-v-spacer\"></div><div class=\"row filter-week\"><div class=\"col-md-12\"><div class=\"calendar-panel\"><div class=\"btn-group fill\"><button type=\"button\" ng-repeat=\"day in [1, 2, 3, 4, 5, 6, 0]\" class=\"btn btn-default day-btn\" ng-click=\"ctrl.goToDay(day)\" ng-disabled=\"model.targetingMode\" ng-class=\"{'day-btn-selected': ctrl.getCurrentWeekday() === day}\">{{ctrl.getDayName(day)}}<br><strong>{{getEntryPerDay(day)}}</strong></button><div class=\"total pull-right\">Total:<br><strong>{{getTotalEntries()}}</strong></div></div></div></div></div>"
   );
 
 
