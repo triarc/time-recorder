@@ -24,13 +24,19 @@ declare module TimeRecorder.Web.Data {
         emergencyPin: string;
         bookingLock?: Date;
         claimConfigurations: Data.IFeatureConfigurationVm[];
-        mainAddressId?: number;
         lastName: string;
         firstName: string;
         email: string;
         telephone: string;
         id: number;
         timestamp: Date;
+        addressId?: number;
+        city: string;
+        country: string;
+        countryCode: string;
+        street: string;
+        streetNumber: string;
+        zipCode: string;
     }
     interface IPersonVm {
         id: number;
@@ -182,30 +188,48 @@ declare module TimeRecorder.Web.Data {
         bytes: string;
     }
     interface IPersonCm {
-        mainAddressId?: number;
         lastName: string;
         firstName: string;
         email: string;
         telephone: string;
         id: number;
         timestamp: Date;
+        addressId?: number;
+        city: string;
+        country: string;
+        countryCode: string;
+        street: string;
+        streetNumber: string;
+        zipCode: string;
     }
     interface IClientCm {
         id: number;
         name: string;
         mainContactId: number;
-        mainAddressId: number;
+        addressId: number;
         timestamp: number;
+        city: string;
+        country: string;
+        countryCode: string;
+        street: string;
+        streetNumber: string;
+        zipCode: string;
     }
     interface IContactCm {
         clientId?: number;
-        mainAddressId?: number;
         lastName: string;
         firstName: string;
         email: string;
         telephone: string;
         id: number;
         timestamp: Date;
+        addressId?: number;
+        city: string;
+        country: string;
+        countryCode: string;
+        street: string;
+        streetNumber: string;
+        zipCode: string;
     }
     interface IProjectPersonVm {
         personId: number;
@@ -236,9 +260,10 @@ declare module TimeRecorder.Web.Data {
         parent: Data.IProjectVm;
     }
     interface IExpenseCm {
-        id?: number;
+        id: number;
         value: number;
-        timestamp: Date;
+        timestamp: number;
+        date: Date;
         description: string;
         expenseTypeId: number;
         employeeId: number;
@@ -252,12 +277,15 @@ declare module TimeRecorder.Web.Data {
         validFrom?: Date;
         validTo?: Date;
         amountBased: boolean;
+        timestamp: number;
         unitOfMeasure: string;
     }
     interface IExpensesSearchCm {
         skip?: number;
         take?: number;
         employeeId?: number;
+        from?: Date;
+        to?: Date;
     }
     interface IConfigVm {
         id: number;
@@ -1717,7 +1745,8 @@ declare module TimeRecorder.Web.Business {
         description: string;
         employeeId: number;
         value: number;
-        timestamp: Date;
+        date: Date;
+        timestamp: number;
         expenseTypeId: number;
         visaEmployeeId: number;
         visaTimestamp: Date;
@@ -1733,19 +1762,27 @@ declare module TimeRecorder.Web.Business {
         validFrom: Date;
         validTo: Date;
         amountBased: boolean;
+        timestamp: number;
+        unitOfMeasure: string;
     }
 }
 declare module TimeRecorder.Web.Bu {
     class PersonVm {
         protected cm: () => Data.IPersonCm;
         constructor(cm: () => Data.IPersonCm);
-        mainAddressId: number;
+        addressId: number;
         lastName: string;
         firstName: string;
         email: string;
         telephone: string;
         id: number;
         timestamp: Date;
+        city: string;
+        zipCode: string;
+        country: string;
+        countryCode: string;
+        street: string;
+        streetNumber: string;
         fullName: string;
         update(entityCm: Data.IPersonCm): void;
         reset(): void;
@@ -1879,7 +1916,7 @@ declare module TimeRecorder.Web.Business {
         static $inject: string[];
         static serviceId: string;
         constructor($proxy: Data.ProxyContainer, $q: ng.IQService);
-        search(): ng.IPromise<Data.IExpenseCm[]>;
+        search(skip?: number, take?: number, from?: Date, to?: Date, employeeId?: number): ng.IPromise<Data.IExpenseCm[]>;
         addOrUpdate(expenseCm: Data.IExpenseCm): ng.IPromise<Data.IExpenseCm>;
         getExpenseById(id: number): ng.IPromise<Data.IExpenseCm>;
         delete(id: number): ng.IPromise<void>;
@@ -1977,7 +2014,7 @@ declare module TimeRecorder.Web.Business {
         static $inject: string[];
         container: Business.DataControllerContainer;
         constructor($q: ng.IQService, expenseTypeRepository: ExpenseTypeRepository);
-        getAllExpenses(): ng.IPromise<ExpenseTypeVm[]>;
+        getAllExpenseTypes(): ng.IPromise<ExpenseTypeVm[]>;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -1988,7 +2025,7 @@ declare module TimeRecorder.Web.Business {
         static $inject: string[];
         container: Business.DataControllerContainer;
         constructor($q: ng.IQService, expenseRepository: ExpenseRepository);
-        search(): ng.IPromise<ExpenseVm[]>;
+        search(skip?: number, take?: number, from?: Date, to?: Date, employeeId?: number): ng.IPromise<ExpenseVm[]>;
         getExpenseById(id: number): ng.IPromise<ExpenseVm>;
         addOrUpdateExpense(expenseVm: ExpenseVm): ng.IPromise<ExpenseVm>;
         delete(id: number): ng.IPromise<void>;
@@ -2752,26 +2789,32 @@ declare module TimeRecorder.Web {
     }
 }
 declare module TimeRecorder.Web {
-    interface IExpenseControllerScope extends ng.IScope {
-        filterHeaderModel: IFilterHeaderModel;
-    }
     class ExpensesController {
         private $scope;
-        private authentication;
-        private expensesDataController;
-        private expenseTypeDataController;
+        private $q;
+        private $authentication;
+        private $expensesDataController;
+        private $expenseTypeDataController;
         private $state;
         static controllerId: string;
         static $inject: string[];
-        searchResult: Business.ExpenseVm[];
+        private searchResult;
+        displayedExpenses: Business.ExpenseVm[];
+        date: Date;
         private expenseTypesMap;
-        constructor($scope: IExpenseControllerScope, authentication: IAuthenticationService, expensesDataController: Business.ExpenseDataController, expenseTypeDataController: Business.ExpenseTypeDataController, $state: any);
+        private appUserId;
+        private searchFrom;
+        constructor($scope: ng.IScope, $q: ng.IQService, $authentication: IAuthenticationService, $expensesDataController: Business.ExpenseDataController, $expenseTypeDataController: Business.ExpenseTypeDataController, $state: any);
         private init();
         getExpenseTypeName(entry: Business.ExpenseVm): string;
         getValue(entry: Business.ExpenseVm): string;
-        search(): void;
+        private refreshDisplayedExpenses();
+        private getDayStart(time);
+        search(force: boolean): void;
         addButtonCallback(): void;
         okButtonCallback(): void;
+        getEntryPerDay: (day: number) => number;
+        getTotalEntries(): number;
     }
 }
 declare module TimeRecorder.Web {
@@ -3018,13 +3061,12 @@ declare module TimeRecorder.Web {
     }
 }
 declare module TimeRecorder.Web {
-    interface IFilterHeaderModel {
-        date: Date;
-    }
     interface IFilterHeaderScope extends ng.IScope {
-        model: IFilterHeaderModel;
+        date: Date;
         buttonText: string;
-        addButtonCallback: () => {};
+        addButtonCallback: () => void;
+        getEntriesPerDay: (day: number) => number;
+        getTotalEntries: () => number;
     }
     class FilterHeaderController {
         private $scope;
@@ -3035,7 +3077,10 @@ declare module TimeRecorder.Web {
         previousWeek(): void;
         nextWeek(): void;
         today(): void;
+        getCurrentWeekday(): number;
         openDatepicker($event: any): void;
+        goToDay(day: number): void;
+        getDayName(day: number): string;
     }
 }
 declare module TimeRecorder.Web {
