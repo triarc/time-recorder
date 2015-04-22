@@ -1,11 +1,4 @@
-/// <reference path="../typings/linq.d.ts" />
 /// <reference path="../typings/tsd.d.ts" />
-/// <reference path="../bower_components/cirrus-tlArray/tlArray.d.ts" />
-/// <reference path="../bower_components/cirrus-tlAuth/tlAuth.d.ts" />
-/// <reference path="../bower_components/cirrus-tlDataServices/tlDataServices.d.ts" />
-/// <reference path="../bower_components/cirrus-tlLocalization/tlLocalization.d.ts" />
-/// <reference path="../bower_components/cirrus-utils/utils.d.ts" />
-/// <reference path="../bower_components/cirrus-tlUtils/tlUtils.d.ts" />
 declare module TimeRecorder.Web.Data {
     interface IVersionVm {
         key: number;
