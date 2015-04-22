@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
 declare module TimeRecorder.Web.Data {
     interface IVersionVm {
         key: number;
