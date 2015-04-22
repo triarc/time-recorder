@@ -8344,7 +8344,6 @@ sig.directive("tlSignature", [function () {
 /// <reference path="directives/multiselect.ts" />
 /// <reference path="directives/minstohours.ts" />
 /// <reference path="directives/tlsignature.ts" />
-/// <reference path="typings/tsd.d.ts" />
 /// <reference path="client/data/data.ts" />
 /// <reference path="Client/timeRecorder.ts" /> 
 /// <reference path="client/filters/filters.ts" />
