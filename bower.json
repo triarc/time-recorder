@@ -1,6 +1,6 @@
 {
   "name": "triarc-time-recorder",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "authors": [
     "Marco Bachmann <mb@triarc-labs.com>"
   ],
@@ -24,7 +24,8 @@
     "definition": "time-recorder.d.ts"
   },
   "resolutions": {
-    "angular": "~1.3.5"
+    "angular": "~1.3.5",
+    "cirrus-utils": "~0.1.0"
   },
   "endpoint": "https://github.com/triarc/time-recorder.git",
   "dependencies": {
