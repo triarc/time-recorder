@@ -69,6 +69,13 @@ var TimeRecorder;
                 EAuftragVerificationStatus[EAuftragVerificationStatus["CommunicationError"] = -1] = "CommunicationError";
             })(Data.EAuftragVerificationStatus || (Data.EAuftragVerificationStatus = {}));
             var EAuftragVerificationStatus = Data.EAuftragVerificationStatus;
+            (function (EStampType) {
+                EStampType[EStampType["Start"] = 1] = "Start";
+                EStampType[EStampType["Stop"] = 2] = "Stop";
+                EStampType[EStampType["StartError"] = 3] = "StartError";
+                EStampType[EStampType["StopError"] = 4] = "StopError";
+            })(Data.EStampType || (Data.EStampType = {}));
+            var EStampType = Data.EStampType;
             ;
             var VersionResource = (function () {
                 function VersionResource($requestSender) {
@@ -448,13 +455,25 @@ var TimeRecorder;
                     var request = this.searchMultipleRequest(params, data);
                     return this.$requestSender.requestValue(request);
                 };
-                TimeBookingResource.prototype.saveRequest = function (data) {
+                TimeBookingResource.prototype.saveMultipleRequest = function (params, data) {
                     var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeBooking/Save";
-                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeBooking", "ITimeBookingCm", true);
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeBooking", "ITimeBookingCm[]", true);
                     return dataRequest;
                 };
-                TimeBookingResource.prototype.save = function (data) {
-                    var request = this.saveRequest(data);
+                TimeBookingResource.prototype.saveMultiple = function (params, data) {
+                    var request = this.saveMultipleRequest(params, data);
                     return this.$requestSender.requestValue(request);
                 };
                 TimeBookingResource.prototype.getRequest = function (params) {
@@ -474,7 +493,7 @@ var TimeRecorder;
                     if (angular.isDefined(params.id)) {
                         url = Triarc.Data.appendUrlParameter(url, "id", encodeURIComponent(params.id));
                     }
-                    var dataRequest = new Triarc.Data.DataRequest("DELETE", url, {}, "TimeBooking", "boolean", false);
+                    var dataRequest = new Triarc.Data.DataRequest("DELETE", url, {}, "TimeBooking", "any", false);
                     return dataRequest;
                 };
                 TimeBookingResource.prototype.delete = function (params) {
@@ -2091,6 +2110,15 @@ var TimeRecorder;
                     var request = this.getAvailableBookingTypesMultipleRequest(params);
                     return this.$requestSender.requestValue(request);
                 };
+                TimeEntryResource.prototype.createTimeEntryRequest = function (data) {
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/CreateTimeEntry";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "any", true);
+                    return dataRequest;
+                };
+                TimeEntryResource.prototype.createTimeEntry = function (data) {
+                    var request = this.createTimeEntryRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
                 TimeEntryResource.prototype.newCheckUserResult = function () {
                     return {};
                 };
@@ -2104,6 +2132,9 @@ var TimeRecorder;
                     return {};
                 };
                 TimeEntryResource.prototype.newTimeEntrySearchVm = function () {
+                    return {};
+                };
+                TimeEntryResource.prototype.newTimeEntryCm = function () {
                     return {};
                 };
                 return TimeEntryResource;
@@ -3517,6 +3548,7 @@ var TimeRecorder;
                 }
                 TimeBookingVm.prototype.clone = function () {
                     var copiedCm = angular.copy(this.toCm());
+                    copiedCm.id = null;
                     return new TimeBookingVm(function () { return copiedCm; }, this.timeBookingDc);
                 };
                 TimeBookingVm.prototype.toCm = function () {
@@ -3525,6 +3557,9 @@ var TimeRecorder;
                 Object.defineProperty(TimeBookingVm.prototype, "id", {
                     get: function () {
                         return this.cm().id;
+                    },
+                    set: function (value) {
+                        this.cm().id = value;
                     },
                     enumerable: true,
                     configurable: true
@@ -3594,6 +3629,9 @@ var TimeRecorder;
                     get: function () {
                         return this.cm().comment;
                     },
+                    set: function (value) {
+                        this.cm().comment = value;
+                    },
                     enumerable: true,
                     configurable: true
                 });
@@ -3617,6 +3655,15 @@ var TimeRecorder;
                     enumerable: true,
                     configurable: true
                 });
+                TimeBookingVm.prototype.checkUnConfirmedExtraBookings = function () {
+                    var params = {
+                        person: "",
+                        parentId: this.cm().id
+                    };
+                    return this.timeBookingDc().search(params).then(function (extraTimeBookings) {
+                        return extraTimeBookings.toEnumerable().any(function (t) { return !t.confirmed; });
+                    }, angular.noop);
+                };
                 return TimeBookingVm;
             })();
             Business.TimeBookingVm = TimeBookingVm;
@@ -4195,11 +4242,10 @@ var TimeRecorder;
                     return this.$proxy.TimeBooking.searchMultiple({}, data).then(function (response) { return response.data; });
                 };
                 TimeBookingRepository.prototype.save = function (data) {
-                    // todo: dupliacte
-                    return this.$proxy.TimeBooking.save(data).then(function (response) { return response.data; });
+                    return this.$proxy.TimeBooking.saveMultiple({}, data).then(function (response) { return response.data; });
                 };
                 TimeBookingRepository.prototype.remove = function (id) {
-                    return this.$proxy.TimeBooking.delete({ id: id }).then(function (response) { return response.data; });
+                    return this.$proxy.TimeBooking.delete({ id: id });
                 };
                 TimeBookingRepository.prototype.resolveFor = function (ids) {
                     return this.$proxy.TimeBooking.getForMultiple({}, { ids: ids }).then(function (response) { return response.data; });
@@ -4292,26 +4338,22 @@ var TimeRecorder;
                         this.timeEntryTypes = timeEntryTypeMap.getValues().toEnumerable();
                     }
                 };
-                RuleBasedTimeBookingDataController.prototype.apply = function (data) {
-                    if (data == null)
+                RuleBasedTimeBookingDataController.prototype.getRuleBasedTimeBookings = function (timeBooking) {
+                    if (timeBooking == null)
                         return null;
                     var ruleBasedTimeBookings = [];
-                    for (var i = 0; i < data.length; i++) {
-                        var timeBooking = data[i];
-                        var rules = this.availableRules;
-                        for (var key in rules) {
-                            if (!rules.hasOwnProperty(key))
-                                continue;
-                            var rule = rules[key];
-                            if (rule.match(timeBooking)) {
-                                var booking = this.create(timeBooking, rule);
-                                if (booking != null)
-                                    ruleBasedTimeBookings.add(booking);
-                            }
+                    var rules = this.availableRules;
+                    for (var key in rules) {
+                        if (!rules.hasOwnProperty(key))
+                            continue;
+                        var rule = rules[key];
+                        if (rule.match(timeBooking)) {
+                            var booking = this.create(timeBooking, rule);
+                            if (booking != null)
+                                ruleBasedTimeBookings.add(booking);
                         }
                     }
-                    data.addRange(ruleBasedTimeBookings);
-                    return data;
+                    return ruleBasedTimeBookings;
                 };
                 RuleBasedTimeBookingDataController.prototype.getTimeEntryTypeForRule = function (rule) {
                     this.ensureTimeEntryTypes();
@@ -4566,6 +4608,9 @@ var TimeRecorder;
                     this.$q = $q;
                     this.repository = repository;
                 }
+                TimeBookingDataController.prototype.getIsExtraBooking = function (timebooking) {
+                    return timebooking.parentId != null;
+                };
                 TimeBookingDataController.prototype.getIsEditable = function (entry) {
                     return entry.state == null || entry.state === 0 /* Open */;
                 };
@@ -4576,13 +4621,35 @@ var TimeRecorder;
                 TimeBookingDataController.prototype.search = function (data) {
                     var _this = this;
                     return this.repository.search(data).then(function (cms) {
-                        var viewModels = cms.toEnumerable().select(function (t) { return new Business.TimeBookingVm(function () { return t; }, function () { return _this; }); }).toArray();
-                        var result = _this.container.ruleBasedTimeBookingDc.apply(viewModels);
-                        return result;
+                        return cms.toEnumerable().select(function (t) { return new Business.TimeBookingVm(function () { return t; }, function () { return _this; }); }).toArray();
+                        //var viewModels = cms.toEnumerable().select(t => new Business.TimeBookingVm(() => t,() => this)).toArray();
+                        //var result = this.container.ruleBasedTimeBookingDc.apply(viewModels);
+                        //return result;
                     });
                 };
-                TimeBookingDataController.prototype.save = function (data) {
-                    return this.repository.save(data);
+                TimeBookingDataController.prototype.save = function (timeBooking) {
+                    var _this = this;
+                    return this.repository.save([timeBooking]).then(function (data) {
+                        // if our time booking is an extra booking we're done
+                        timeBooking = data.first();
+                        if (timeBooking.parentId != null)
+                            return data;
+                        // otherwise create possible extra bookings
+                        var extraTimeBookings = [];
+                        var ruleBasedTimeBookingDc = _this.container.ruleBasedTimeBookingDc;
+                        var timeBookingVm = new Business.TimeBookingVm(function () { return timeBooking; }, function () { return _this.container.timeBookingDc; });
+                        var extraTimeBookingVms = ruleBasedTimeBookingDc.getRuleBasedTimeBookings(timeBookingVm);
+                        var extraTimeBookingCms = extraTimeBookingVms.toEnumerable().select(function (t) { return t.toCm(); });
+                        extraTimeBookings.addRange(extraTimeBookingCms.toArray());
+                        // ..and save 'em
+                        if (extraTimeBookings.any())
+                            return _this.repository.save(extraTimeBookings).then(function (extraTimeBookingsData) {
+                                // add previously saved time booking to the response
+                                extraTimeBookingsData.add(timeBooking);
+                                return extraTimeBookingsData;
+                            });
+                        return data;
+                    });
                 };
                 TimeBookingDataController.prototype.remove = function (id) {
                     return this.repository.remove(id);
@@ -4831,8 +4898,10 @@ var TimeRecorder;
                     var entity = timeBooking.clone();
                     var start = moment(entity.start);
                     var end = moment(entity.stop);
+                    entity.comment = "";
                     entity.parentId = timeBooking.id;
                     entity.typeId = timeEntryType.id;
+                    entity.confirmed = true;
                     entity.start = moment.max([start, this.getStartRange(start)]).toDate();
                     entity.stop = moment.min([end, this.getEndRange(start)]).toDate();
                     return entity;
@@ -4865,6 +4934,7 @@ var TimeRecorder;
                     var entity = timeBooking.clone();
                     entity.parentId = timeBooking.id;
                     entity.typeId = timeEntryType.id;
+                    entity.comment = "";
                     return entity;
                 };
                 return SundayBookingRule;
@@ -4970,6 +5040,7 @@ var TimeRecorder;
                     var entity = timeBooking.clone();
                     entity.parentId = timeBooking.id;
                     entity.typeId = timeEntryType.id;
+                    entity.comment = "";
                     return entity;
                 };
                 return SaturdayBookingRule;
@@ -7218,12 +7289,15 @@ var TimeRecorder;
                 console.log("filterHeaderShowConfirm");
             };
             TimeBookingController.prototype.filterHeaderConfirmCancel = function () {
+                // todo: set back to original state
                 console.log("filterHeaderConfirmCancel");
             };
             TimeBookingController.prototype.filterHeaderConfirmSave = function () {
+                // todo: save state
                 console.log("filterHeaderConfirmSave");
             };
             TimeBookingController.prototype.filterHeaderGetEntryPerDay = function () {
+                return "2h";
                 console.log("filterHeaderGetEntryPerDay");
             };
             TimeBookingController.prototype.filterHeaderGetTotalEntries = function () {
@@ -7234,6 +7308,12 @@ var TimeRecorder;
                 console.log(timebooking);
                 console.log(timebooking.confirmed);
             };
+            TimeBookingController.prototype.getDuration = function (timebooking) {
+                var start = moment(timebooking.start);
+                var end = moment(timebooking.stop);
+                var duration = moment.duration(end.diff(start));
+                return moment.utc(duration.asMilliseconds()).format("HH:mm");
+            };
             TimeBookingController.prototype.getStateById = function (id) {
                 if (id == null)
                     return null;
@@ -7242,17 +7322,11 @@ var TimeRecorder;
                     return Web.Data.ETimeBookingState[key];
                 return null;
             };
-            TimeBookingController.prototype.getBookingBackground = function (timebooking) {
-                // http://www.stripegenerator.com/#Zm9yZT1FRUVFRUU7aD0zMDt3PTI7cD0zO2JhY2sxPWZmZmZmZjtiYWNrMj1mZjAwMDA7Z3Q9MDtkPTA7c2hhZG93PTA7
-                if (this.getIsExtraBooking(timebooking))
-                    return "url(Content/images/stripes.png)";
-                return "transparent";
-            };
             TimeBookingController.prototype.getStateColor = function (state) {
                 return this.timeEntryTypeDataController.getStateColor(state);
             };
-            TimeBookingController.prototype.getIsExtraBooking = function (timebooking) {
-                return timebooking.parentId != null;
+            TimeBookingController.prototype.getIsExtraBooking = function (timeBooking) {
+                return this.timeBookingDataController.getIsExtraBooking(timeBooking);
             };
             // search
             TimeBookingController.prototype.search = function () {
@@ -7322,9 +7396,11 @@ var TimeRecorder;
     (function (Web) {
         var TimeBookingFormController = (function () {
             // constructor
-            function TimeBookingFormController($scope, timeBookingDataController, timeEntryTypeDataController, employeeDataController, projectDataController, authentication, $state, $stateParams) {
+            function TimeBookingFormController($q, $scope, $translate, timeBookingDataController, timeEntryTypeDataController, employeeDataController, projectDataController, authentication, $state, $stateParams) {
                 var _this = this;
+                this.$q = $q;
                 this.$scope = $scope;
+                this.$translate = $translate;
                 this.timeBookingDataController = timeBookingDataController;
                 this.timeEntryTypeDataController = timeEntryTypeDataController;
                 this.employeeDataController = employeeDataController;
@@ -7348,6 +7424,8 @@ var TimeRecorder;
                 var _this = this;
                 if (!this.isNew()) {
                     this.timeBookingDataController.getDetail(this.idValue).then(function (entry) {
+                        _this.timeBooking = entry;
+                        // TODO: get rid of those
                         _this.idValue = entry.id;
                         _this.fromValue = entry.start;
                         _this.comment = entry.comment;
@@ -7390,6 +7468,11 @@ var TimeRecorder;
             TimeBookingFormController.prototype.isNew = function () {
                 return this.idValue == null;
             };
+            TimeBookingFormController.prototype.isExtraBooking = function () {
+                if (this.timeBooking == null)
+                    return false;
+                return this.timeBookingDataController.getIsExtraBooking(this.timeBooking);
+            };
             // delete
             TimeBookingFormController.prototype.remove = function () {
                 var _this = this;
@@ -7398,9 +7481,14 @@ var TimeRecorder;
                         _this.$state.transitionTo("tr.login");
                         return;
                     }
-                    _this.timeBookingDataController.remove(_this.idValue).then(function (response) {
-                        if (response)
-                            _this.$state.transitionTo("tr.timebookings");
+                    var isExtraBooking = _this.isExtraBooking();
+                    var message = isExtraBooking ? "Soll die Zusatzbuchung unwiderruflich gelöscht werden?" : "Soll die Buchung inkl. allen Zusatzbuchungen unwiderruflich gelöscht werden?";
+                    var translatedMessage = _this.$translate.instant(message);
+                    var confirmation = confirm(translatedMessage);
+                    if (!confirmation)
+                        return;
+                    _this.timeBookingDataController.remove(_this.idValue).then(function () {
+                        _this.$state.transitionTo("tr.timebookings");
                     }, function () {
                     });
                 });
@@ -7432,6 +7520,28 @@ var TimeRecorder;
                     _this.searchedEmployees = response;
                 }, angular.noop);
             };
+            // check if there are extra bookings that we manually changed (=unconfirmed)
+            TimeBookingFormController.prototype.checkUnConfirmedExtraBookings = function () {
+                var q = this.$q.defer();
+                if (this.isNew() || this.isExtraBooking() || this.timeBooking == null) {
+                    q.resolve(false);
+                    return q.promise;
+                }
+                return this.timeBooking.checkUnConfirmedExtraBookings();
+            };
+            TimeBookingFormController.prototype.confirmSave = function () {
+                var _this = this;
+                this.checkUnConfirmedExtraBookings().then(function (unconfirmedExtraBookings) {
+                    if (unconfirmedExtraBookings) {
+                        var message = "Ein -oder mehrere Zusatzbuchungen wurden manuell bearbeitet und beim speichern der Buchung werden diese Änderungen überschrieben. Fortfahren?";
+                        var translatedMessage = _this.$translate.instant(message);
+                        var confirmation = confirm(translatedMessage);
+                        if (!confirmation)
+                            return;
+                    }
+                    _this.save();
+                });
+            };
             // save
             TimeBookingFormController.prototype.save = function () {
                 var _this = this;
@@ -7439,14 +7549,16 @@ var TimeRecorder;
                 if (this.$scope.timebookingForm.$invalid) {
                     return;
                 }
+                // if we save an extra booking, always set the confirmed value to false to indicate a manual change
+                var isConfirmed = this.timeBooking == null || this.isExtraBooking() ? false : this.timeBooking.confirmed;
                 var data = {
                     id: this.idValue,
                     employeeId: this.employee.id,
                     projectId: this.project.id,
-                    comment: "",
-                    confirmed: null,
+                    comment: this.comment,
+                    confirmed: isConfirmed,
                     billed: false,
-                    //parentId: null,
+                    parentId: this.timeBooking != null ? this.timeBooking.parentId : null,
                     start: this.fromValue,
                     stop: this.toValue,
                     timeEntryTypeId: this.entryType.id,
@@ -7458,8 +7570,9 @@ var TimeRecorder;
                 data.stop.setHours(this.toTimeValue.getHours());
                 data.stop.setMinutes(this.toTimeValue.getMinutes());
                 // save & redirect
-                this.timeBookingDataController.save(data).then(function (timeBooking) {
-                    if (_this.isNew() && timeBooking.id != null)
+                this.timeBookingDataController.save(data).then(function (timeBookings) {
+                    var timeBooking = timeBookings.toEnumerable().firstOrDefault(function (t) { return t.parentId == null; });
+                    if (_this.isNew() && timeBooking != null)
                         _this.$state.transitionTo("tr.timebookings.side.edit", {
                             id: timeBooking.id,
                             date: _this.$stateParams["date"]
@@ -7469,7 +7582,9 @@ var TimeRecorder;
             };
             TimeBookingFormController.controllerId = "TimeBookingFormController";
             TimeBookingFormController.$inject = [
+                "$q",
                 "$scope",
+                "$translate",
                 Web.Business.TimeBookingDataController.serviceId,
                 Web.Business.TimeEntryTypeDataController.serviceId,
                 Web.Business.EmployeeDataController.serviceId,
@@ -7978,7 +8093,7 @@ var TimeRecorder;
                 var expenseVm;
                 if (this.isNew()) {
                     var expenseCm = {
-                        id: '',
+                        id: Triarc.generateGuid(),
                         description: this.expenseDescription,
                         employeeId: this.appUserId,
                         date: this.expenseDate,
@@ -8067,7 +8182,7 @@ var TimeRecorder;
                     dateDisabled: "day",
                     datepickerMode: "month"
                 };
-                authentication.hasClaimEnsureLoggedIn("web_persons").then(function (hasClaim) {
+                authentication.hasClaimEnsureLoggedIn("web_timesheet").then(function (hasClaim) {
                     if (hasClaim)
                         _this.timesheetData = new Web.TimesheetData();
                     else
@@ -10103,12 +10218,12 @@ sig.directive("tlSignature", [
 
 
   $templateCache.put('Client/Views/timebookings.form.html',
-    "<div ng-controller=\"TimeBookingFormController as ctrl\" class=\"timebookings-edit\"><h2>{{ ctrl.isNew() ? 'Neuer Eintrag am ' + (ctrl.fromValue | date : 'dd.MM.yyyy') : 'Eintrag bearbeiten' }}</h2><hr><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><form name=\"timebookingForm\" class=\"form-horizontal\" novalidate><div class=\"row\"><div class=\"col-xs-4\"><div class=\"row\"><tl-validate target=\"timebookingForm.employee\" label-text=\"'Person' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"employee\" ng-model=\"ctrl.employee\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.firstName}}&nbsp;{{$select.selected.lastName}}</ui-select-match><ui-select-choices repeat=\"employee in ctrl.searchedEmployees track by $index\" refresh=\"ctrl.searchEmployee($select.search)\"><div ng-bind-html=\"employee.firstName + ' ' + employee.lastName  | highlight: $select.search\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"timebookingForm.project\" label-text=\"'Projekt' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"project\" ng-model=\"ctrl.project\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"project in ctrl.searchedProjects track by $index\" refresh=\"ctrl.searchProject($select.search)\"><div ng-bind-html=\"project.name | highlight: $select.search\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"timebookingForm.entryType\" label-text=\"'Typ' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"entryType\" ng-model=\"ctrl.entryType\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"type in ctrl.searchedTypes track by $index\" refresh=\"ctrl.searchType($select.search)\"><div ng-bind-html=\"type.name\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.fromDate\" label-text=\"'Von' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><div class=\"input-group time-picker\"><timepicker ng-model=\"ctrl.fromTimeValue\" show-meridian=\"false\"></timepicker></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.toDate\" label-text=\"'Bis' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><div class=\"input-group time-picker\"><timepicker ng-model=\"ctrl.toTimeValue\" show-meridian=\"false\"></timepicker></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.description\" label-text=\"'Bemerkung' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><textarea class=\"form-control\" name=\"description\" type=\"text\" ng-model=\"ctrl.comment\"></textarea></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn btn-default pull-left\" ui-sref=\"tr.timebookings\">Zurück</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.save();\">Speichern</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.remove();\" ng-hide=\"ctrl.isNew()\">Löschen</div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div></div></div></form></div>"
+    "<div ng-controller=\"TimeBookingFormController as ctrl\" class=\"timebookings-edit\"><h2><span ng-if=\"ctrl.isNew()\">{{'Neue Buchung am ' + (ctrl.fromValue | date : 'dd.MM.yyyy')}}</span> <span ng-if=\"!ctrl.isNew() && !ctrl.isExtraBooking()\">Buchung bearbeiten</span> <span ng-if=\"ctrl.isExtraBooking()\">Zusatzbuchung bearbeiten</span></h2><hr><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><form name=\"timebookingForm\" class=\"form-horizontal\" novalidate><div class=\"row\"><div class=\"col-xs-4\"><div class=\"row\"><tl-validate target=\"timebookingForm.employee\" label-text=\"'Person' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"employee\" ng-model=\"ctrl.employee\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.firstName}}&nbsp;{{$select.selected.lastName}}</ui-select-match><ui-select-choices repeat=\"employee in ctrl.searchedEmployees track by $index\" refresh=\"ctrl.searchEmployee($select.search)\"><div ng-bind-html=\"employee.firstName + ' ' + employee.lastName  | highlight: $select.search\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"timebookingForm.project\" label-text=\"'Projekt' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"project\" ng-model=\"ctrl.project\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"project in ctrl.searchedProjects track by $index\" refresh=\"ctrl.searchProject($select.search)\"><div ng-bind-html=\"project.name | highlight: $select.search\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"timebookingForm.entryType\" label-text=\"'Typ' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"entryType\" ng-model=\"ctrl.entryType\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"type in ctrl.searchedTypes track by $index\" refresh=\"ctrl.searchType($select.search)\"><div ng-bind-html=\"type.name\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.fromDate\" label-text=\"'Von' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><div class=\"input-group time-picker\"><timepicker ng-model=\"ctrl.fromTimeValue\" show-meridian=\"false\"></timepicker></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.toDate\" label-text=\"'Bis' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><div class=\"input-group time-picker\"><timepicker ng-model=\"ctrl.toTimeValue\" show-meridian=\"false\"></timepicker></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.description\" label-text=\"'Bemerkung' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><textarea class=\"form-control\" name=\"description\" type=\"text\" ng-model=\"ctrl.comment\"></textarea></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn btn-default pull-left\" ui-sref=\"tr.timebookings\">Zurück</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.confirmSave();\">Speichern</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.remove();\" ng-hide=\"ctrl.isNew()\">Löschen</div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div></div></div></form></div>"
   );
 
 
   $templateCache.put('Client/Views/timebookings.html',
-    "<div ng-controller=\"TimeBookingController as ctrl\"><!-- side navigation --><ui-view class=\"detail-slide\"></ui-view><div class=\"row\"><h1 class=\"col-md-9\">Arbeitszeiterfassung</h1></div><filter-header model=\"ctrl.filterHeaderDate\" add-button-callback=\"ctrl.filterHeaderAdd()\" add-button-text=\"Hinzufügen\" target-start-button-callback=\"ctrl.filterHeaderShowConfirm()\" target-start-button-text=\"Visieren\" target-cancel-button-callback=\"ctrl.filterHeaderConfirmCancel()\" target-cancel-button-text=\"Abbrechen\" target-confirm-button-callback=\"ctrl.filterHeaderConfirmSave()\" target-confirm-button-text=\"Speichern\" get-entry-per-day=\"ctrl.filterHeaderGetEntryPerDay()\" get-total-entries=\"ctrl.filterHeaderGetTotalEntries()\"></filter-header><!--\r" +
+    "<div ng-controller=\"TimeBookingController as ctrl\"><!-- side navigation --><ui-view class=\"detail-slide\"></ui-view><div class=\"row\"><h1 class=\"col-md-9\">Arbeitszeiterfassung</h1></div><filter-header model=\"ctrl.filterHeaderDate\" add-button-callback=\"ctrl.filterHeaderAdd()\" add-button-text=\"Hinzufügen\" target-start-button-callback=\"ctrl.filterHeaderShowConfirm()\" target-start-button-text=\"Visieren\" target-cancel-button-callback=\"ctrl.filterHeaderConfirmCancel()\" target-cancel-button-text=\"Abbrechen\" target-confirm-button-callback=\"ctrl.filterHeaderConfirmSave()\" target-confirm-button-text=\"Speichern\" get-entry-per-day=\"ctrl.filterHeaderGetEntryPerDay\" get-total-entries=\"ctrl.filterHeaderGetTotalEntries()\"></filter-header><!--\r" +
     "\n" +
     "  <div class=\"row\">\r" +
     "\n" +
@@ -10214,25 +10329,29 @@ sig.directive("tlSignature", [
     "\n" +
     "  </div>\r" +
     "\n" +
-    "  --><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\" ng-if=\"ctrl.hasData() && !ctrl.isLoading\"><div class=\"col-md-12 tr-list-head\"><div class=\"row\"><div class=\"col-md-1\">Person</div><div class=\"col-md-1\">Projekt</div><div class=\"col-md-2\">Start</div><div class=\"col-md-2\">Stop</div><div class=\"col-md-2\">Typ</div><div class=\"col-md-2\">Status</div><div class=\"col-md-1\"><span ng-show=\"ctrl.filterHeaderDate.targetingMode\">Visiert</span></div></div></div><div infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\" class=\"tr-list\"><div ng-repeat=\"container in ctrl.orderedTimeBookingsForDay\"><ng-include include-replace src=\"'timebooking.row.template.html'\"></ng-include><div ng-repeat=\"entry in container.related\"><ng-include include-replace src=\"'timebooking.extra.row.template.html'\"></ng-include></div></div></div></div><div ng-if=\"!ctrl.hasData() && !ctrl.isLoading\" class=\"row tr-list-item\"><div class=\"col-md-12\">Keine Arbeitszeit erfasst.</div></div><div ng-if=\"ctrl.isLoading\" class=\"row tr-list-item\"><div class=\"col-md-12\">Wird geladen..</div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div></div><script type=\"text/ng-template\" id=\"timebooking.row.template.html\"><div class=\"col-md-12 tr-list-item\">\r" +
+    "  --><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\" ng-if=\"ctrl.hasData() && !ctrl.isLoading\"><div class=\"col-md-12 tr-list-head\"><div class=\"row\"><!--<div class=\"col-md-1\">Person</div>--><div class=\"col-md-2\">Projekt</div><div class=\"col-md-2\">Typ</div><div class=\"col-md-1\">Start</div><div class=\"col-md-1\">Stop</div><div class=\"col-md-2\">Kommentar</div><div class=\"col-md-1\">Dauer</div><div class=\"col-md-1\">Status</div><div class=\"col-md-1\"><span ng-show=\"ctrl.filterHeaderDate.targetingMode\">Visiert</span></div></div></div><div infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\" class=\"tr-list\"><div ng-repeat=\"container in ctrl.orderedTimeBookingsForDay\"><ng-include include-replace src=\"'timebooking.row.template.html'\"></ng-include><div ng-repeat=\"entry in container.related\"><ng-include include-replace src=\"'timebooking.extra.row.template.html'\"></ng-include></div></div></div></div><div ng-if=\"!ctrl.hasData() && !ctrl.isLoading\" class=\"row tr-list-item\"><div class=\"col-md-12\">Keine Arbeitszeit erfasst.</div></div><div ng-if=\"ctrl.isLoading\" class=\"row tr-list-item\"><div class=\"col-md-12\">Wird geladen..</div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div></div><script type=\"text/ng-template\" id=\"timebooking.row.template.html\"><div class=\"col-md-12 tr-list-item timebooking-list-item\" ng:class=\"{true:'confirmed-timebooking', false:'unconfirmed-timebooking'}[container.entry.confirmed]\">\r" +
     "\n" +
     "    <div class=\"row\" ng-click=\"ctrl.selectEntry(container.entry)\">\r" +
     "\n" +
-    "      <div class=\"col-md-1 tr-ellipsis\">{{container.entry.employeeName}}</div>\r" +
+    "      <!--<div class=\"col-md-1 tr-ellipsis\">{{container.entry.employeeName}}</div>-->\r" +
     "\n" +
-    "      <div class=\"col-md-1 tr-ellipsis\">{{container.entry.projectName}}</div>\r" +
-    "\n" +
-    "      <div class=\"col-md-2\">{{container.entry.start | date : 'dd.MM.yyyy - H:mm'}}</div>\r" +
-    "\n" +
-    "      <div class=\"col-md-2\">{{container.entry.stop | date : 'dd.MM.yyyy - H:mm'}}</div>\r" +
+    "      <div class=\"col-md-2\">{{container.entry.projectName}}</div>\r" +
     "\n" +
     "      <div class=\"col-md-2\">{{container.entry.typeName}}</div>\r" +
     "\n" +
-    "      <div class=\"col-md-2\" ng-style=\"{'color': ctrl.getStateColor(container.entry.state) }\">{{ctrl.getStateById(container.entry.state)}}</div>\r" +
+    "      <div class=\"col-md-1\">{{container.entry.start | date : 'H:mm'}}</div>\r" +
+    "\n" +
+    "      <div class=\"col-md-1\">{{container.entry.stop | date : 'H:mm'}}</div>\r" +
+    "\n" +
+    "      <div class=\"col-md-2 tr-ellipsis\">{{container.entry.comment}}</div>\r" +
+    "\n" +
+    "      <div class=\"col-md-1 timebooking-duration\">{{ctrl.getDuration(container.entry)}}</div>\r" +
+    "\n" +
+    "      <div class=\"col-md-1\" ng-style=\"{'color': ctrl.getStateColor(container.entry.state) }\">{{ctrl.getStateById(container.entry.state)}}</div>\r" +
     "\n" +
     "      <div class=\"col-md-1\">\r" +
     "\n" +
-    "        <a ng-hide=\"ctrl.filterHeaderDate.targetingMode\" ui-sref=\"tr.timebookings.side.edit({id:container.entry.id})\">Edit</a>\r" +
+    "        <a ng-hide=\"ctrl.filterHeaderDate.targetingMode\" ui-sref=\"tr.timebookings.side.edit({id:container.entry.id})\">Bearbeiten</a>\r" +
     "\n" +
     "        <input type=\"checkbox\" ng-show=\"ctrl.filterHeaderDate.targetingMode && !ctrl.getIsExtraBooking(container.entry)\" ng-model=\"container.entry.confirmed\" ng-change=\"ctrl.setConfirmed(container.entry)\" />\r" +
     "\n" +
@@ -10248,25 +10367,29 @@ sig.directive("tlSignature", [
     "\n" +
     "    </div>\r" +
     "\n" +
-    "  </div></script><script type=\"text/ng-template\" id=\"timebooking.extra.row.template.html\"><div class=\"col-md-12 tr-list-item\" ng-style=\"{'background': ctrl.getBookingBackground(entry) }\">\r" +
+    "  </div></script><script type=\"text/ng-template\" id=\"timebooking.extra.row.template.html\"><div class=\"col-md-12 tr-list-item timebooking-extra-list-item\" ng:class=\"{true:'confirmed-timebooking', false:'unconfirmed-timebooking'}[entry.confirmed]\">\r" +
     "\n" +
     "    <div class=\"row\" ng-click=\"ctrl.selectEntry(entry)\">\r" +
     "\n" +
-    "      <div class=\"col-md-1 tr-ellipsis\">{{entry.employeeName}}</div>\r" +
+    "      <!--<div class=\"col-md-1 tr-ellipsis\">{{entry.employeeName}}</div>-->\r" +
     "\n" +
-    "      <div class=\"col-md-1 tr-ellipsis\">{{entry.projectName}}</div>\r" +
-    "\n" +
-    "      <div class=\"col-md-2\">{{entry.start | date : 'dd.MM.yyyy - H:mm'}}</div>\r" +
-    "\n" +
-    "      <div class=\"col-md-2\">{{entry.stop | date : 'dd.MM.yyyy - H:mm'}}</div>\r" +
+    "      <div class=\"col-md-2\"></div>\r" +
     "\n" +
     "      <div class=\"col-md-2\">{{entry.typeName}}</div>\r" +
     "\n" +
-    "      <div class=\"col-md-2\" ng-style=\"{'color': ctrl.getStateColor(entry.state) }\">{{ctrl.getStateById(entry.state)}}</div>\r" +
+    "      <div class=\"col-md-1\">{{entry.start | date : 'H:mm'}}</div>\r" +
+    "\n" +
+    "      <div class=\"col-md-1\">{{entry.stop | date : 'H:mm'}}</div>\r" +
+    "\n" +
+    "      <div class=\"col-md-2 tr-ellipsis\">{{entry.comment}}</div>\r" +
+    "\n" +
+    "      <div class=\"col-md-1 timebooking-duration\">{{ctrl.getDuration(entry)}}</div>\r" +
+    "\n" +
+    "      <div class=\"col-md-1\" ng-style=\"{'color': ctrl.getStateColor(entry.state) }\">{{ctrl.getStateById(entry.state)}}</div>\r" +
     "\n" +
     "      <div class=\"col-md-1\">\r" +
     "\n" +
-    "        <a ng-hide=\"ctrl.filterHeaderDate.targetingMode\" ui-sref=\"tr.timebookings.side.edit({id:entry.id})\">Edit</a>\r" +
+    "        <a ng-hide=\"ctrl.filterHeaderDate.targetingMode\" ui-sref=\"tr.timebookings.side.edit({id:entry.id})\">Bearbeiten</a>\r" +
     "\n" +
     "        <input type=\"checkbox\" ng-show=\"ctrl.filterHeaderDate.targetingMode && !ctrl.getIsExtraBooking(entry)\" ng-model=\"entry.confirmed\" ng-change=\"ctrl.setConfirmed(entry)\" />\r" +
     "\n" +
