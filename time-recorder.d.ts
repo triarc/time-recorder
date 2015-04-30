@@ -124,6 +124,7 @@ declare module TimeRecorder.Web.Data {
         person: string;
         from?: Date;
         to?: Date;
+        parentId?: string;
         timeEntryTypeId?: number;
         state?: ETimeBookingState;
     }
@@ -468,6 +469,14 @@ declare module TimeRecorder.Web.Data {
         skip: number;
         take: number;
     }
+    interface ITimeEntryCm {
+        id: string;
+        employeeId: number;
+        abbrevation: string;
+        simpleStampType: EStampType;
+        bookedTime: Date;
+        objectId: string;
+    }
     enum EPlatform {
         Android = 0,
         iOS = 1,
@@ -522,6 +531,12 @@ declare module TimeRecorder.Web.Data {
         AuftragNotExist = 16,
         PositionNotExist = 32,
         CommunicationError = -1,
+    }
+    enum EStampType {
+        Start = 1,
+        Stop = 2,
+        StartError = 3,
+        StopError = 4,
     }
     interface VersionGetLatestPlistParams {
         versionCode1: number;
@@ -720,6 +735,12 @@ declare module TimeRecorder.Web.Data {
         $orderBy?: string;
         $filter?: string;
     }
+    interface TimeBookingSaveEnumerableParams {
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
     interface TimeBookingGetParams {
         id: string;
     }
@@ -749,12 +770,12 @@ declare module TimeRecorder.Web.Data {
     interface ITimeBookingResource {
         searchMultipleRequest(params: TimeBookingSearchEnumerableParams, data: ITimeBookingSearchParams): Triarc.Data.DataRequest<ITimeBookingCm[]>;
         searchMultiple(params: TimeBookingSearchEnumerableParams, data: ITimeBookingSearchParams): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm[]>>;
-        saveRequest(data: ITimeBookingCm): Triarc.Data.DataRequest<ITimeBookingCm>;
-        save(data: ITimeBookingCm): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm>>;
+        saveMultipleRequest(params: TimeBookingSaveEnumerableParams, data: ITimeBookingCm[]): Triarc.Data.DataRequest<ITimeBookingCm[]>;
+        saveMultiple(params: TimeBookingSaveEnumerableParams, data: ITimeBookingCm[]): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm[]>>;
         getRequest(params: TimeBookingGetParams): Triarc.Data.DataRequest<ITimeBookingCm>;
         get(params: TimeBookingGetParams): ng.IPromise<Triarc.Data.DataResponse<ITimeBookingCm>>;
-        deleteRequest(params: TimeBookingDeleteParams): Triarc.Data.DataRequest<boolean>;
-        delete(params: TimeBookingDeleteParams): ng.IPromise<Triarc.Data.DataResponse<boolean>>;
+        deleteRequest(params: TimeBookingDeleteParams): Triarc.Data.DataRequest<any>;
+        delete(params: TimeBookingDeleteParams): ng.IPromise<Triarc.Data.DataResponse<any>>;
         getTimeEntryTypesMultipleRequest(params: TimeBookingGetTimeEntryTypesEnumerableParams): Triarc.Data.DataRequest<ITimeEntryTypeCm[]>;
         getTimeEntryTypesMultiple(params: TimeBookingGetTimeEntryTypesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<ITimeEntryTypeCm[]>>;
         getForMultipleRequest(params: TimeBookingGetForEnumerableParams, data: IIdsContainer): Triarc.Data.DataRequest<ITimeBookingCm[]>;
@@ -771,11 +792,11 @@ declare module TimeRecorder.Web.Data {
         constructor($requestSender: any);
         searchMultipleRequest(params: any, data: any): Triarc.Data.DataRequest<ITimeBookingCm[]>;
         searchMultiple(params: any, data: any): any;
-        saveRequest(data: any): Triarc.Data.DataRequest<ITimeBookingCm>;
-        save(data: any): any;
+        saveMultipleRequest(params: any, data: any): Triarc.Data.DataRequest<ITimeBookingCm[]>;
+        saveMultiple(params: any, data: any): any;
         getRequest(params: any): Triarc.Data.DataRequest<ITimeBookingCm>;
         get(params: any): any;
-        deleteRequest(params: any): Triarc.Data.DataRequest<boolean>;
+        deleteRequest(params: any): Triarc.Data.DataRequest<any>;
         delete(params: any): any;
         getTimeEntryTypesMultipleRequest(params: any): Triarc.Data.DataRequest<ITimeEntryTypeCm[]>;
         getTimeEntryTypesMultiple(params: any): any;
@@ -1557,11 +1578,14 @@ declare module TimeRecorder.Web.Data {
         searchTimeEntriesMultiple(params: TimeEntrySearchTimeEntriesEnumerableParams, data: ITimeEntrySearchVm): ng.IPromise<Triarc.Data.DataResponse<ITimeEntryVm[]>>;
         getAvailableBookingTypesMultipleRequest(params: TimeEntryGetAvailableBookingTypesEnumerableParams): Triarc.Data.DataRequest<string[]>;
         getAvailableBookingTypesMultiple(params: TimeEntryGetAvailableBookingTypesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<string[]>>;
+        createTimeEntryRequest(data: ITimeEntryCm): Triarc.Data.DataRequest<any>;
+        createTimeEntry(data: ITimeEntryCm): ng.IPromise<Triarc.Data.DataResponse<any>>;
         newCheckUserResult(): ICheckUserResult;
         newTimeEntryVm(): ITimeEntryVm;
         newTimeEntryModel(): ITimeEntryModel;
         newTimeEntryCollection(): ITimeEntryCollection;
         newTimeEntrySearchVm(): ITimeEntrySearchVm;
+        newTimeEntryCm(): ITimeEntryCm;
     }
     class TimeEntryResource implements ITimeEntryResource {
         private $requestSender;
@@ -1582,11 +1606,14 @@ declare module TimeRecorder.Web.Data {
         searchTimeEntriesMultiple(params: any, data: any): any;
         getAvailableBookingTypesMultipleRequest(params: any): Triarc.Data.DataRequest<string[]>;
         getAvailableBookingTypesMultiple(params: any): any;
+        createTimeEntryRequest(data: any): Triarc.Data.DataRequest<any>;
+        createTimeEntry(data: any): any;
         newCheckUserResult(): ICheckUserResult;
         newTimeEntryVm(): ITimeEntryVm;
         newTimeEntryModel(): ITimeEntryModel;
         newTimeEntryCollection(): ITimeEntryCollection;
         newTimeEntrySearchVm(): ITimeEntrySearchVm;
+        newTimeEntryCm(): ITimeEntryCm;
     }
     interface ProxyContainer {
         Version: IVersionResource;
@@ -1852,6 +1879,7 @@ declare module TimeRecorder.Web.Business {
         comment: string;
         confirmed: boolean;
         parentId: string;
+        checkUnConfirmedExtraBookings(): ng.IPromise<boolean>;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -1995,8 +2023,8 @@ declare module TimeRecorder.Web.Business {
         protected applyRuleBasedTimeBookings(data: Data.ITimeBookingCm[]): Data.ITimeBookingCm[];
         getDetail(id: string): ng.IPromise<Data.ITimeBookingCm>;
         search(data: Data.ITimeBookingSearchParams): ng.IPromise<Data.ITimeBookingCm[]>;
-        save(data: Data.ITimeBookingCm): ng.IPromise<Data.ITimeBookingCm>;
-        remove(id: string): ng.IPromise<boolean>;
+        save(data: Data.ITimeBookingCm[]): ng.IPromise<Data.ITimeBookingCm[]>;
+        remove(id: string): ng.IPromise<Triarc.Data.DataResponse<any>>;
         resolveFor(ids: string[]): ng.IPromise<Data.ITimeBookingCm[]>;
         getUnBilledCompletedBookings(employeeId: number, projectId: number): ng.IPromise<Data.ITimeBookingCm[]>;
     }
@@ -2025,7 +2053,7 @@ declare module TimeRecorder.Web.Business {
         private availableRules;
         private ensureTimeEntryTypes();
         container: Business.DataControllerContainer;
-        apply(data: TimeBookingVm[]): TimeBookingVm[];
+        getRuleBasedTimeBookings(timeBooking: TimeBookingVm): TimeBookingVm[];
         private getTimeEntryTypeForRule(rule);
         private create(timeBooking, rule);
     }
@@ -2119,11 +2147,12 @@ declare module TimeRecorder.Web.Business {
         static $inject: string[];
         container: Business.DataControllerContainer;
         constructor($q: ng.IQService, repository: TimeBookingRepository);
+        getIsExtraBooking(timebooking: Business.TimeBookingVm): boolean;
         getIsEditable(entry: Data.ITimeBookingCm): boolean;
         getDetail(id: string): ng.IPromise<TimeBookingVm>;
         search(data: Data.ITimeBookingSearchParams): ng.IPromise<TimeBookingVm[]>;
-        save(data: Data.ITimeBookingCm): ng.IPromise<Data.ITimeBookingCm>;
-        remove(id: string): ng.IPromise<boolean>;
+        save(timeBooking: Data.ITimeBookingCm): ng.IPromise<Data.ITimeBookingCm[]>;
+        remove(id: string): ng.IPromise<Triarc.Data.DataResponse<any>>;
         resolveFor(ids: string[]): ng.IPromise<TimeBookingVm[]>;
         getUnBilledCompletedBookings(employeeId: number, projectId: number): ng.IPromise<TimeBookingVm[]>;
     }
@@ -2824,13 +2853,13 @@ declare module TimeRecorder.Web {
         filterHeaderShowConfirm(): void;
         filterHeaderConfirmCancel(): void;
         filterHeaderConfirmSave(): void;
-        filterHeaderGetEntryPerDay(): void;
+        filterHeaderGetEntryPerDay(): string;
         filterHeaderGetTotalEntries(): void;
         setConfirmed(timebooking: Data.ITimeBookingCm): void;
+        getDuration(timebooking: Data.ITimeBookingCm): string;
         getStateById(id: number): Data.ETimeBookingState;
-        getBookingBackground(timebooking: Business.TimeBookingVm): string;
         getStateColor(state: Data.ETimeBookingState): string;
-        getIsExtraBooking(timebooking: Business.TimeBookingVm): boolean;
+        getIsExtraBooking(timeBooking: Business.TimeBookingVm): boolean;
         search(): ng.IPromise<void>;
         resolveTimeBookingData(data: Business.TimeBookingVm[], projects: Business.ProjectVm[], employees: Business.EmployeeVm[]): linqjs.IEnumerable<Business.TimeBookingVm>;
     }
@@ -2840,7 +2869,9 @@ declare module TimeRecorder.Web {
         timebookingForm: ng.IFormController;
     }
     class TimeBookingFormController {
+        $q: ng.IQService;
         $scope: ITimebookingControllerScope;
+        $translate: angular.translate.ITranslateService;
         private timeBookingDataController;
         private timeEntryTypeDataController;
         private employeeDataController;
@@ -2851,6 +2882,7 @@ declare module TimeRecorder.Web {
         static controllerId: string;
         static $inject: string[];
         triggerValidation: boolean;
+        timeBooking: Business.TimeBookingVm;
         idValue: string;
         employee: Business.EmployeeVm;
         project: Business.ProjectVm;
@@ -2863,14 +2895,17 @@ declare module TimeRecorder.Web {
         searchedProjects: Business.ProjectVm[];
         searchedTypes: Business.TimeEntryTypeVm[];
         searchedEmployees: Business.EmployeeVm[];
-        constructor($scope: ITimebookingControllerScope, timeBookingDataController: Business.TimeBookingDataController, timeEntryTypeDataController: Business.TimeEntryTypeDataController, employeeDataController: Business.EmployeeDataController, projectDataController: Business.ProjectDataController, authentication: IAuthenticationService, $state: any, $stateParams: any);
+        constructor($q: ng.IQService, $scope: ITimebookingControllerScope, $translate: angular.translate.ITranslateService, timeBookingDataController: Business.TimeBookingDataController, timeEntryTypeDataController: Business.TimeEntryTypeDataController, employeeDataController: Business.EmployeeDataController, projectDataController: Business.ProjectDataController, authentication: IAuthenticationService, $state: any, $stateParams: any);
         private init();
         isNew(): boolean;
+        isExtraBooking(): boolean;
         remove(): void;
         searchType(searchValue: string): void;
         searchProject(searchValue: string): void;
         searchEmployee(searchValue: string): void;
-        save(): void;
+        private checkUnConfirmedExtraBookings();
+        confirmSave(): void;
+        private save();
     }
 }
 declare module TimeRecorder.Web {
