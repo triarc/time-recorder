@@ -3917,19 +3917,25 @@ var TimeRecorder;
                     enumerable: true,
                     configurable: true
                 });
-                Object.defineProperty(ExternalWorkReportVm.prototype, "customerSignatureImage", {
+                Object.defineProperty(ExternalWorkReportVm.prototype, "contactSignatureImage", {
                     get: function () {
-                        return this.cm().customerSignatureImage;
+                        return this.cm().contactSignatureImage;
                     },
                     set: function (value) {
-                        this.cm().customerSignatureImage = value;
+                        if (Triarc.hasNoValue(this.cm().contactSignatureImage) && Triarc.hasValue(value)) {
+                            this.cm().contactSignatureImageTimestamp = new Date();
+                        }
+                        else if (Triarc.hasNoValue(value)) {
+                            this.cm().contactSignatureImageTimestamp = null;
+                        }
+                        this.cm().contactSignatureImage = value;
                     },
                     enumerable: true,
                     configurable: true
                 });
-                Object.defineProperty(ExternalWorkReportVm.prototype, "signatureTimestamp", {
+                Object.defineProperty(ExternalWorkReportVm.prototype, "contactSignatureImageTimestamp", {
                     get: function () {
-                        return this.cm().signatureTimestamp;
+                        return this.cm().contactSignatureImageTimestamp;
                     },
                     enumerable: true,
                     configurable: true
@@ -4477,7 +4483,7 @@ var TimeRecorder;
                 // Determins if the external work report has the correct criteria so that the state can be set to closed
                 ////
                 ExternalWorkReportRepository.prototype.hasCloseStateCriteria = function (externalWorkReport) {
-                    return Triarc.hasValue(externalWorkReport.employeeSignatureImage) && Triarc.hasValue(externalWorkReport.customerSignatureImage) && Triarc.hasValue(externalWorkReport.signedContactId) && Triarc.hasValue(externalWorkReport.projectCompleted);
+                    return Triarc.hasValue(externalWorkReport.employeeSignatureImage) && Triarc.hasValue(externalWorkReport.contactSignatureImage) && Triarc.hasValue(externalWorkReport.signedContactId) && Triarc.hasValue(externalWorkReport.projectCompleted);
                 };
                 ExternalWorkReportRepository.serviceId = "$trExternalWorkReportRepository";
                 ExternalWorkReportRepository.$inject = [
@@ -5028,7 +5034,7 @@ var TimeRecorder;
                                 from: null,
                                 to: null,
                                 employeeSignatureImage: null,
-                                customerSignatureImage: null,
+                                contactSignatureImage: null,
                                 projectCompleted: false,
                                 projectId: projectId,
                                 html: "",
@@ -8629,7 +8635,7 @@ var TimeRecorder;
                     _this.$state.transitionTo("tr.expenses");
                 });
             };
-            ExpensesFormController.controllerId = "ExpensesFormController";
+            ExpensesFormController.controllerId = "TrExpensesFormController";
             ExpensesFormController.$inject = [
                 "$scope",
                 "$q",
@@ -9117,8 +9123,8 @@ var TimeRecorder;
                     _this.employeeSignatureImage = image;
                 };
                 // Clone index.html, modify it so that a work report can be created on the server.
-                this.setCustomerSignatureImage = function (image) {
-                    _this.customerSignatureImage = image;
+                this.setContactSignatureImage = function (image) {
+                    _this.contactSignatureImage = image;
                 };
                 this.requiredDataQ = this.$services.$q.all([
                     this.dataControllers.timeEntryTypeDc.ensureLoaded(),
@@ -9153,7 +9159,7 @@ var TimeRecorder;
             WorkReportController.prototype.save = function () {
                 var _this = this;
                 this.workReport.externalWorkReport.employeeSignatureImage = this.employeeSignatureImage;
-                this.workReport.externalWorkReport.customerSignatureImage = this.customerSignatureImage;
+                this.workReport.externalWorkReport.contactSignatureImage = this.contactSignatureImage;
                 this.workReport.externalWorkReport.projectCompleted = this.projectComplete;
                 if (this.selectedContact) {
                     this.workReport.externalWorkReport.signedContactId = this.selectedContact.id;
@@ -9193,10 +9199,10 @@ var TimeRecorder;
                     clone.find('#employeeSignatureImage').attr("src", "data:image/png;base64," + this.employeeSignatureImage);
                 }
                 clone.find('#employeeSignatureCanvas').remove();
-                if (Triarc.hasValue(this.customerSignatureImage)) {
-                    clone.find('#customerSignatureImage').attr("src", "data:image/png;base64," + this.customerSignatureImage);
+                if (Triarc.hasValue(this.contactSignatureImage)) {
+                    clone.find('#contactSignatureImage').attr("src", "data:image/png;base64," + this.contactSignatureImage);
                 }
-                clone.find('#customerSignatureCanvas').remove();
+                clone.find('#contactSignatureCanvas').remove();
                 return $(clone)[0].outerHTML;
             };
             WorkReportController.prototype.savePdf = function () {
@@ -9330,7 +9336,7 @@ var TimeRecorder;
                             }
                         });
                         _this.employeeSignatureImage = _this.workReport.externalWorkReport.employeeSignatureImage;
-                        _this.customerSignatureImage = _this.workReport.externalWorkReport.customerSignatureImage;
+                        _this.contactSignatureImage = _this.workReport.externalWorkReport.contactSignatureImage;
                         if (Triarc.hasValue(_this.workReport.externalWorkReport.projectCompleted)) {
                             _this.projectComplete = _this.workReport.externalWorkReport.projectCompleted;
                             _this.projectNotComplete = !_this.workReport.externalWorkReport.projectCompleted;
@@ -10467,11 +10473,11 @@ sig.directive("tlSignature", [
     "\n" +
     "        <div class=\"col-xs-6\">\r" +
     "\n" +
-    "          <img id=\"customerSignatureImage\" class=\"avoid-page-break printable-element\" />\r" +
+    "          <img id=\"contactSignatureImage\" class=\"avoid-page-break printable-element\" />\r" +
     "\n" +
-    "          <tl-signature id=\"customerSignatureCanvas\"\r" +
+    "          <tl-signature id=\"contactSignatureCanvas\"\r" +
     "\n" +
-    "                        signature-image-fn=\"ctrl.setCustomerSignatureImage\"\r" +
+    "                        signature-image-fn=\"ctrl.setContactSignatureImage\"\r" +
     "\n" +
     "                        style=\"border: 1px solid black;\"\r" +
     "\n" +
@@ -10481,7 +10487,7 @@ sig.directive("tlSignature", [
     "\n" +
     "                        save-size=3000\r" +
     "\n" +
-    "                        initial-base-64=\"ctrl.customerSignatureImage\"\r" +
+    "                        initial-base-64=\"ctrl.contactSignatureImage\"\r" +
     "\n" +
     "                        disabled=\"!ctrl.reportIsOpen(ctrl.workReport.externalWorkReport)\">\r" +
     "\n" +
