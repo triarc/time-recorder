@@ -2046,7 +2046,7 @@ var TimeRecorder;
                 };
                 TimeEntryResource.prototype.createTimeStampRequest = function (data) {
                     var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/CreateTimeStamp";
-                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "any", true);
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "string", true);
                     return dataRequest;
                 };
                 TimeEntryResource.prototype.createTimeStamp = function (data) {
@@ -3455,9 +3455,61 @@ var TimeRecorder;
     (function (Web) {
         var Business;
         (function (Business) {
-            var ProjectVm = (function () {
-                function ProjectVm(cm) {
+            var ProjectTypeVm = (function () {
+                function ProjectTypeVm(cm) {
                     this.cm = cm;
+                }
+                Object.defineProperty(ProjectTypeVm.prototype, "id", {
+                    get: function () {
+                        return this.cm().id;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ProjectTypeVm.prototype, "name", {
+                    get: function () {
+                        return this.cm().name;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ProjectTypeVm.prototype, "externalId", {
+                    get: function () {
+                        return this.cm().externalId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ProjectTypeVm.prototype, "image", {
+                    get: function () {
+                        return this.cm().image;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ProjectTypeVm.prototype, "externalTypeString", {
+                    get: function () {
+                        return this.cm().externalTypeString;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                return ProjectTypeVm;
+            })();
+            Business.ProjectTypeVm = ProjectTypeVm;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ProjectVm = (function () {
+                function ProjectVm(cm, projectType) {
+                    this.cm = cm;
+                    this.projectType = projectType;
                 }
                 Object.defineProperty(ProjectVm.prototype, "id", {
                     get: function () {
@@ -3504,6 +3556,20 @@ var TimeRecorder;
                 Object.defineProperty(ProjectVm.prototype, "externalNumber", {
                     get: function () {
                         return this.cm().externalNumber;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ProjectVm.prototype, "projectTypeId", {
+                    get: function () {
+                        return this.cm().projectTypeId;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(ProjectVm.prototype, "type", {
+                    get: function () {
+                        return this.projectType();
                     },
                     enumerable: true,
                     configurable: true
@@ -4075,6 +4141,7 @@ var TimeRecorder;
 /// <reference path="expensetypevm.ts" />
 /// <reference path="personvm.ts" />
 /// <reference path="EmployeeVm.ts" />
+/// <reference path="projecttypevm.ts" />
 /// <reference path="projectvm.ts" />
 /// <reference path="clientvm.ts" />
 /// <reference path="contactvm.ts" />
@@ -4177,6 +4244,9 @@ var TimeRecorder;
                 };
                 ProjectRepository.prototype.searchForExternalWorkReports = function (searchValue, skip, take) {
                     return this.$proxy.Project.searchForExternalWorkReportsMultiple({ searchString: searchValue, skip: skip, take: take }).then(function (ret) { return ret.data; });
+                };
+                ProjectRepository.prototype.getProjectTypes = function () {
+                    return this.$proxy.Project.getProjectTypesMultiple({}).then(function (response) { return response.data; });
                 };
                 ProjectRepository.$inject = [
                     "$tr-proxy",
@@ -4612,10 +4682,31 @@ var TimeRecorder;
                 function ProjectDataController($q, projectRepository) {
                     this.$q = $q;
                     this.projectRepository = projectRepository;
+                    this.projectTypesMap = new Map();
                     this.projectMap = new Map();
                 }
-                ProjectDataController.prototype.getProjectById = function (id) {
-                    return this.projectRepository.getProjectById(id).then(function (p) { return new Business.ProjectVm(function () { return p; }); });
+                ProjectDataController.prototype.loadProjectTypes = function () {
+                    var _this = this;
+                    var deffered = this.$q.defer();
+                    this.projectRepository.getProjectTypes().then(function (projectTypes) {
+                        _this.projectTypesMap.clear();
+                        projectTypes.forEach(function (pt) {
+                            _this.projectTypesMap.set(pt.id, new Business.ProjectTypeVm(function () { return pt; }));
+                        });
+                        deffered.resolve(_this.projectTypesMap.getValues());
+                    });
+                    return deffered.promise;
+                };
+                ProjectDataController.prototype.getProjectById = function (id, includeType) {
+                    var _this = this;
+                    if (includeType === void 0) { includeType = false; }
+                    return this.projectRepository.getProjectById(id).then(function (p) {
+                        var projectType = null;
+                        if (includeType) {
+                            projectType = _this.projectTypesMap.get(p.projectTypeId);
+                        }
+                        return new Business.ProjectVm(function () { return p; }, function () { return projectType; });
+                    });
                 };
                 ProjectDataController.prototype.getProjectsById = function (ids) {
                     var _this = this;
@@ -4910,7 +5001,7 @@ var TimeRecorder;
                     var _this = this;
                     return this.repository.get(id).then(function (cm) {
                         return _this.container.timeBookingDc.resolveFor(cm.timeBookingIds).then(function (timeBookings) {
-                            return _this.container.projectDc.getProjectById(cm.externalWorkReport.projectId).then(function (projectVm) {
+                            return _this.container.projectDc.getProjectById(cm.externalWorkReport.projectId, true).then(function (projectVm) {
                                 return new Business.WorkReportVm(function () { return cm; }, function () { return timeBookings; }, function () { return projectVm; }, function () { return _this; });
                             });
                         });
@@ -4953,7 +5044,7 @@ var TimeRecorder;
                             cm.externalWorkReport.to = moment(timeBookings.toEnumerable().max(function (t) { return t.stop.getTime(); })).toDate();
                             cm.timeBookingIds = timeBookings.toEnumerable().select(function (tb) { return tb.id; }).toArray();
                         }
-                        return _this.container.projectDc.getProjectById(cm.externalWorkReport.projectId).then(function (projectCm) {
+                        return _this.container.projectDc.getProjectById(cm.externalWorkReport.projectId, true).then(function (projectCm) {
                             return new Business.WorkReportVm(function () { return cm; }, function () { return timeBookings; }, function () { return projectCm; }, function () { return _this; });
                         });
                     });
@@ -4996,7 +5087,8 @@ var TimeRecorder;
                         projectId: projectId,
                         simpleStampType: 2 /* Stop */,
                         timeEntryTypeId: typeId,
-                        hasBooking: false
+                        hasBooking: false,
+                        timestamp: new Date().getTime()
                     };
                     this.timeEntryRepo.createTimeStamp(cm).then(function () {
                         _this.triggerBookingCreation(employeeId);
@@ -5011,7 +5103,8 @@ var TimeRecorder;
                         projectId: projectId,
                         simpleStampType: 1 /* Start */,
                         timeEntryTypeId: typeId,
-                        hasBooking: false
+                        hasBooking: false,
+                        timestamp: new Date().getTime()
                     };
                     this.timeEntryRepo.createTimeStamp(cm);
                 };
@@ -9028,7 +9121,8 @@ var TimeRecorder;
                     _this.customerSignatureImage = image;
                 };
                 this.requiredDataQ = this.$services.$q.all([
-                    this.dataControllers.timeEntryTypeDc.ensureLoaded()
+                    this.dataControllers.timeEntryTypeDc.ensureLoaded(),
+                    this.dataControllers.projectDc.loadProjectTypes()
                 ]);
                 this.$scope.$on(this.saveContactEvent, function (evt, saveEvt) {
                     _this.loadContactsForClient(_this.associatedClient.id).then(function () {
@@ -9041,18 +9135,32 @@ var TimeRecorder;
             WorkReportController.prototype.setWorkReport = function (workReport) {
                 this.workReport = workReport;
                 this.dayContainers = null;
-                this.loadClient(this.workReport.externalWorkReport.project.clientId);
                 if (Triarc.arrayHasValues(this.workReport.timeBookings)) {
-                    this.dayContainers = this.workReport.timeBookings.toEnumerable().groupBy(function (d) { return moment(d.start).startOf("day").toDate().getTime(); }).select(function (g) {
+                    this.dayContainers = this.workReport.timeBookings.toEnumerable().groupBy(function (d) { return moment(d.start).startOf("day").toDate().getTime(); }).select(function (grouping) {
                         return {
-                            date: new Date(g.key()),
-                            timeBookings: g.toArray()
+                            date: new Date(grouping.key()),
+                            timeBookingGroups: grouping.toArray().toEnumerable().where(function (parentTimeBooking) { return parentTimeBooking.parentId == null; }).select(function (timeBooking) {
+                                return {
+                                    timeBooking: timeBooking,
+                                    additionalBookings: grouping.toArray().toEnumerable().where(function (additionalTimeBooking) { return additionalTimeBooking.parentId === timeBooking.id; }).toArray()
+                                };
+                            }).toArray()
                         };
                     }).toArray();
                 }
+                return this.loadClient(this.workReport.externalWorkReport.project.clientId);
             };
             WorkReportController.prototype.save = function () {
                 var _this = this;
+                this.workReport.externalWorkReport.employeeSignatureImage = this.employeeSignatureImage;
+                this.workReport.externalWorkReport.customerSignatureImage = this.customerSignatureImage;
+                this.workReport.externalWorkReport.projectCompleted = this.projectComplete;
+                if (this.selectedContact) {
+                    this.workReport.externalWorkReport.signedContactId = this.selectedContact.id;
+                }
+                else {
+                    this.workReport.externalWorkReport.signedContactId = null;
+                }
                 // has the external work report captured all relavent information to be closed?
                 if (!this.dataControllers.externalWorkReportDc.hasCloseStateCriteria(this.workReport.externalWorkReport)) {
                     Web.ExternalWorkReport.Modal.openModalSaveState(this.$services.$modal, this.workReport.externalWorkReport).then(function (proceedWithSave) {
@@ -9067,18 +9175,6 @@ var TimeRecorder;
             };
             WorkReportController.prototype.persistReport = function () {
                 var _this = this;
-                if (this.employeeSignatureImage) {
-                    this.workReport.externalWorkReport.employeeSignatureImage = this.employeeSignatureImage;
-                }
-                if (this.customerSignatureImage) {
-                    this.workReport.externalWorkReport.customerSignatureImage = this.customerSignatureImage;
-                }
-                if (this.selectedContact) {
-                    this.workReport.externalWorkReport.signedContactId = this.selectedContact.id;
-                }
-                if (Triarc.hasValue(this.projectComplete)) {
-                    this.workReport.externalWorkReport.projectCompleted = this.projectComplete;
-                }
                 this.workReport.externalWorkReport.html = this.getPdfHtml();
                 this.dataControllers.externalWorkReportDc.save(this.workReport).then(function () {
                     toastr.info("Saved");
@@ -9108,10 +9204,10 @@ var TimeRecorder;
             };
             WorkReportController.prototype.loadClient = function (clientId) {
                 var _this = this;
-                this.dataControllers.peopleDc.getClient(clientId).then(function (client) {
+                return this.dataControllers.peopleDc.getClient(clientId).then(function (client) {
                     _this.associatedClient = client;
+                    return _this.loadContactsForClient(clientId);
                 });
-                this.loadContactsForClient(clientId);
             };
             WorkReportController.prototype.loadContactsForClient = function (clientId) {
                 var _this = this;
@@ -9126,8 +9222,8 @@ var TimeRecorder;
             WorkReportController.prototype.getDailyTotalMins = function (dayContainer) {
                 var _this = this;
                 var totalMins = 0;
-                dayContainer.timeBookings.forEach(function (tb) {
-                    totalMins += _this.getWorkedMins(tb.start, tb.stop);
+                dayContainer.timeBookingGroups.forEach(function (tb) {
+                    totalMins += _this.getWorkedMins(tb.timeBooking.start, tb.timeBooking.stop);
                 });
                 return totalMins;
             };
@@ -9228,7 +9324,11 @@ var TimeRecorder;
                 var _this = this;
                 this.requiredDataQ.then(function () {
                     _this.dataControllers.externalWorkReportDc.get(id).then(function (workReport) {
-                        _this.setWorkReport(workReport);
+                        _this.setWorkReport(workReport).then(function () {
+                            if (Triarc.hasValue(workReport.externalWorkReport.signedContactId)) {
+                                _this.selectedContact = _this.clientContacts.toEnumerable().firstOrDefault(function (c) { return c.id === workReport.externalWorkReport.signedContactId; });
+                            }
+                        });
                         _this.employeeSignatureImage = _this.workReport.externalWorkReport.employeeSignatureImage;
                         _this.customerSignatureImage = _this.workReport.externalWorkReport.customerSignatureImage;
                         if (Triarc.hasValue(_this.workReport.externalWorkReport.projectCompleted)) {
@@ -9885,9 +9985,11 @@ sig.directive("tlSignature", [
                 });
                 attrs.$observe("canvasHeight", function (newValue) {
                     canvas.height = newValue;
+                    element.height(newValue);
                 });
                 attrs.$observe("canvasWidth", function (newValue) {
                     canvas.width = newValue;
+                    element.width(newValue);
                 });
                 scope.$watch("clear", function (clear, oldValue) {
                     if (clear) {
@@ -9957,7 +10059,7 @@ sig.directive("tlSignature", [
 
 
   $templateCache.put('Client/Views/directives/templates/tlSignatureTemplate.html',
-    "<div><canvas id=\"canvas\"></canvas><span id=\"clearButton\" ng-if=\"!disabled\" class=\"glyphicon glyphicon-remove-circle tl-signature-remove\" aria-hidden=\"true\"></span></div>"
+    "<div class=\"tl-signature\"><canvas id=\"canvas\" class=\"canvas\"></canvas><span id=\"clearButton\" ng-if=\"!disabled\" ng-click=\"clearSignature()\" class=\"glyphicon glyphicon-remove-circle tl-signature-remove\" aria-hidden=\"true\"></span></div>"
   );
 
 
@@ -10059,7 +10161,7 @@ sig.directive("tlSignature", [
     "\n" +
     "        <div class=\"col-xs-8\">\r" +
     "\n" +
-    "          {{ctrl.workReport.externalWorkReport.project.type.name}}Typ\r" +
+    "          {{ctrl.workReport.externalWorkReport.project.type.name}}\r" +
     "\n" +
     "        </div>\r" +
     "\n" +
@@ -10145,23 +10247,49 @@ sig.directive("tlSignature", [
     "\n" +
     "              </div>\r" +
     "\n" +
-    "              <div class=\"row avoid-page-break tr-list-item\" ng-repeat=\"timeBooking in dayContainer.timeBookings | orderBy:'from'\">\r" +
+    "              <div class=\"row avoid-page-break\" ng-repeat=\"group in dayContainer.timeBookingGroups | orderBy:'from'\">\r" +
     "\n" +
-    "                <div class=\"col-xs-2\">\r" +
+    "                <div class=\"col-xs-12\" >\r" +
     "\n" +
-    "                  {{timeBooking.type.name}}\r" +
+    "                  <div class=\"row tr-list-item timebooking-list-item confirmed-timebooking\">\r" +
     "\n" +
-    "                </div>\r" +
+    "                    <div class=\"col-xs-6\">\r" +
     "\n" +
-    "                <div class=\"col-xs-8\">\r" +
+    "                      {{group.timeBooking.type.name}}\r" +
     "\n" +
-    "                  <!--                  {{timeBooking.comment}}-->\r" +
+    "                    </div>\r" +
     "\n" +
-    "                </div>\r" +
+    "                    <div class=\"col-xs-4\">\r" +
     "\n" +
-    "                <div class=\"col-xs-2\">\r" +
+    "                    </div>\r" +
     "\n" +
-    "                  {{ctrl.getWorkedMins(timeBooking.start, timeBooking.stop) | minsToHours | tlDecimalPlaces:2}}\r" +
+    "                    <div class=\"col-xs-2\">\r" +
+    "\n" +
+    "                      {{ctrl.getWorkedMins(group.timeBooking.start, group.timeBooking.stop) | minsToHours | tlDecimalPlaces:2}}\r" +
+    "\n" +
+    "                    </div>\r" +
+    "\n" +
+    "                  </div>\r" +
+    "\n" +
+    "                  <div class=\"row avoid-page-break tr-list-item timebooking-extra-list-item confirmed-timebooking\" ng-repeat=\"additionalTimeBooking in group.additionalBookings | orderBy:'from'\">\r" +
+    "\n" +
+    "                    <div class=\"col-xs-2\">\r" +
+    "\n" +
+    "                      {{additionalTimeBooking.type.name}}\r" +
+    "\n" +
+    "                    </div>\r" +
+    "\n" +
+    "                    <div class=\"col-xs-8\">\r" +
+    "\n" +
+    "                    </div>\r" +
+    "\n" +
+    "                    <div class=\"col-xs-2\">\r" +
+    "\n" +
+    "                      {{ctrl.getWorkedMins(additionalTimeBooking.start, additionalTimeBooking.stop) | minsToHours | tlDecimalPlaces:2}}\r" +
+    "\n" +
+    "                    </div>\r" +
+    "\n" +
+    "                  </div>\r" +
     "\n" +
     "                </div>\r" +
     "\n" +
