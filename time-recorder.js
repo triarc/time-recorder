@@ -5133,7 +5133,7 @@ var TimeRecorder;
                     this.$q = $q;
                     this.timeEntryRepo = timeEntryRepo;
                 }
-                TimeEntryDataController.prototype.stop = function (employeeId, projectId, typeId) {
+                TimeEntryDataController.prototype.stop = function (employeeId, projectId) {
                     var _this = this;
                     var cm = {
                         id: Triarc.generateGuid(),
@@ -5141,7 +5141,7 @@ var TimeRecorder;
                         employeeId: employeeId,
                         projectId: projectId,
                         simpleStampType: 2 /* Stop */,
-                        timeEntryTypeId: typeId,
+                        timeEntryTypeId: null,
                         hasBooking: false,
                         timestamp: new Date().getTime()
                     };
