@@ -198,6 +198,7 @@ declare module TimeRecorder.Web.Data {
         clientId?: number;
         timestamp: number;
         externalNumber: string;
+        projectTypeId?: number;
     }
     interface IProjectVm {
         id: number;
@@ -223,6 +224,7 @@ declare module TimeRecorder.Web.Data {
         clientId?: number;
         timestamp: number;
         externalNumber: string;
+        projectTypeId?: number;
     }
     interface IProjectTypeCm {
         id: number;
@@ -231,6 +233,7 @@ declare module TimeRecorder.Web.Data {
         externalId: string;
         image: string;
         timestamp: number;
+        externalTypeString: string;
     }
     interface IExpenseCm {
         id: string;
@@ -291,8 +294,8 @@ declare module TimeRecorder.Web.Data {
         from: Date;
         to: Date;
         employeeSignatureImage: string;
-        customerSignatureImage: string;
-        signatureTimestamp?: Date;
+        contactSignatureImage: string;
+        contactSignatureImageTimestamp?: Date;
         projectCompleted?: boolean;
         projectId: number;
         signedContactId?: string;
@@ -439,12 +442,13 @@ declare module TimeRecorder.Web.Data {
     }
     interface ITimeEntryCm {
         id: string;
-        employeeId: number;
-        timeEntryTypeId: number;
-        simpleStampType: EStampType;
+        employeeId?: number;
+        timeEntryTypeId?: number;
+        simpleStampType?: EStampType;
         bookedTime: Date;
-        projectId: number;
+        projectId?: number;
         hasBooking: boolean;
+        timestamp: number;
     }
     interface ICheckUserResult {
         presenceStatus: boolean;
@@ -1596,8 +1600,8 @@ declare module TimeRecorder.Web.Data {
         postSingle(data: ITimeEntryModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
         postMultipleRequest(data: ITimeEntryCollection): Triarc.Data.DataRequest<any>;
         postMultiple(data: ITimeEntryCollection): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        createTimeStampRequest(data: ITimeEntryCm): Triarc.Data.DataRequest<any>;
-        createTimeStamp(data: ITimeEntryCm): ng.IPromise<Triarc.Data.DataResponse<any>>;
+        createTimeStampRequest(data: ITimeEntryCm): Triarc.Data.DataRequest<string>;
+        createTimeStamp(data: ITimeEntryCm): ng.IPromise<Triarc.Data.DataResponse<string>>;
         getUnbookedTimeEntriesMultipleRequest(params: TimeEntryGetUnbookedTimeEntriesEnumerableParams): Triarc.Data.DataRequest<ITimeEntryCm[]>;
         getUnbookedTimeEntriesMultiple(params: TimeEntryGetUnbookedTimeEntriesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<ITimeEntryCm[]>>;
         validateUserRequest(params: TimeEntryValidateUserParams): Triarc.Data.DataRequest<ICheckUserResult>;
@@ -1628,7 +1632,7 @@ declare module TimeRecorder.Web.Data {
         postSingle(data: any): any;
         postMultipleRequest(data: any): Triarc.Data.DataRequest<any>;
         postMultiple(data: any): any;
-        createTimeStampRequest(data: any): Triarc.Data.DataRequest<any>;
+        createTimeStampRequest(data: any): Triarc.Data.DataRequest<string>;
         createTimeStamp(data: any): any;
         getUnbookedTimeEntriesMultipleRequest(params: any): Triarc.Data.DataRequest<ITimeEntryCm[]>;
         getUnbookedTimeEntriesMultiple(params: any): any;
@@ -1864,9 +1868,21 @@ declare module TimeRecorder.Web.Business {
     }
 }
 declare module TimeRecorder.Web.Business {
+    class ProjectTypeVm {
+        protected cm: () => Data.IProjectTypeCm;
+        constructor(cm: () => Data.IProjectTypeCm);
+        id: number;
+        name: string;
+        externalId: string;
+        image: string;
+        externalTypeString: string;
+    }
+}
+declare module TimeRecorder.Web.Business {
     class ProjectVm {
         protected cm: () => Data.IProjectCm;
-        constructor(cm: () => Data.IProjectCm);
+        protected projectType: () => ProjectTypeVm;
+        constructor(cm: () => Data.IProjectCm, projectType?: () => ProjectTypeVm);
         id: number;
         name: string;
         parentId: number;
@@ -1874,6 +1890,8 @@ declare module TimeRecorder.Web.Business {
         bookable: boolean;
         clientId: number;
         externalNumber: string;
+        projectTypeId: number;
+        type: ProjectTypeVm;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -1943,8 +1961,8 @@ declare module TimeRecorder.Web.Business {
         from: Date;
         to: Date;
         employeeSignatureImage: string;
-        customerSignatureImage: string;
-        signatureTimestamp: Date;
+        contactSignatureImage: string;
+        contactSignatureImageTimestamp: Date;
         projectCompleted: boolean;
         project: ProjectVm;
         signedClient: ClientVm;
@@ -2015,6 +2033,7 @@ declare module TimeRecorder.Web.Business {
         getProjectsById(ids: number[]): ng.IPromise<Data.IProjectCm[]>;
         search(searchValue: string, skip: number, take: number): ng.IPromise<Data.IProjectCm[]>;
         searchForExternalWorkReports(searchValue: string, skip: number, take: number): ng.IPromise<Data.IExternalWorkReportCreationProjectCm[]>;
+        getProjectTypes(): ng.IPromise<Data.IProjectTypeCm[]>;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -2091,7 +2110,7 @@ declare module TimeRecorder.Web.Business {
         static serviceId: string;
         static $inject: string[];
         constructor($q: ng.IQService, $proxy: Data.ProxyContainer);
-        createTimeStamp(timeStamp: Data.ITimeEntryCm): ng.IPromise<any>;
+        createTimeStamp(timeStamp: Data.ITimeEntryCm): ng.IPromise<string>;
         getUnbookedTimeEntries(employeeId: number): ng.IPromise<Data.ITimeEntryCm[]>;
     }
 }
@@ -2153,9 +2172,11 @@ declare module TimeRecorder.Web.Business {
         static serviceId: string;
         static $inject: string[];
         container: Business.DataControllerContainer;
+        private projectTypesMap;
         private projectMap;
         constructor($q: ng.IQService, projectRepository: ProjectRepository);
-        getProjectById(id: number): ng.IPromise<ProjectVm>;
+        loadProjectTypes(): ng.IPromise<{}>;
+        getProjectById(id: number, includeType?: boolean): ng.IPromise<ProjectVm>;
         getProjectsById(ids: number[]): ng.IPromise<ProjectVm[]>;
         search(searchValue: string, skip: number, take: number): ng.IPromise<ProjectVm[]>;
         searchForExternalWorkReports(searchValue: string, skip: number, take: number): ng.IPromise<ExternalWorkReportCreationProjectVm[]>;
@@ -2550,12 +2571,13 @@ declare module TimeRecorder.Web {
         $timeout: ng.ITimeoutService;
         blockUi: angular.ui.block.IBlockService;
         pageLock: Triarc.PageLock.PageLockService;
+        $auth: AuthenticationService;
         $proxy: Data.ProxyContainer;
         $filter: ng.IFilterService;
         $templateCache: ng.ITemplateCacheService;
         static $inject: string[];
         static serviceId: string;
-        constructor($q: ng.IQService, $translate: angular.translate.ITranslateService, $location: ng.ILocationService, $anchorScroll: ng.IAnchorScrollService, $state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $modal: any, $locale: ng.ILocaleService, $timeout: ng.ITimeoutService, blockUi: angular.ui.block.IBlockService, pageLock: Triarc.PageLock.PageLockService, $proxy: Data.ProxyContainer, $filter: ng.IFilterService, $templateCache: ng.ITemplateCacheService);
+        constructor($q: ng.IQService, $translate: angular.translate.ITranslateService, $location: ng.ILocationService, $anchorScroll: ng.IAnchorScrollService, $state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $modal: any, $locale: ng.ILocaleService, $timeout: ng.ITimeoutService, blockUi: angular.ui.block.IBlockService, pageLock: Triarc.PageLock.PageLockService, $auth: AuthenticationService, $proxy: Data.ProxyContainer, $filter: ng.IFilterService, $templateCache: ng.ITemplateCacheService);
         translate(value: string): string;
         translateWith(value: string, params?: any): string;
         translateService(): angular.translate.ITranslateService;
@@ -3259,9 +3281,13 @@ declare module TimeRecorder.Web {
     interface IWorkReportControllerScope extends ng.IScope {
         downloadFile: any;
     }
+    interface ITimeBookingGroup {
+        timeBooking: Business.TimeBookingVm;
+        additionalBookings: Business.TimeBookingVm[];
+    }
     interface IDayContainer {
         date: Date;
-        timeBookings: Business.TimeBookingVm[];
+        timeBookingGroups: ITimeBookingGroup[];
     }
     class WorkReportController {
         protected $scope: IWorkReportControllerScope;
@@ -3271,8 +3297,8 @@ declare module TimeRecorder.Web {
         workReport: Business.WorkReportVm;
         dayContainers: IDayContainer[];
         employeeSignatureImage: any;
-        customerSignatureImage: any;
-        currentEmployee: Business.EmployeeVm;
+        contactSignatureImage: any;
+        currentEmployee: Data.IEmployeeCm;
         selectedContact: Web.Bu.ContactVm;
         associatedClient: Business.ClientVm;
         clientContacts: Web.Bu.ContactVm[];
@@ -3281,15 +3307,15 @@ declare module TimeRecorder.Web {
         protected requiredDataQ: ng.IPromise<any[]>;
         saveContactEvent: string;
         constructor($scope: IWorkReportControllerScope, $services: TrServiceContainer, dataControllers: Business.DataControllerContainer);
-        setWorkReport(workReport: Business.WorkReportVm): void;
+        setWorkReport(workReport: Business.WorkReportVm): ng.IPromise<void>;
         save(): void;
         private persistReport();
         cancel(): void;
         setEmployeeSignatureImage: (image: any) => void;
-        setCustomerSignatureImage: (image: any) => void;
+        setContactSignatureImage: (image: any) => void;
         private getPdfHtml();
         savePdf(): void;
-        protected loadClient(clientId: number): void;
+        protected loadClient(clientId: number): ng.IPromise<void>;
         protected loadContactsForClient(clientId: number): ng.IPromise<void>;
         getWorkedMins(from: Date, to: Date): number;
         getDailyTotalMins(dayContainer: IDayContainer): number;
