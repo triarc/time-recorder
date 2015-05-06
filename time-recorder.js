@@ -58,6 +58,13 @@ var TimeRecorder;
                 EAppUserType[EAppUserType["Personal"] = 2] = "Personal";
             })(Data.EAppUserType || (Data.EAppUserType = {}));
             var EAppUserType = Data.EAppUserType;
+            (function (EStampType) {
+                EStampType[EStampType["Start"] = 1] = "Start";
+                EStampType[EStampType["Stop"] = 2] = "Stop";
+                EStampType[EStampType["StartError"] = 3] = "StartError";
+                EStampType[EStampType["StopError"] = 4] = "StopError";
+            })(Data.EStampType || (Data.EStampType = {}));
+            var EStampType = Data.EStampType;
             (function (EAuftragVerificationStatus) {
                 EAuftragVerificationStatus[EAuftragVerificationStatus["Success"] = 0] = "Success";
                 EAuftragVerificationStatus[EAuftragVerificationStatus["ArbeitsgangNotValid"] = 1] = "ArbeitsgangNotValid";
@@ -69,13 +76,6 @@ var TimeRecorder;
                 EAuftragVerificationStatus[EAuftragVerificationStatus["CommunicationError"] = -1] = "CommunicationError";
             })(Data.EAuftragVerificationStatus || (Data.EAuftragVerificationStatus = {}));
             var EAuftragVerificationStatus = Data.EAuftragVerificationStatus;
-            (function (EStampType) {
-                EStampType[EStampType["Start"] = 1] = "Start";
-                EStampType[EStampType["Stop"] = 2] = "Stop";
-                EStampType[EStampType["StartError"] = 3] = "StartError";
-                EStampType[EStampType["StopError"] = 4] = "StopError";
-            })(Data.EStampType || (Data.EStampType = {}));
-            var EStampType = Data.EStampType;
             ;
             var VersionResource = (function () {
                 function VersionResource($requestSender) {
@@ -2044,6 +2044,39 @@ var TimeRecorder;
                     var request = this.postMultipleRequest(data);
                     return this.$requestSender.requestValue(request);
                 };
+                TimeEntryResource.prototype.createTimeStampRequest = function (data) {
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/CreateTimeStamp";
+                    var dataRequest = new Triarc.Data.DataRequest("POST", url, data, "TimeEntry", "any", true);
+                    return dataRequest;
+                };
+                TimeEntryResource.prototype.createTimeStamp = function (data) {
+                    var request = this.createTimeStampRequest(data);
+                    return this.$requestSender.requestValue(request);
+                };
+                TimeEntryResource.prototype.getUnbookedTimeEntriesMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/GetUnbookedTimeEntries";
+                    if (angular.isDefined(params.employeeId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "employeeId", encodeURIComponent(params.employeeId));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "TimeEntry", "ITimeEntryCm[]", false);
+                    return dataRequest;
+                };
+                TimeEntryResource.prototype.getUnbookedTimeEntriesMultiple = function (params) {
+                    var request = this.getUnbookedTimeEntriesMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
                 TimeEntryResource.prototype.validateUserRequest = function (params) {
                     var url = this.$requestSender.getUrl('$tr-proxy') + "/TimeEntry/ValidateUser";
                     if (angular.isDefined(params.persNr)) {
@@ -2143,6 +2176,9 @@ var TimeRecorder;
                     var request = this.createTimeEntryRequest(data);
                     return this.$requestSender.requestValue(request);
                 };
+                TimeEntryResource.prototype.newTimeEntryCm = function () {
+                    return {};
+                };
                 TimeEntryResource.prototype.newCheckUserResult = function () {
                     return {};
                 };
@@ -2156,9 +2192,6 @@ var TimeRecorder;
                     return {};
                 };
                 TimeEntryResource.prototype.newTimeEntrySearchVm = function () {
-                    return {};
-                };
-                TimeEntryResource.prototype.newTimeEntryCm = function () {
                     return {};
                 };
                 return TimeEntryResource;
@@ -3582,6 +3615,8 @@ var TimeRecorder;
                         state: null,
                         externalWorkReportId: null,
                         timestamp: null,
+                        fromSourceId: null,
+                        toSourceId: null,
                         start: date,
                         stop: date
                     };
@@ -3658,6 +3693,26 @@ var TimeRecorder;
                     },
                     set: function (value) {
                         this.cm().timeEntryTypeId = value;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimeBookingVm.prototype, "fromSourceId", {
+                    get: function () {
+                        return this.cm().fromSourceId;
+                    },
+                    set: function (val) {
+                        this.cm().fromSourceId = val;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(TimeBookingVm.prototype, "toSourceId", {
+                    get: function () {
+                        return this.cm().toSourceId;
+                    },
+                    set: function (val) {
+                        this.cm().toSourceId = val;
                     },
                     enumerable: true,
                     configurable: true
@@ -4366,6 +4421,32 @@ var TimeRecorder;
         })(Business = Web.Business || (Web.Business = {}));
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var TimeEntryRepository = (function () {
+                function TimeEntryRepository($q, $proxy) {
+                    this.$q = $q;
+                    this.$proxy = $proxy;
+                }
+                TimeEntryRepository.prototype.createTimeStamp = function (timeStamp) {
+                    return this.$proxy.TimeEntry.createTimeStamp(timeStamp).then(function (response) { return response.data; });
+                };
+                TimeEntryRepository.prototype.getUnbookedTimeEntries = function (employeeId) {
+                    return this.$proxy.TimeEntry.getUnbookedTimeEntriesMultiple({ employeeId: employeeId }).then(function (response) { return response.data; });
+                };
+                TimeEntryRepository.serviceId = "$trTimeEntryRepository";
+                TimeEntryRepository.$inject = ['$q', '$tr-proxy'];
+                return TimeEntryRepository;
+            })();
+            Business.TimeEntryRepository = TimeEntryRepository;
+            timeRecorder.service(TimeEntryRepository.serviceId, TimeEntryRepository);
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
 /// <reference path="expensetyperepository.ts" />
 /// <reference path="expenserepository.ts" />
 /// <reference path="projectrepository.ts" />
@@ -4373,7 +4454,8 @@ var TimeRecorder;
 /// <reference path="employeerespository.ts" />
 /// <reference path="timeentrytyperepository.ts" />
 /// <reference path="timebookingrepository.ts" />
-/// <reference path="externalworkreportrepository.ts" /> 
+/// <reference path="externalworkreportrepository.ts" />
+/// <reference path="timeentryrepository.ts" />
 var TimeRecorder;
 (function (TimeRecorder) {
     var Web;
@@ -4693,25 +4775,44 @@ var TimeRecorder;
                 TimeBookingDataController.prototype.saveMultiple = function (timeBookings, calculateExtraBookings) {
                     var _this = this;
                     return this.repository.save(timeBookings).then(function (data) {
-                        var timeBooking = data.first();
-                        // if we don't need to re-calculate extra bookings we stop here..
-                        if (!calculateExtraBookings || timeBooking.parentId != null)
-                            return data;
-                        // otherwise create possible extra bookings
                         var extraTimeBookings = [];
-                        var ruleBasedTimeBookingDc = _this.container.ruleBasedTimeBookingDc;
-                        var timeBookingVm = new Business.TimeBookingVm(function () { return timeBooking; }, function () { return _this.container.timeBookingDc; });
-                        var extraTimeBookingVms = ruleBasedTimeBookingDc.getRuleBasedTimeBookings(timeBookingVm);
-                        var extraTimeBookingCms = extraTimeBookingVms.toEnumerable().select(function (t) { return t.toCm(); });
-                        extraTimeBookings.addRange(extraTimeBookingCms.toArray());
-                        // ..and save 'em
+                        if (!calculateExtraBookings)
+                            return data;
+                        data.forEach(function (timeBooking) {
+                            if (timeBooking.parentId != null)
+                                return;
+                            var ruleBasedTimeBookingDc = _this.container.ruleBasedTimeBookingDc;
+                            var timeBookingVm = new Business.TimeBookingVm(function () { return timeBooking; }, function () { return _this.container.timeBookingDc; });
+                            var extraTimeBookingVms = ruleBasedTimeBookingDc.getRuleBasedTimeBookings(timeBookingVm);
+                            var extraTimeBookingCms = extraTimeBookingVms.toEnumerable().select(function (t) { return t.toCm(); });
+                            extraTimeBookings.addRange(extraTimeBookingCms.toArray());
+                        });
                         if (extraTimeBookings.any())
                             return _this.repository.save(extraTimeBookings).then(function (extraTimeBookingsData) {
                                 // add previously saved time booking to the response
-                                extraTimeBookingsData.add(timeBooking);
+                                extraTimeBookingsData.addRange(data);
                                 return extraTimeBookingsData;
                             });
                         return data;
+                        //var timeBooking = data.first();
+                        //// if we don't need to re-calculate extra bookings we stop here..
+                        //if (!calculateExtraBookings || timeBooking.parentId != null)
+                        //  return data;
+                        //// otherwise create possible extra bookings
+                        //var extraTimeBookings: Data.ITimeBookingCm[] = [];
+                        //var ruleBasedTimeBookingDc = this.container.ruleBasedTimeBookingDc;
+                        //var timeBookingVm = new TimeBookingVm(() => timeBooking,() => this.container.timeBookingDc);
+                        //var extraTimeBookingVms = ruleBasedTimeBookingDc.getRuleBasedTimeBookings(timeBookingVm);
+                        //var extraTimeBookingCms = extraTimeBookingVms.toEnumerable().select(t => t.toCm());
+                        //extraTimeBookings.addRange(extraTimeBookingCms.toArray());
+                        //// ..and save 'em
+                        //if (extraTimeBookings.any())
+                        //  return this.repository.save(extraTimeBookings).then(extraTimeBookingsData => {
+                        //    // add previously saved time booking to the response
+                        //    extraTimeBookingsData.add(timeBooking);
+                        //    return extraTimeBookingsData;
+                        //  });
+                        //return data;
                     });
                 };
                 TimeBookingDataController.prototype.remove = function (id) {
@@ -4875,56 +4976,165 @@ var TimeRecorder;
         })(Business = Web.Business || (Web.Business = {}));
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
-// Update the most local relative references and declare this service.
 var TimeRecorder;
 (function (TimeRecorder) {
     var Web;
     (function (Web) {
         var Business;
         (function (Business) {
-            var DataControllerContainer = (function () {
-                function DataControllerContainer(expencesDc, expenceTypeDc, externalWorkReportDc, projectDc, ruleBasedTimeBookingDc, timeBookingDc, timeEntryTypeDc, timeSheetDc, employeeDc, peopleDc) {
-                    this.expencesDc = expencesDc;
-                    this.expenceTypeDc = expenceTypeDc;
-                    this.externalWorkReportDc = externalWorkReportDc;
-                    this.projectDc = projectDc;
-                    this.ruleBasedTimeBookingDc = ruleBasedTimeBookingDc;
-                    this.timeBookingDc = timeBookingDc;
-                    this.timeEntryTypeDc = timeEntryTypeDc;
-                    this.timeSheetDc = timeSheetDc;
-                    this.employeeDc = employeeDc;
-                    this.peopleDc = peopleDc;
+            var TimeEntryDataController = (function () {
+                function TimeEntryDataController($q, timeEntryRepo) {
+                    this.$q = $q;
+                    this.timeEntryRepo = timeEntryRepo;
                 }
-                DataControllerContainer.prototype.initialize = function () {
-                    this.expencesDc.container = this;
-                    this.expenceTypeDc.container = this;
-                    this.externalWorkReportDc.container = this;
-                    this.projectDc.container = this;
-                    this.ruleBasedTimeBookingDc.container = this;
-                    this.timeBookingDc.container = this;
-                    this.timeEntryTypeDc.container = this;
-                    this.timeSheetDc.container = this;
-                    this.employeeDc.container = this;
-                    this.peopleDc.container = this;
+                TimeEntryDataController.prototype.stop = function (employeeId, projectId, typeId) {
+                    var _this = this;
+                    var cm = {
+                        id: Triarc.generateGuid(),
+                        bookedTime: new Date(),
+                        employeeId: employeeId,
+                        projectId: projectId,
+                        simpleStampType: 2 /* Stop */,
+                        timeEntryTypeId: typeId,
+                        hasBooking: false
+                    };
+                    this.timeEntryRepo.createTimeStamp(cm).then(function () {
+                        _this.triggerBookingCreation(employeeId);
+                    }, function () {
+                    });
                 };
-                DataControllerContainer.serviceId = "$trDataControllerContainer";
-                DataControllerContainer.$inject = [
-                    Business.ExpenseDataController.serviceId,
-                    Business.ExpenseTypeDataController.serviceId,
-                    Business.ExternalWorkReportDataController.serviceId,
-                    Business.ProjectDataController.serviceId,
-                    Business.RuleBasedTimeBookingDataController.serviceId,
-                    Business.TimeBookingDataController.serviceId,
-                    Business.TimeEntryTypeDataController.serviceId,
-                    Business.TimeSheetDataController.serviceId,
-                    Business.EmployeeDataController.serviceId,
-                    Business.PeopleDataController.serviceId
-                ];
-                return DataControllerContainer;
+                TimeEntryDataController.prototype.start = function (employeeId, projectId, typeId) {
+                    var cm = {
+                        id: Triarc.generateGuid(),
+                        bookedTime: new Date(),
+                        employeeId: employeeId,
+                        projectId: projectId,
+                        simpleStampType: 1 /* Start */,
+                        timeEntryTypeId: typeId,
+                        hasBooking: false
+                    };
+                    this.timeEntryRepo.createTimeStamp(cm);
+                };
+                TimeEntryDataController.prototype.triggerBookingCreation = function (employeeId) {
+                    var _this = this;
+                    this.timeEntryRepo.getUnbookedTimeEntries(employeeId).then(function (entries) {
+                        var bookings = _this.generateBookingsFromTimeEntries(entries);
+                        console.log(bookings);
+                        _this.container.timeEntryTypeDc.ensureLoaded().then(function () {
+                            _this.container.timeBookingDc.saveMultiple(bookings, true);
+                        }, function () {
+                        });
+                    }, function () {
+                    });
+                };
+                TimeEntryDataController.prototype.generateBookingsFromTimeEntries = function (unbookedEntries) {
+                    var _this = this;
+                    if (unbookedEntries.length === 0)
+                        return [];
+                    var bookings = [];
+                    var currentStartEntry = null;
+                    unbookedEntries.forEach(function (currentEntry) {
+                        if (currentEntry.simpleStampType === 1 /* Start */) {
+                            if (currentStartEntry != null && currentStartEntry.projectId === currentEntry.projectId) {
+                                currentEntry.simpleStampType = 3 /* StartError */;
+                                return;
+                            }
+                        }
+                        else if (currentEntry.simpleStampType === 2 /* Stop */) {
+                            if (currentStartEntry == null) {
+                                currentEntry.simpleStampType = 4 /* StopError */;
+                                return;
+                            }
+                        }
+                        else {
+                            return;
+                        }
+                        if (currentStartEntry != null) {
+                            bookings.push(_this.createBooking(currentStartEntry, currentEntry));
+                            currentStartEntry = null;
+                        }
+                        if (currentEntry.simpleStampType === 1 /* Start */) {
+                            currentStartEntry = currentEntry;
+                        }
+                    });
+                    console.log('bookings before breaking up', bookings);
+                    return this.breakMultidayBookings(bookings);
+                };
+                TimeEntryDataController.prototype.breakMultidayBookings = function (bookings) {
+                    var _this = this;
+                    var brokenBookings = [];
+                    bookings.forEach(function (b) {
+                        if (!_this.areOnSameDate(b.start, b.stop)) {
+                            var currentBooking = b;
+                            while (_this.isOnAPreviousDay(currentBooking.start, currentBooking.stop)) {
+                                var nextBooking = _this.copyBooking(currentBooking);
+                                nextBooking.stop = moment(nextBooking.start).startOf('day').add(86399000, 'ms').toDate();
+                                brokenBookings.push(nextBooking);
+                                currentBooking.start = moment(nextBooking.start).startOf('day').add(1, 'd').toDate();
+                                if (currentBooking.fromSourceId != null) {
+                                    nextBooking.fromSourceId = currentBooking.fromSourceId;
+                                    currentBooking.fromSourceId = null;
+                                }
+                                console.log(nextBooking, currentBooking);
+                            }
+                            brokenBookings.push(currentBooking);
+                        }
+                        else {
+                            brokenBookings.push(b);
+                        }
+                    });
+                    return brokenBookings;
+                };
+                TimeEntryDataController.prototype.createBooking = function (startEntry, endEntry) {
+                    startEntry.hasBooking = true;
+                    endEntry.hasBooking = true;
+                    return {
+                        id: Triarc.generateGuid(),
+                        comment: "",
+                        confirmed: false,
+                        employeeId: startEntry.employeeId,
+                        projectId: startEntry.projectId,
+                        externalWorkReportId: null,
+                        parentId: null,
+                        start: startEntry.bookedTime,
+                        timeEntryTypeId: startEntry.timeEntryTypeId,
+                        state: 1 /* Complete */,
+                        stop: endEntry.bookedTime,
+                        timestamp: new Date().getMilliseconds(),
+                        fromSourceId: startEntry.id,
+                        toSourceId: endEntry.id
+                    };
+                };
+                TimeEntryDataController.prototype.copyBooking = function (booking) {
+                    return {
+                        id: Triarc.generateGuid(),
+                        comment: "",
+                        confirmed: false,
+                        employeeId: booking.employeeId,
+                        projectId: booking.projectId,
+                        externalWorkReportId: null,
+                        parentId: null,
+                        start: booking.start,
+                        timeEntryTypeId: booking.timeEntryTypeId,
+                        state: 1 /* Complete */,
+                        stop: booking.stop,
+                        timestamp: new Date().getMilliseconds(),
+                        fromSourceId: '',
+                        toSourceId: ''
+                    };
+                };
+                TimeEntryDataController.prototype.areOnSameDate = function (dateTime1, dateTime2) {
+                    return moment(dateTime1).isSame(dateTime2, "day");
+                };
+                TimeEntryDataController.prototype.isOnAPreviousDay = function (dateTime1, dateTime2) {
+                    return moment(dateTime1).isBefore(dateTime2, 'day');
+                };
+                TimeEntryDataController.serviceId = "$trTimeEntryDataController";
+                TimeEntryDataController.$inject = ['$q', Business.TimeEntryRepository.serviceId];
+                return TimeEntryDataController;
             })();
-            Business.DataControllerContainer = DataControllerContainer;
-            // declare correct angularjs module
-            timeRecorder.service(DataControllerContainer.serviceId, DataControllerContainer).run([DataControllerContainer.serviceId, function (container) { return container.initialize(); }]);
+            Business.TimeEntryDataController = TimeEntryDataController;
+            timeRecorder.service(TimeEntryDataController.serviceId, TimeEntryDataController);
         })(Business = Web.Business || (Web.Business = {}));
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
@@ -4961,6 +5171,8 @@ var TimeRecorder;
                     var entity = timeBooking.clone();
                     var start = moment(entity.start);
                     var end = moment(entity.stop);
+                    entity.fromSourceId = null;
+                    entity.toSourceId = null;
                     entity.comment = "";
                     entity.parentId = timeBooking.id;
                     entity.typeId = timeEntryType.id;
@@ -5112,6 +5324,62 @@ var TimeRecorder;
         })(Business = Web.Business || (Web.Business = {}));
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
+// Update the most local relative references and declare this service.
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var DataControllerContainer = (function () {
+                function DataControllerContainer(expencesDc, expenceTypeDc, externalWorkReportDc, projectDc, ruleBasedTimeBookingDc, timeBookingDc, timeEntryTypeDc, timeSheetDc, employeeDc, peopleDc, timeEntryDc) {
+                    this.expencesDc = expencesDc;
+                    this.expenceTypeDc = expenceTypeDc;
+                    this.externalWorkReportDc = externalWorkReportDc;
+                    this.projectDc = projectDc;
+                    this.ruleBasedTimeBookingDc = ruleBasedTimeBookingDc;
+                    this.timeBookingDc = timeBookingDc;
+                    this.timeEntryTypeDc = timeEntryTypeDc;
+                    this.timeSheetDc = timeSheetDc;
+                    this.employeeDc = employeeDc;
+                    this.peopleDc = peopleDc;
+                    this.timeEntryDc = timeEntryDc;
+                }
+                DataControllerContainer.prototype.initialize = function () {
+                    this.expencesDc.container = this;
+                    this.expenceTypeDc.container = this;
+                    this.externalWorkReportDc.container = this;
+                    this.projectDc.container = this;
+                    this.ruleBasedTimeBookingDc.container = this;
+                    this.timeBookingDc.container = this;
+                    this.timeEntryTypeDc.container = this;
+                    this.timeSheetDc.container = this;
+                    this.employeeDc.container = this;
+                    this.peopleDc.container = this;
+                    this.timeEntryDc.container = this;
+                };
+                DataControllerContainer.serviceId = "$trDataControllerContainer";
+                DataControllerContainer.$inject = [
+                    Business.ExpenseDataController.serviceId,
+                    Business.ExpenseTypeDataController.serviceId,
+                    Business.ExternalWorkReportDataController.serviceId,
+                    Business.ProjectDataController.serviceId,
+                    Business.RuleBasedTimeBookingDataController.serviceId,
+                    Business.TimeBookingDataController.serviceId,
+                    Business.TimeEntryTypeDataController.serviceId,
+                    Business.TimeSheetDataController.serviceId,
+                    Business.EmployeeDataController.serviceId,
+                    Business.PeopleDataController.serviceId,
+                    Business.TimeEntryDataController.serviceId
+                ];
+                return DataControllerContainer;
+            })();
+            Business.DataControllerContainer = DataControllerContainer;
+            // declare correct angularjs module
+            timeRecorder.service(DataControllerContainer.serviceId, DataControllerContainer).run([DataControllerContainer.serviceId, function (container) { return container.initialize(); }]);
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
 /// <reference path="rulebasedtimebookingdatacontroller.ts" />
 /// <reference path="timesheetdatacontroller.ts" />
 /// <reference path="expensetypedatacontroller.ts" />
@@ -5122,7 +5390,7 @@ var TimeRecorder;
 /// <reference path="timebookingdatacontroller.ts" />
 /// <reference path="timeentrytypedatacontroller.ts" />
 /// <reference path="externalworkreportdatacontroller.ts" />
-/// <reference path="datacontrollercontainer.ts" />
+/// <reference path="timeentrydatacontroller.ts" />
 /// <reference path="rulebasedtimebooking/itimebookingrule.ts" />
 /// <reference path="rulebasedtimebooking/timebasedbookingrule.ts" />
 /// <reference path="rulebasedtimebooking/sundaytimebookingrule.ts" />
@@ -5130,6 +5398,9 @@ var TimeRecorder;
 /// <reference path="rulebasedtimebooking/nighttimemorningbookingrule.ts" />
 /// <reference path="rulebasedtimebooking/overtimebookingrule.ts" />
 /// <reference path="rulebasedtimebooking/staturdaytimebookingrule.ts" />
+// data controller container
+// put all data controller references above this declaration or you will not be able to include it in the contiainer!
+/// <reference path="datacontrollercontainer.ts" /> 
 var TimeRecorder;
 (function (TimeRecorder) {
     var Web;
@@ -7307,8 +7578,6 @@ var TimeRecorder;
                 this.$stateParams = $stateParams;
                 this.pendingConfirmedTimeBookings = [];
                 this.weekdayDuration = [];
-                // current search result
-                this.timeBookingsOfWeek = [];
                 // form values
                 this.stateValue = null;
                 this.typeValue = null;
@@ -7340,10 +7609,9 @@ var TimeRecorder;
             // initialize view
             TimeBookingController.prototype.init = function () {
                 var _this = this;
-                this.$scope.$on(Web.TimeBookingFormController.changeEventId, function () { return _this.search(); });
+                this.$scope.$on(Web.TimeBookingFormController.changeEventId, function () { return _this.search(true); });
                 this.$scope.$watch("ctrl.filterHeaderDate.date", function () {
-                    _this.isLoading = true;
-                    _this.search();
+                    _this.search(false);
                 }, true);
             };
             TimeBookingController.prototype.hasData = function () {
@@ -7409,18 +7677,29 @@ var TimeRecorder;
             TimeBookingController.prototype.getIsExtraBooking = function (timeBooking) {
                 return this.timeBookingDataController.getIsExtraBooking(timeBooking);
             };
-            TimeBookingController.prototype.getTimeRange = function (unitOfTime, weekday) {
-                if (weekday === void 0) { weekday = null; }
+            TimeBookingController.prototype.getWeekRange = function () {
+                // our first day of the week is monday not sunday
                 var date = moment(this.filterHeaderDate.date);
-                if (weekday != null)
-                    date = date.day(weekday);
                 return {
-                    from: date.startOf(unitOfTime).toDate(),
-                    to: date.clone().endOf(unitOfTime).toDate()
+                    from: date.clone().startOf("week").add(1, "day").toDate(),
+                    to: date.clone().endOf("week").add(1, "day").toDate()
+                };
+            };
+            TimeBookingController.prototype.getDayRange = function (weekday) {
+                var date = moment(this.filterHeaderDate.date).add(-1, "day").day(weekday);
+                // sunday is our last day of the week and not the first one
+                if (weekday === 0)
+                    date.add(1, "week");
+                return {
+                    from: date.clone().startOf("day").toDate(),
+                    to: date.clone().endOf("day").toDate()
                 };
             };
             TimeBookingController.prototype.getSearchParams = function () {
-                var timeRange = this.getTimeRange("week");
+                var timeRange = this.getWeekRange();
+                console.log(timeRange.from);
+                console.log(timeRange.to);
+                console.log("??????????????");
                 return {
                     person: "",
                     state: this.getStateById(this.stateValue),
@@ -7430,7 +7709,7 @@ var TimeRecorder;
                 };
             };
             TimeBookingController.prototype.getTimeBookingsForDay = function (result, weekday) {
-                var dayRange = this.getTimeRange("day", weekday);
+                var dayRange = this.getDayRange(weekday);
                 var rangeStartTime = dayRange.from.getTime();
                 var rangeEndTime = dayRange.to.getTime();
                 var entries = result.where(function (t) { return t.parentId == null && t.start.getTime() <= rangeEndTime && t.stop.getTime() >= rangeStartTime; }).orderBy(function (t) { return t.start; }).select(function (t) { return {
@@ -7443,32 +7722,78 @@ var TimeRecorder;
                     duration: entries.sum(function (t) { return t.entry.stop.getTime() - t.entry.start.getTime(); })
                 };
             };
+            TimeBookingController.prototype.getTotalFormat = function (duration) {
+                var secs = duration / 1000;
+                var minutes = Math.round((secs / 60) % 60);
+                //var hours = Math.floor((secs / 3600) % 24);
+                var hours = Math.floor(secs / 3600);
+                return (("00" + hours).slice(-2) + ":" + (("00" + minutes).slice(-2)));
+            };
             // search
-            TimeBookingController.prototype.search = function () {
+            TimeBookingController.prototype.search = function (forceReload) {
                 var _this = this;
+                this.getWeekTimeBookings(forceReload).then(function (timeBookings) {
+                    var currentDay = _this.filterHeaderDate.date.getDay();
+                    _this.timeBookingsOfWeek = timeBookings;
+                    var totalTime = 0;
+                    var days = [1, 2, 3, 4, 5, 6, 0];
+                    for (var i = 0; i < days.length; i++) {
+                        var day = days[i];
+                        var timeBookingsOfDay = _this.getTimeBookingsForDay(_this.timeBookingsOfWeek, day);
+                        var timeRange = _this.getDayRange(day);
+                        console.log(timeRange.from);
+                        console.log(timeRange.to);
+                        console.log("*************");
+                        _this.weekdayDuration[day] = moment.utc(timeBookingsOfDay.duration).format("HH:mm");
+                        totalTime += timeBookingsOfDay.duration;
+                        if (day === currentDay) {
+                            _this.timeBookingsOfDay = timeBookingsOfDay;
+                        }
+                    }
+                    _this.totalDuration = _this.getTotalFormat(totalTime);
+                });
+            };
+            TimeBookingController.prototype.getStartOfWeek = function (date) {
+                var currentDate = moment(date);
+                if (currentDate.day() === 0)
+                    currentDate.add(-1, "day");
+                return currentDate.startOf("week");
+            };
+            TimeBookingController.prototype.getWeekTimeBookingsAlreadyLoaded = function () {
+                if (this.timeBookingsOfWeek == null || !this.timeBookingsOfWeek.any())
+                    return false;
+                var timeBooking = this.timeBookingsOfWeek.firstOrDefault();
+                var timeBookingStart = this.getStartOfWeek(timeBooking.start);
+                var timeBookingEnd = this.getStartOfWeek(timeBooking.stop);
+                var currentDateTime = this.getStartOfWeek(this.filterHeaderDate.date);
+                return currentDateTime.isSame(timeBookingStart) || currentDateTime.isSame(timeBookingEnd);
+            };
+            TimeBookingController.prototype.getWeekTimeBookings = function (forceReload) {
+                var _this = this;
+                var q = this.$q.defer();
+                if (this.getWeekTimeBookingsAlreadyLoaded() && !forceReload) {
+                    // data already loaded
+                    q.resolve(this.timeBookingsOfWeek);
+                    return q.promise;
+                }
+                // load data from repository
+                this.isLoading = true;
                 var params = this.getSearchParams();
-                return this.timeBookingDataController.search(params).then(function (data) {
+                this.timeBookingDataController.search(params).then(function (data) {
                     var enumerable = data.toEnumerable();
                     var projectIds = enumerable.select(function (t) { return t.projectId; });
                     _this.projectDataController.getProjectsById(projectIds.toArray()).then(function (projects) {
                         var employeeIds = enumerable.select(function (t) { return t.employeeId; });
                         _this.employeeDataController.getByIds(employeeIds.toArray()).then(function (employees) {
-                            var result = _this.resolveTimeBookingData(data, projects, employees);
-                            var currentDay = _this.filterHeaderDate.date.getDay();
-                            var totalTime = 0;
-                            for (var day = 0; day < 7; day++) {
-                                var timeBookingsOfDay = _this.getTimeBookingsForDay(result, day);
-                                _this.weekdayDuration[day] = moment.utc(timeBookingsOfDay.duration).format("HH:mm");
-                                totalTime += timeBookingsOfDay.duration;
-                                if (day === currentDay)
-                                    _this.timeBookingsOfDay = timeBookingsOfDay;
-                            }
-                            _this.totalDuration = moment.utc(totalTime).format("HH:mm");
+                            var timeBookigs = _this.resolveTimeBookingData(data, projects, employees);
                             _this.isLoading = false;
+                            q.resolve(timeBookigs);
                         });
                     });
                 }, function () {
+                    q.reject();
                 });
+                return q.promise;
             };
             TimeBookingController.prototype.resolveTimeBookingData = function (data, projects, employees) {
                 if (data != null && projects != null && employees != null) {
