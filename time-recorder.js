@@ -895,6 +895,30 @@ var TimeRecorder;
                     var request = this.getAllLocationsMultipleRequest(params);
                     return this.$requestSender.requestValue(request);
                 };
+                ProjectResource.prototype.getProjectsForEmployeeMultipleRequest = function (params) {
+                    var url = this.$requestSender.getUrl('$tr-proxy') + "/Project/GetProjectsForEmployee";
+                    if (angular.isDefined(params.employeeId)) {
+                        url = Triarc.Data.appendUrlParameter(url, "employeeId", encodeURIComponent(params.employeeId));
+                    }
+                    if (angular.isDefined(params.$skip)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$skip", encodeURIComponent(params.$skip));
+                    }
+                    if (angular.isDefined(params.$top)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$top", encodeURIComponent(params.$top));
+                    }
+                    if (angular.isDefined(params.$orderBy)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$orderBy", encodeURIComponent(params.$orderBy));
+                    }
+                    if (angular.isDefined(params.$filter)) {
+                        url = Triarc.Data.appendUrlParameter(url, "$filter", encodeURIComponent(params.$filter));
+                    }
+                    var dataRequest = new Triarc.Data.DataRequest("GET", url, {}, "Project", "IProjectCm[]", false);
+                    return dataRequest;
+                };
+                ProjectResource.prototype.getProjectsForEmployeeMultiple = function (params) {
+                    var request = this.getProjectsForEmployeeMultipleRequest(params);
+                    return this.$requestSender.requestValue(request);
+                };
                 ProjectResource.prototype.searchProjectsMultipleRequest = function (params) {
                     var url = this.$requestSender.getUrl('$tr-proxy') + "/Project/SearchProjects";
                     if (angular.isDefined(params.searchValue)) {
@@ -3869,6 +3893,13 @@ var TimeRecorder;
                     enumerable: true,
                     configurable: true
                 });
+                Object.defineProperty(TimeEntryTypeVm.prototype, "abbreviation", {
+                    get: function () {
+                        return this.cm().abbreviation;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 return TimeEntryTypeVm;
             })();
             Business.TimeEntryTypeVm = TimeEntryTypeVm;
@@ -4961,6 +4992,21 @@ var TimeRecorder;
                             _this.timeEntryTypesMap.set(cm.id, new Business.TimeEntryTypeVm(function () { return cm; }));
                         });
                     });
+                };
+                TimeEntryTypeDataController.prototype.getTimeEntryTypeForAbbreviation = function (abbreviation) {
+                    var _this = this;
+                    var q = this.$q.defer();
+                    this.ensureLoaded().then(function () {
+                        var type = null;
+                        _this.timeEntryTypesMap.getValues().forEach(function (t) {
+                            if (t.abbreviation === abbreviation)
+                                type = t;
+                        });
+                        q.resolve(type);
+                    }, function () {
+                        q.reject();
+                    });
+                    return q.promise;
                 };
                 TimeEntryTypeDataController.prototype.getTimeEntryTypesMap = function () {
                     return this.timeEntryTypesMap;
