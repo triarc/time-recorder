@@ -3937,6 +3937,9 @@ var TimeRecorder;
                     get: function () {
                         return this.cm().contactSignatureImageTimestamp;
                     },
+                    set: function (date) {
+                        this.cm().contactSignatureImageTimestamp = date;
+                    },
                     enumerable: true,
                     configurable: true
                 });
@@ -6248,9 +6251,7 @@ var TimeRecorder;
     var Web;
     (function (Web) {
         var TrServiceContainer = (function () {
-            function TrServiceContainer($q, $translate, $location, $anchorScroll, $state, $stateParams, $modal, $locale, $timeout, blockUi, pageLock, 
-                //  public $auth: AuthenticationService,
-                $proxy, $filter, $templateCache) {
+            function TrServiceContainer($q, $translate, $location, $anchorScroll, $state, $stateParams, $modal, $locale, $timeout, blockUi, pageLock, $auth, $proxy, $filter, $templateCache) {
                 this.$q = $q;
                 this.$translate = $translate;
                 this.$location = $location;
@@ -6262,6 +6263,7 @@ var TimeRecorder;
                 this.$timeout = $timeout;
                 this.blockUi = blockUi;
                 this.pageLock = pageLock;
+                this.$auth = $auth;
                 this.$proxy = $proxy;
                 this.$filter = $filter;
                 this.$templateCache = $templateCache;
@@ -6300,6 +6302,7 @@ var TimeRecorder;
                 '$timeout',
                 'blockUI',
                 Triarc.PageLock.PageLockService.serviceId,
+                Web.AuthenticationService.serviceId,
                 '$tr-proxy',
                 '$filter',
                 "$templateCache"
@@ -9125,10 +9128,16 @@ var TimeRecorder;
                 // Clone index.html, modify it so that a work report can be created on the server.
                 this.setContactSignatureImage = function (image) {
                     _this.contactSignatureImage = image;
+                    if (Triarc.hasNoValue(image)) {
+                        _this.workReport.externalWorkReport.contactSignatureImageTimestamp = null;
+                    }
                 };
                 this.requiredDataQ = this.$services.$q.all([
                     this.dataControllers.timeEntryTypeDc.ensureLoaded(),
-                    this.dataControllers.projectDc.loadProjectTypes()
+                    this.dataControllers.projectDc.loadProjectTypes(),
+                    this.$services.$auth.getAppUser().then(function (appUser) {
+                        _this.currentEmployee = appUser.person;
+                    })
                 ]);
                 this.$scope.$on(this.saveContactEvent, function (evt, saveEvt) {
                     _this.loadContactsForClient(_this.associatedClient.id).then(function () {
@@ -9718,19 +9727,19 @@ var TimeRecorder;
             FilterHeaderController.prototype.getDayName = function (day) {
                 switch (day) {
                     case 0:
-                        return "Sunday";
+                        return "Sonntag";
                     case 1:
-                        return "Monday";
+                        return "Montag";
                     case 2:
-                        return "Tuesday";
+                        return "Dienstag";
                     case 3:
-                        return "Wednesday";
+                        return "Mittwoch";
                     case 4:
-                        return "Thursday";
+                        return "Donnerstag";
                     case 5:
-                        return "Friday";
+                        return "Freitag";
                     case 6:
-                        return "Saturday";
+                        return "Samstag";
                 }
                 return "";
             };
@@ -10075,12 +10084,12 @@ sig.directive("tlSignature", [
 
 
   $templateCache.put('Client/Views/employee/contactDetails.html',
-    "<div ng-controller=\"TrContactDetailsController as ctrl\"><form name=\"contactForm\" class=\"form-horizontal\" novalidate><div class=\"row\"><div class=\"col-xs-8\"><div class=\"row\"><tl-validate target=\"contactForm.firstName\" label-text=\"'Vorname' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><input class=\"form-control\" name=\"firstName\" type=\"text\" ng-model=\"ctrl.contact.firstName\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.lastName\" label-text=\"'Nachname' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><input class=\"form-control\" name=\"lastName\" type=\"text\" ng-model=\"ctrl.contact.lastName\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.email\" label-text=\"'Email' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><input class=\"form-control\" name=\"lastName\" type=\"text\" ng-model=\"ctrl.contact.email\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.telephone\" label-text=\"'Telefon' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"telephone\" type=\"text\" ng-model=\"ctrl.contact.telephone\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.street\" label-text=\"'Street' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"street\" type=\"text\" ng-model=\"ctrl.contact.street\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.streetNumber\" label-text=\"'Street Number' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"street\" type=\"text\" ng-model=\"ctrl.contact.streetNumber\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.city\" label-text=\"'City' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"city\" type=\"text\" ng-model=\"ctrl.contact.city\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.country\" label-text=\"'Country' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"country\" type=\"text\" ng-model=\"ctrl.contact.country\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.countryCode\" label-text=\"'Country Code' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"countryCode\" type=\"text\" ng-model=\"ctrl.contact.countryCode\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn btn-default pull-left\" ng-click=\"side.close()\">Zurück</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.save();\">Speichern</div></div></div></div></div></form></div>"
+    "<div ng-controller=\"TrContactDetailsController as ctrl\"><form name=\"contactForm\" class=\"form-horizontal\" novalidate><div class=\"row\"><div class=\"col-xs-8\"><div class=\"row\"><tl-validate target=\"contactForm.firstName\" label-text=\"'Vorname' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><input class=\"form-control\" name=\"firstName\" type=\"text\" ng-model=\"ctrl.contact.firstName\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.lastName\" label-text=\"'Nachname' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><input class=\"form-control\" name=\"lastName\" type=\"text\" ng-model=\"ctrl.contact.lastName\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.email\" label-text=\"'Email' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><input class=\"form-control\" name=\"lastName\" type=\"text\" ng-model=\"ctrl.contact.email\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.telephone\" label-text=\"'Telefon' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"telephone\" type=\"text\" ng-model=\"ctrl.contact.telephone\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.street\" label-text=\"'Strasse' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"street\" type=\"text\" ng-model=\"ctrl.contact.street\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.streetNumber\" label-text=\"'Nummer' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"street\" type=\"text\" ng-model=\"ctrl.contact.streetNumber\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.city\" label-text=\"'Stadt' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"city\" type=\"text\" ng-model=\"ctrl.contact.city\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.country\" label-text=\"'Land' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"country\" type=\"text\" ng-model=\"ctrl.contact.country\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"contactForm.countryCode\" label-text=\"'PLZ' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><input class=\"form-control\" name=\"countryCode\" type=\"text\" ng-model=\"ctrl.contact.countryCode\"></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn btn-default pull-left\" ng-click=\"side.close()\">Abbrechen</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.save();\">Speichern</div></div></div></div></div></form></div>"
   );
 
 
   $templateCache.put('Client/Views/employee/createExternalWorkReport.html',
-    "<div ng-controller=\"TrCreateExternalWorkReportController as ctrl\" block-ui=\"fetchingData\"><div class=\"row\"><ui-select ng-model=\"ctrl.selectedProject\" ng-change=\"ctrl.fetchAssociations($select.selected)\" class=\"col-md-9\"><ui-select-match placeholder=\"{{'_select' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"project in ctrl.searchedProjects track by $index\" refresh=\"ctrl.searchProjects($select.search)\"><div ng-bind-html=\"project.name | highlight: $select.search\"></div><small><span class=\"detail\"><span translate>ExtNumer</span>&#58; <span ng-bind-html=\"project.externalNumber | highlight: $select.search\">\"></span></span> <span class=\"detail\"><span translate>Description</span>&#58; <span ng-bind-html=\"project.description | highlight: $select.search\">\"></span></span></small></ui-select-choices></ui-select></div><div class=\"row\"><div>{{ctrl.associatedClient.name}}</div></div><div class=\"row\"><div class=\"col-md-4\"><span translate>Dauer</span></div><div class=\"col-md-4\">{{ctrl.selectedProject.timeBookingFrom | date:'dd.MM.yyyy'}}&mdash;{{ctrl.selectedProject.timeBookingTo | date:'dd.MM.yyyy'}}</div></div><div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn btn-default pull-left\" ng-click=\"side.close()\">Zurück</div><div class=\"pull-left\">&nbsp;</div><div ng-show=\"ctrl.selectedProject\" class=\"btn btn-default pull-left\" ng-click=\"ctrl.next();\">Offen</div></div></div></div>"
+    "<div ng-controller=\"TrCreateExternalWorkReportController as ctrl\" block-ui=\"fetchingData\"><div class=\"row\"><ui-select ng-model=\"ctrl.selectedProject\" ng-change=\"ctrl.fetchAssociations($select.selected)\" class=\"col-md-9\"><ui-select-match placeholder=\"{{'_select' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"project in ctrl.searchedProjects track by $index\" refresh=\"ctrl.searchProjects($select.search)\"><div ng-bind-html=\"project.name | highlight: $select.search\"></div><small><span class=\"detail\"><span translate>Aba Projekt Nr.</span>&#58; <span ng-bind-html=\"project.externalNumber | highlight: $select.search\">\"></span></span> <span class=\"detail\"><span translate>Beschreibung</span>&#58; <span ng-bind-html=\"project.description | highlight: $select.search\">\"></span></span></small></ui-select-choices></ui-select></div><div class=\"row\"><label>Kunde:</label><div>{{ctrl.associatedClient.name}}</div></div><div class=\"row\"><div class=\"col-md-4\"><span translate>Dauer:</span></div><div class=\"col-md-4\">{{ctrl.selectedProject.timeBookingFrom | date:'dd.MM.yyyy'}}&mdash;{{ctrl.selectedProject.timeBookingTo | date:'dd.MM.yyyy'}}</div></div><div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn btn-default pull-left\" ng-click=\"side.close()\">Zurück</div><div class=\"pull-left\">&nbsp;</div><div ng-show=\"ctrl.selectedProject\" class=\"btn btn-default pull-left\" ng-click=\"ctrl.next();\">Öffnen</div></div></div></div>"
   );
 
 
@@ -10091,13 +10100,13 @@ sig.directive("tlSignature", [
     "\n" +
     "    <div class=\"col-xs-1 col-md-offset-10\">\r" +
     "\n" +
-    "      <button class=\"btn btn-success hidden-from-print\" ng-if=\"ctrl.reportIsOpen(ctrl.workReport.externalWorkReport)\" ng-click=\"ctrl.cancel()\" translate>Cancel</button>\r" +
+    "      <button class=\"btn btn-success hidden-from-print\" ng-if=\"ctrl.reportIsOpen(ctrl.workReport.externalWorkReport)\" ng-click=\"ctrl.cancel()\" translate>Abbrechen</button>\r" +
     "\n" +
     "    </div>\r" +
     "\n" +
     "    <div class=\"col-xs-1\">\r" +
     "\n" +
-    "      <button class=\"btn btn-success hidden-from-print\" ng-if=\"ctrl.reportIsOpen(ctrl.workReport.externalWorkReport)\" ng-click=\"ctrl.save()\" translate>Save</button>\r" +
+    "      <button class=\"btn btn-success hidden-from-print\" ng-if=\"ctrl.reportIsOpen(ctrl.workReport.externalWorkReport)\" ng-click=\"ctrl.save()\" translate>Speichern</button>\r" +
     "\n" +
     "    </div>\r" +
     "\n" +
@@ -10129,7 +10138,7 @@ sig.directive("tlSignature", [
     "\n" +
     "        <div class=\"col-xs-2\">\r" +
     "\n" +
-    "          <label translate=\"Projektname\"></label>\r" +
+    "          <label translate=\"Auftrag\"></label>\r" +
     "\n" +
     "        </div>\r" +
     "\n" +
@@ -10255,7 +10264,7 @@ sig.directive("tlSignature", [
     "\n" +
     "              <div class=\"row avoid-page-break\" ng-repeat=\"group in dayContainer.timeBookingGroups | orderBy:'from'\">\r" +
     "\n" +
-    "                <div class=\"col-xs-12\" >\r" +
+    "                <div class=\"col-xs-12\">\r" +
     "\n" +
     "                  <div class=\"row tr-list-item timebooking-list-item confirmed-timebooking\">\r" +
     "\n" +
@@ -10323,7 +10332,7 @@ sig.directive("tlSignature", [
     "\n" +
     "            <input type=\"checkbox\" class=\"\" ng-disabled=\"!ctrl.reportIsOpen(ctrl.workReport.externalWorkReport)\" ng-model=\"ctrl.workReport.externalWorkReport.warrenty\">\r" +
     "\n" +
-    "            Garentteantrag\r" +
+    "            Garantieantrag\r" +
     "\n" +
     "          </label>\r" +
     "\n" +
@@ -10401,7 +10410,7 @@ sig.directive("tlSignature", [
     "\n" +
     "        <div class=\"col-xs-6\">\r" +
     "\n" +
-    "          <label>{{app.appUser.person.firstName + ' ' + app.appUser.person.lastName}}</label>\r" +
+    "          <label>{{ctrl.currentEmployee.firstName + ' ' + ctrl.currentEmployee.lastName}}</label>\r" +
     "\n" +
     "        </div>\r" +
     "\n" +
@@ -10497,6 +10506,22 @@ sig.directive("tlSignature", [
     "\n" +
     "      </div>\r" +
     "\n" +
+    "      <div class=\"row\">\r" +
+    "\n" +
+    "        <div class=\"col-xs-6\">\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "        <div class=\"col-xs-6\">\r" +
+    "\n" +
+    "          <label ng-show=\"ctrl.workReport.externalWorkReport.contactSignatureImageTimestamp\">Datum: {{ctrl.workReport.externalWorkReport.contactSignatureImageTimestamp | date:'dd.MM.yyyy HH:mm'}}</label>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "      </div>\r" +
+    "\n" +
     "    </div>\r" +
     "\n" +
     "  </div></script>"
@@ -10504,12 +10529,12 @@ sig.directive("tlSignature", [
 
 
   $templateCache.put('Client/Views/employee/employeeSearchWorkReport.html',
-    "<div id=\"workReport\" ng-controller=\"TrSearchWorkReportController as ctrl\" class=\"search-work-report\"><ui-view class=\"detail-slide\"></ui-view><h2>Arbeitsrapport</h2><hr><div class=\"row\"><form class=\"col-md-12\" ng-submit=\"ctrl.search()\"><div class=\"row\"><div class=\"col-md-3\" ng-if=\"app.appUser.isAdmin\"><ui-select ng-change=\"ctrl.employeeSelected()\" ng-model=\"ctrl.selectedEmployee\"><ui-select-match placeholder=\"{{'_select' | translate}}\">{{$select.selected.firstName + ' ' + $select.selected.lastName}}</ui-select-match><ui-select-choices repeat=\"employee in ctrl.searchedEmployees track by $index\" refresh=\"ctrl.searchEmployees($select.search)\"><div ng-bind-html=\"employee.firstName + ' ' + employee.lastName | highlight: $select.search\"></div></ui-select-choices></ui-select></div><div class=\"col-md-3\"><ui-select ng-change=\"ctrl.projectSelected()\" ng-model=\"ctrl.selectedProject\"><ui-select-match placeholder=\"{{'Projekt' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"project in ctrl.searchedProjects track by $index\" refresh=\"ctrl.searchProjects($select.search)\"><div ng-bind-html=\"project.name | highlight: $select.search\"></div></ui-select-choices></ui-select></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Von\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup ng-model=\"ctrl.searchService.from\" is-open=\"ctrl.datePickerStates['from']\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openDatepicker($event, 'from')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Bis\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup ng-model=\"ctrl.searchSerivce.to\" is-open=\"ctrl.datePickerStates['to']\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openDatepicker($event, 'to')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><ui-select ng-model=\"ctrl.searchService.state\"><ui-select-match placeholder=\"{{'_select' | translate}}\"><span translate>{{$select.selected | tlEnum:'TimeRecorder.Web.Data.EWorkReportState' | translate}}</span><!--<span translate>{{$select.selected | translate}}</span>--></ui-select-match><ui-select-choices repeat=\"state in (states | tlEnumOrdinals:'TimeRecorder.Web.Data.EWorkReportState')\"><span translate>{{state | tlEnum:'TimeRecorder.Web.Data.EWorkReportState'}}</span></ui-select-choices></ui-select></div></div><div class=\"row\"><div class=\"col-md-1\"><button type=\"submit\" class=\"btn btn-default\">Suchen</button></div><div class=\"col-md-1\"><button ui-sref=\"tr.employeeWorkReport.search.side.createExternalWorkReport\" class=\"btn btn-default\"><i class=\"glyphicon glyphicon-plus\"></i><span>Erstellen</span></button></div></div></form></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"></div><div class=\"row\"><div class=\"col-md-12 tr-list-head\"><div class=\"row\"><div class=\"col-md-1\" ng-if=\"app.appUser.isAdmin\">Person</div><div class=\"col-md-3\">Projekt</div><div class=\"col-md-2\">Von</div><div class=\"col-md-2\">Bis</div><div class=\"col-md-2\">State</div><div class=\"col-md-1\"></div></div></div><div infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\" class=\"tr-list\"><div ng-repeat=\"externalWorkReport in ctrl.searchResults\" class=\"col-md-12 tr-list-item\" ng-style=\"{'background': ctrl.getBookingBackground(externalWorkReport) }\"><div class=\"row\"><div class=\"col-md-1 tr-ellipsis\" ng-if=\"app.appUser.isAdmin\">{{externalWorkReport.employee.fullName}}</div><div class=\"col-md-3 tr-ellipsis\">{{externalWorkReport.project.name}}({{externalWorkReport.project.externalNumber}})</div><div class=\"col-md-2\">{{externalWorkReport.from | date : 'dd.MM.yyyy - H:mm'}}</div><div class=\"col-md-2\">{{externalWorkReport.to | date : 'dd.MM.yyyy - H:mm'}}</div><div class=\"col-md-2\">{{externalWorkReport.state | tlEnum:'TimeRecorder.Web.Data.EWorkReportState'}}</div><div class=\"col-md-1\"><a ui-sref=\"tr.employeeWorkReport.edit({workReportId: externalWorkReport.id})\">Edit</a></div><div class=\"tr-list-selector-left\"></div><div class=\"tr-list-selector-right\"></div></div></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div></div>"
+    "<div id=\"workReport\" ng-controller=\"TrSearchWorkReportController as ctrl\" class=\"search-work-report\"><ui-view class=\"detail-slide\"></ui-view><h2>Arbeitsrapport</h2><hr><div class=\"row\"><form class=\"col-md-12\" ng-submit=\"ctrl.search()\"><div class=\"row\"><div class=\"col-md-3\" ng-if=\"app.appUser.isAdmin\"><ui-select ng-change=\"ctrl.employeeSelected()\" ng-model=\"ctrl.selectedEmployee\"><ui-select-match placeholder=\"{{'_select' | translate}}\">{{$select.selected.firstName + ' ' + $select.selected.lastName}}</ui-select-match><ui-select-choices repeat=\"employee in ctrl.searchedEmployees track by $index\" refresh=\"ctrl.searchEmployees($select.search)\"><div ng-bind-html=\"employee.firstName + ' ' + employee.lastName | highlight: $select.search\"></div></ui-select-choices></ui-select></div><div class=\"col-md-3\"><ui-select ng-change=\"ctrl.projectSelected()\" ng-model=\"ctrl.selectedProject\"><ui-select-match placeholder=\"{{'Projekt' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"project in ctrl.searchedProjects track by $index\" refresh=\"ctrl.searchProjects($select.search)\"><div ng-bind-html=\"project.name | highlight: $select.search\"></div></ui-select-choices></ui-select></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Von\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup ng-model=\"ctrl.searchService.from\" is-open=\"ctrl.datePickerStates['from']\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openDatepicker($event, 'from')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><p class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Bis\" current-text=\"Heute\" clear-text=\"Löschen\" close-text=\"Schliessen\" datepicker-popup ng-model=\"ctrl.searchSerivce.to\" is-open=\"ctrl.datePickerStates['to']\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openDatepicker($event, 'to')\"><i class=\"glyphicon glyphicon-th-list\"></i></button></span></p></div><div class=\"col-md-2\"><ui-select ng-model=\"ctrl.searchService.state\"><ui-select-match placeholder=\"{{'_select' | translate}}\"><span translate>{{$select.selected | tlEnum:'TimeRecorder.Web.Data.EWorkReportState' | translate}}</span><!--<span translate>{{$select.selected | translate}}</span>--></ui-select-match><ui-select-choices repeat=\"state in (states | tlEnumOrdinals:'TimeRecorder.Web.Data.EWorkReportState')\"><span translate>{{state | tlEnum:'TimeRecorder.Web.Data.EWorkReportState'}}</span></ui-select-choices></ui-select></div></div><div class=\"row\"><div class=\"col-md-1\"><button type=\"submit\" class=\"btn btn-default\">Suchen</button></div><div class=\"col-md-1\"><button ui-sref=\"tr.employeeWorkReport.search.side.createExternalWorkReport\" class=\"btn btn-default\"><i class=\"glyphicon glyphicon-plus\"></i><span>Erstellen</span></button></div></div></form></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"></div><div class=\"row\"><div class=\"col-md-12 tr-list-head\"><div class=\"row\"><div class=\"col-md-1\" ng-if=\"app.appUser.isAdmin\">Person</div><div class=\"col-md-3\">Projekt</div><div class=\"col-md-2\">Von</div><div class=\"col-md-2\">Bis</div><div class=\"col-md-2\">State</div><div class=\"col-md-1\"></div></div></div><div infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\" class=\"tr-list\"><div ng-repeat=\"externalWorkReport in ctrl.searchResults\" class=\"col-md-12 tr-list-item\" ng-style=\"{'background': ctrl.getBookingBackground(externalWorkReport) }\"><div class=\"row\"><div class=\"col-md-1 tr-ellipsis\" ng-if=\"app.appUser.isAdmin\">{{externalWorkReport.employee.fullName}}</div><div class=\"col-md-3 tr-ellipsis\">{{externalWorkReport.project.name}} ({{externalWorkReport.project.externalNumber}})</div><div class=\"col-md-2\">{{externalWorkReport.from | date : 'dd.MM.yyyy - H:mm'}}</div><div class=\"col-md-2\">{{externalWorkReport.to | date : 'dd.MM.yyyy - H:mm'}}</div><div class=\"col-md-2\">{{externalWorkReport.state | tlEnum:'TimeRecorder.Web.Data.EWorkReportState'}}</div><div class=\"col-md-1\"><a ui-sref=\"tr.employeeWorkReport.edit({workReportId: externalWorkReport.id})\">Edit</a></div><div class=\"tr-list-selector-left\"></div><div class=\"tr-list-selector-right\"></div></div></div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div></div>"
   );
 
 
   $templateCache.put('Client/Views/employee/modal/externalWorkReportRemainingCloseStateModalTemplate.html',
-    "<div class=\"modal-header\"><h4 class=\"modal-title\" translate>Outstanding criteria</h4></div><div class=\"modal-body\"><form name=\"saveFilterForm\" class=\"form-horizontal\" novalidate><div class=\"row\"><div class=\"col-md-12 col-md-offset-1\"><div translate>The following criteria has not been set to be able to close the report</div></div></div><div class=\"row\" ng-if=\"!externalWorkReport.projectCompleted\"><div class=\"col-md-6\"><label translate>Arbeit Fertig (Ya/Nein)</label></div></div><div class=\"row\" ng-if=\"!externalWorkReport.employeeSignatureImage\"><div class=\"col-md-6\"><label translate>Employee Signature</label></div></div><div class=\"row\" ng-if=\"!externalWorkReport.signedContactId\"><div class=\"col-md-6\"><label translate>Select Contact</label></div></div><div class=\"row\" ng-if=\"!externalWorkReport.customerSignatureImage\"><div class=\"col-md-6\"><label translate>Contact Signature</label></div></div></form></div><div class=\"modal-footer\"><button class=\"btn btn-primary\" ng-click=\"$close(true)\" translate>Save Anyway</button> <button class=\"btn btn-warning\" ng-click=\"$dismiss('cancel')\" translate>Cancel</button></div>"
+    "<div class=\"modal-header\"><h4 class=\"modal-title\" translate>Warnung</h4></div><div class=\"modal-body\"><form name=\"saveFilterForm\" class=\"form-horizontal\" novalidate><div class=\"row\"><div class=\"col-md-12\"><label translate>Um den Arbeitsrapport abzuschliessen, erfassen Sie bitte die folgenden Informationen:</label></div></div><div class=\"tr-v-spacer\"></div><div class=\"row\" ng-if=\"externalWorkReport.projectCompleted == null\"><div class=\"col-md-12\"><label translate>&bull; Arbeit Fertig (Ja/Nein)</label></div></div><div class=\"row\" ng-if=\"!externalWorkReport.employeeSignatureImage\"><div class=\"col-md-12\"><label translate>&bull; Unterschrift des Mitarbeiters</label></div></div><div class=\"row\" ng-if=\"!externalWorkReport.signedContactId\"><div class=\"col-md-12\"><label translate>&bull; Auswahl der Kontaktperson</label></div></div><div class=\"row\" ng-if=\"!externalWorkReport.contactSignatureImage\"><div class=\"col-md-12\"><label translate>&bull; Unterschrift der Kontaktperson</label></div></div></form></div><div class=\"modal-footer\"><button class=\"btn btn-primary\" ng-click=\"$close(true)\" translate>Speichern ohne Abzuschliessen</button> <button class=\"btn btn-warning\" ng-click=\"$dismiss('cancel')\" translate>Abbrechen</button></div>"
   );
 
 
@@ -10524,7 +10549,7 @@ sig.directive("tlSignature", [
 
 
   $templateCache.put('Client/Views/expenses.html',
-    "<div ng-controller=\"TrExpensesController as ctrl\" class=\"expenses\"><ui-view class=\"detail-slide\"></ui-view><div class=\"row\"><h1 class=\"col-md-9\">Spesen</h1></div><filter-header model=\"ctrl.model\" add-button-callback=\"ctrl.addButtonCallback()\" add-button-text=\"Add new expense\" target-start-button-callback=\"ctrl.targetStartButtonCallback()\" target-start-button-text=\"Target expenses\" target-cancel-button-callback=\"ctrl.targetCancelButtonCallback()\" target-cancel-button-text=\"Abbrechen\" target-confirm-button-callback=\"ctrl.targetConfirmButtonCallback()\" target-confirm-button-text=\"Ok\" get-entry-per-day=\"ctrl.getEntryPerDay\" get-total-entries=\"ctrl.getTotalEntries()\"></filter-header><div class=\"row\"></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row tr-list-head\"></div><div class=\"row\"><div class=\"tr-list col-md-12\"><!--infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\"--><ng-include src=\"'expenses.row'\"></ng-include><div ng-if=\"ctrl.displayedExpenses.length === 0\" class=\"row tr-list-item\"><div class=\"col-md-12\">No expenses are booked on this day.</div></div></div></div></div><script type=\"text/ng-template\" id=\"expenses.row\"><div ng-repeat=\"entry in ctrl.displayedExpenses\">\r" +
+    "<div ng-controller=\"TrExpensesController as ctrl\" class=\"expenses\"><ui-view class=\"detail-slide\"></ui-view><div class=\"row\"><h1 class=\"col-md-9\">Spesen</h1></div><filter-header model=\"ctrl.model\" add-button-callback=\"ctrl.addButtonCallback()\" add-button-text=\"Neuer Eintrag\" target-start-button-callback=\"ctrl.targetStartButtonCallback()\" target-start-button-text=\"Target expenses\" target-cancel-button-callback=\"ctrl.targetCancelButtonCallback()\" target-cancel-button-text=\"Abbrechen\" target-confirm-button-callback=\"ctrl.targetConfirmButtonCallback()\" target-confirm-button-text=\"Speichern\" get-entry-per-day=\"ctrl.getEntryPerDay\" get-total-entries=\"ctrl.getTotalEntries()\"></filter-header><div class=\"row\"></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row tr-list-head\"></div><div class=\"row\"><div class=\"tr-list col-md-12\"><!--infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\"--><ng-include src=\"'expenses.row'\"></ng-include><div ng-if=\"ctrl.displayedExpenses.length === 0\" class=\"row tr-list-item\"><div class=\"col-md-12\">Keine Einträge</div></div></div></div></div><script type=\"text/ng-template\" id=\"expenses.row\"><div ng-repeat=\"entry in ctrl.displayedExpenses\">\r" +
     "\n" +
     "    <div class=\"row tr-list-item\">\r" +
     "\n" +
