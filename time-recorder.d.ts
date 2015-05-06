@@ -2285,7 +2285,7 @@ declare module TimeRecorder.Web.Business {
         static $inject: string[];
         container: Business.DataControllerContainer;
         constructor($q: ng.IQService, timeEntryRepo: TimeEntryRepository);
-        stop(employeeId: number, projectId: number, typeId: number): void;
+        stop(employeeId: number, projectId: number): void;
         start(employeeId: number, projectId: number, typeId: number): void;
         private triggerBookingCreation(employeeId);
         private generateBookingsFromTimeEntries(unbookedEntries);
