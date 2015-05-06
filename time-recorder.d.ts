@@ -120,6 +120,7 @@ declare module TimeRecorder.Web.Data {
         id: number;
         name: string;
         timestamp: number;
+        abbreviation: string;
         timeBookingRule?: ETimeBookingRule;
     }
     interface ITimeBookingSearchParams {
@@ -971,6 +972,13 @@ declare module TimeRecorder.Web.Data {
         $orderBy?: string;
         $filter?: string;
     }
+    interface ProjectGetProjectsForEmployeeEnumerableParams {
+        employeeId: number;
+        $skip?: number;
+        $top?: number;
+        $orderBy?: string;
+        $filter?: string;
+    }
     interface ProjectSearchProjectsEnumerableParams {
         searchValue: string;
         skip: number;
@@ -1043,6 +1051,8 @@ declare module TimeRecorder.Web.Data {
         getAllPersonsMultiple(params: ProjectGetAllPersonsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IProjectPersonVm[]>>;
         getAllLocationsMultipleRequest(params: ProjectGetAllLocationsEnumerableParams): Triarc.Data.DataRequest<IProjectLocationVm[]>;
         getAllLocationsMultiple(params: ProjectGetAllLocationsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IProjectLocationVm[]>>;
+        getProjectsForEmployeeMultipleRequest(params: ProjectGetProjectsForEmployeeEnumerableParams): Triarc.Data.DataRequest<IProjectCm[]>;
+        getProjectsForEmployeeMultiple(params: ProjectGetProjectsForEmployeeEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IProjectCm[]>>;
         searchProjectsMultipleRequest(params: ProjectSearchProjectsEnumerableParams): Triarc.Data.DataRequest<IProjectCm[]>;
         searchProjectsMultiple(params: ProjectSearchProjectsEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IProjectCm[]>>;
         getRootProjectsMultipleRequest(params: ProjectGetRootProjectsEnumerableParams): Triarc.Data.DataRequest<IProjectVm[]>;
@@ -1080,6 +1090,8 @@ declare module TimeRecorder.Web.Data {
         getAllPersonsMultiple(params: any): any;
         getAllLocationsMultipleRequest(params: any): Triarc.Data.DataRequest<IProjectLocationVm[]>;
         getAllLocationsMultiple(params: any): any;
+        getProjectsForEmployeeMultipleRequest(params: any): Triarc.Data.DataRequest<IProjectCm[]>;
+        getProjectsForEmployeeMultiple(params: any): any;
         searchProjectsMultipleRequest(params: any): Triarc.Data.DataRequest<IProjectCm[]>;
         searchProjectsMultiple(params: any): any;
         getRootProjectsMultipleRequest(params: any): Triarc.Data.DataRequest<IProjectVm[]>;
@@ -1948,6 +1960,7 @@ declare module TimeRecorder.Web.Business {
         id: number;
         name: string;
         timeBookingRule: Data.ETimeBookingRule;
+        abbreviation: string;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -2241,6 +2254,7 @@ declare module TimeRecorder.Web.Business {
         private timeEntryTypesMap;
         constructor($q: ng.IQService, repository: TimeEntryTypeRepository);
         ensureLoaded(): ng.IPromise<void>;
+        getTimeEntryTypeForAbbreviation(abbreviation: string): ng.IPromise<Data.ITimeEntryTypeCm>;
         getTimeEntryTypesMap(): Map<number, TimeEntryTypeVm>;
         search(searchValue: string, skip: number, take: number): ng.IPromise<TimeEntryTypeVm[]>;
         getTypesById(ids: number[]): ng.IPromise<TimeEntryTypeVm[]>;
