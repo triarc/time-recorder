@@ -8,7 +8,7 @@ declare module TimeRecorder.Web.Data {
         platform: string;
     }
     interface IEmployeeCm {
-        id: number;
+        id?: number;
         employeeId: string;
         externalId: string;
         profileId?: number;
@@ -166,7 +166,7 @@ declare module TimeRecorder.Web.Data {
         zipCode: string;
     }
     interface IContactCm {
-        id: string;
+        id?: string;
         clientId?: number;
         lastName: string;
         firstName: string;
@@ -237,7 +237,7 @@ declare module TimeRecorder.Web.Data {
         externalTypeString: string;
     }
     interface IExpenseCm {
-        id: string;
+        id?: string;
         value: number;
         timestamp: number;
         date: Date;
@@ -291,7 +291,7 @@ declare module TimeRecorder.Web.Data {
         timeBookingIds: string[];
     }
     interface IExternalWorkReportCm {
-        id: string;
+        id?: string;
         from: Date;
         to: Date;
         employeeSignatureImage: string;
@@ -442,7 +442,7 @@ declare module TimeRecorder.Web.Data {
         messageRead: boolean;
     }
     interface ITimeEntryCm {
-        id: string;
+        id?: string;
         employeeId?: number;
         timeEntryTypeId?: number;
         simpleStampType?: EStampType;
@@ -1807,6 +1807,7 @@ declare module TimeRecorder.Web.Business {
         expenseTypeId: number;
         visaEmployeeId: number;
         visaTimestamp: Date;
+        update(entityCm: Data.IExpenseCm): void;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -1825,7 +1826,7 @@ declare module TimeRecorder.Web.Business {
 }
 declare module TimeRecorder.Web.Bu {
     interface IPersonCm<TPKeyType> {
-        id: TPKeyType;
+        id?: TPKeyType;
         lastName: string;
         firstName: string;
         email: string;
@@ -1950,6 +1951,7 @@ declare module TimeRecorder.Web.Business {
         comment: string;
         confirmed: boolean;
         parentId: string;
+        update(cm: Data.ITimeBookingCm): void;
         checkUnConfirmedExtraBookings(): ng.IPromise<boolean>;
     }
 }
@@ -1998,7 +2000,7 @@ declare module TimeRecorder.Web.Business {
         private _timeBookings;
         constructor(cm: () => Data.IWorkReportCm, timeBookingVms: () => TimeBookingVm[], projectVm: () => ProjectVm, externalWorkReportDc: () => ExternalWorkReportDataController);
         externalWorkReport: ExternalWorkReportVm;
-        setExternalWorkReport(cm: () => Data.IExternalWorkReportCm): void;
+        setExternalWorkReport(vm: ExternalWorkReportVm): void;
         timeBookings: TimeBookingVm[];
         toCm(): Data.IWorkReportCm;
     }
@@ -2170,6 +2172,7 @@ declare module TimeRecorder.Web.Business {
         static serviceId: string;
         static $inject: string[];
         container: Business.DataControllerContainer;
+        private referenceStore;
         constructor($q: ng.IQService, expenseRepository: ExpenseRepository);
         search(skip?: number, take?: number, from?: Date, to?: Date, employeeId?: number): ng.IPromise<ExpenseVm[]>;
         getExpenseById(id: string): ng.IPromise<ExpenseVm>;
@@ -2232,13 +2235,13 @@ declare module TimeRecorder.Web.Business {
         static serviceId: string;
         static $inject: string[];
         container: Business.DataControllerContainer;
+        private referenceStore;
         constructor($q: ng.IQService, repository: TimeBookingRepository);
         getIsExtraBooking(timebooking: Business.TimeBookingVm): boolean;
-        getIsEditable(entry: Data.ITimeBookingCm): boolean;
         getDetail(id: string): ng.IPromise<TimeBookingVm>;
         search(data: Data.ITimeBookingSearchParams): ng.IPromise<TimeBookingVm[]>;
-        save(timeBooking: Data.ITimeBookingCm, calculateExtraBookings: boolean): ng.IPromise<Data.ITimeBookingCm[]>;
-        saveMultiple(timeBookings: Data.ITimeBookingCm[], calculateExtraBookings: boolean): ng.IPromise<Data.ITimeBookingCm[]>;
+        save(timeBooking: TimeBookingVm, calculateExtraBookings: boolean): ng.IPromise<TimeBookingVm[]>;
+        saveMultiple(timeBookings: TimeBookingVm[], calculateExtraBookings: boolean): ng.IPromise<TimeBookingVm[]>;
         remove(id: string): ng.IPromise<any>;
         resolveFor(ids: string[]): ng.IPromise<TimeBookingVm[]>;
         getUnBilledCompletedBookings(employeeId: number, projectId: number): ng.IPromise<TimeBookingVm[]>;
@@ -2268,6 +2271,7 @@ declare module TimeRecorder.Web.Business {
         static serviceId: string;
         static $inject: string[];
         container: Business.DataControllerContainer;
+        private referenceStore;
         constructor($q: ng.IQService, repository: ExternalWorkReportRepository);
         get(id: string): ng.IPromise<Business.WorkReportVm>;
         save(workReport: Business.WorkReportVm): ng.IPromise<void>;
@@ -2370,6 +2374,47 @@ declare module TimeRecorder.Web.Business {
         static $inject: string[];
         constructor(expencesDc: ExpenseDataController, expenceTypeDc: ExpenseTypeDataController, externalWorkReportDc: ExternalWorkReportDataController, projectDc: ProjectDataController, ruleBasedTimeBookingDc: RuleBasedTimeBookingDataController, timeBookingDc: TimeBookingDataController, timeEntryTypeDc: TimeEntryTypeDataController, timeSheetDc: TimeSheetDataController, employeeDc: EmployeeDataController, peopleDc: PeopleDataController, timeEntryDc: TimeEntryDataController);
         initialize(): void;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    class ViewModelReferenceStore<TCm, TVm> {
+        protected referenceMap: Map<number, TVm>;
+        protected getTimestamp(entity: any): any;
+        protected updateViewModel(entityCm: TCm, viewModel: TVm, createVmCallback: (cm: TCm) => TVm): void;
+        attachMultipleAndGet(entities: TCm[], createVmCallback: (cm: TCm) => TVm, isChanged?: {
+            isChanged?: boolean;
+        }): TVm[];
+        attachAndGet(entityCm: TCm, createVmCallback: (cm: TCm) => TVm, isChanged?: {
+            isChanged?: boolean;
+        }, updateOnSameTimestamp?: boolean): TVm;
+        attachChangeSet(changeSet: IChangeSet<TCm>, createVmCallback: (cm: TCm) => TVm, filterUnchaged?: boolean): IChangeSet<TVm>;
+        get(id: number): TVm;
+        has(id: number): boolean;
+        getAll(): TVm[];
+    }
+    interface IChangeSet<T> {
+        added: T[];
+        updated: T[];
+        deleted: number[];
+    }
+}
+declare module TimeRecorder.Web.Business {
+    import TimeBookingVm = TimeRecorder.Web.Business.TimeBookingVm;
+    import ViewModelReferenceStore = TimeRecorder.Web.Business.ViewModelReferenceStore;
+    class TimeBookingReferenceStore extends ViewModelReferenceStore<Data.ITimeBookingCm, TimeBookingVm> {
+        protected updateViewModel(entityCm: Data.ITimeBookingCm, viewModel: TimeBookingVm): void;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    import ViewModelReferenceStore = TimeRecorder.Web.Business.ViewModelReferenceStore;
+    class ExternalWorkReportReferenceStore extends ViewModelReferenceStore<Data.IExternalWorkReportCm, ExternalWorkReportVm> {
+        protected updateViewModel(entityCm: Data.IExternalWorkReportCm, viewModel: ExternalWorkReportVm): void;
+    }
+}
+declare module TimeRecorder.Web.Business {
+    import ViewModelReferenceStore = TimeRecorder.Web.Business.ViewModelReferenceStore;
+    class ExpenseReferenceStore extends ViewModelReferenceStore<Data.IExpenseCm, ExpenseVm> {
+        protected updateViewModel(entityCm: Data.IExpenseCm, viewModel: ExpenseVm): void;
     }
 }
 declare module TimeRecorder.Web {
