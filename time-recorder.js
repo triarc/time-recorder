@@ -3138,6 +3138,9 @@ var TimeRecorder;
                     enumerable: true,
                     configurable: true
                 });
+                ExpenseVm.prototype.update = function (entityCm) {
+                    this.cm = function () { return entityCm; };
+                };
                 return ExpenseVm;
             })();
             Business.ExpenseVm = ExpenseVm;
@@ -3847,6 +3850,9 @@ var TimeRecorder;
                     enumerable: true,
                     configurable: true
                 });
+                TimeBookingVm.prototype.update = function (cm) {
+                    this.cm = function () { return cm; };
+                };
                 TimeBookingVm.prototype.checkUnConfirmedExtraBookings = function () {
                     var params = {
                         person: "",
@@ -4049,6 +4055,7 @@ var TimeRecorder;
                     configurable: true
                 });
                 ExternalWorkReportVm.prototype.update = function (cm) {
+                    this.cm = function () { return cm(); };
                 };
                 ExternalWorkReportVm.prototype.toCm = function () {
                     var cm = this.cm();
@@ -4115,9 +4122,9 @@ var TimeRecorder;
                     enumerable: true,
                     configurable: true
                 });
-                WorkReportVm.prototype.setExternalWorkReport = function (cm) {
-                    var _this = this;
-                    this._externalWorkReport = new Business.ExternalWorkReportVm(cm, function () { return _this.projectVm(); });
+                WorkReportVm.prototype.setExternalWorkReport = function (vm) {
+                    this._externalWorkReport = vm;
+                    this._externalWorkReport.project = this.projectVm();
                 };
                 Object.defineProperty(WorkReportVm.prototype, "timeBookings", {
                     get: function () {
@@ -4684,9 +4691,15 @@ var TimeRecorder;
                 function ExpenseDataController($q, expenseRepository) {
                     this.$q = $q;
                     this.expenseRepository = expenseRepository;
+                    this.referenceStore = new Business.ExpenseReferenceStore();
                 }
                 ExpenseDataController.prototype.search = function (skip, take, from, to, employeeId) {
-                    return this.expenseRepository.search(skip, take, from, to, employeeId).then(function (expenses) { return expenses.toEnumerable().select(function (e) { return new Business.ExpenseVm(function () { return e; }); }).toArray(); });
+                    var _this = this;
+                    return this.expenseRepository.search(skip, take, from, to, employeeId).then(function (expenses) {
+                        return _this.referenceStore.attachMultipleAndGet(expenses, function (entityCm) {
+                            return new Business.ExpenseVm(function () { return entityCm; });
+                        });
+                    });
                 };
                 ExpenseDataController.prototype.getExpenseById = function (id) {
                     return this.expenseRepository.getExpenseById(id).then(function (e) { return new Business.ExpenseVm(function () { return e; }); });
@@ -4880,24 +4893,23 @@ var TimeRecorder;
                 function TimeBookingDataController($q, repository) {
                     this.$q = $q;
                     this.repository = repository;
+                    this.referenceStore = new Business.TimeBookingReferenceStore();
                 }
                 TimeBookingDataController.prototype.getIsExtraBooking = function (timebooking) {
                     return timebooking.parentId != null;
                 };
-                TimeBookingDataController.prototype.getIsEditable = function (entry) {
-                    return entry.state == null || entry.state === 0 /* Open */;
-                };
                 TimeBookingDataController.prototype.getDetail = function (id) {
                     var _this = this;
-                    return this.repository.getDetail(id).then(function (cm) { return new Business.TimeBookingVm(function () { return cm; }, function () { return _this; }); });
+                    return this.repository.getDetail(id).then(function (cm) { return _this.referenceStore.attachAndGet(cm, function (entityCm) {
+                        return new Business.TimeBookingVm(function () { return entityCm; }, function () { return _this; });
+                    }); });
                 };
                 TimeBookingDataController.prototype.search = function (data) {
                     var _this = this;
                     return this.repository.search(data).then(function (cms) {
-                        return cms.toEnumerable().select(function (t) { return new Business.TimeBookingVm(function () { return t; }, function () { return _this; }); }).toArray();
-                        //var viewModels = cms.toEnumerable().select(t => new Business.TimeBookingVm(() => t,() => this)).toArray();
-                        //var result = this.container.ruleBasedTimeBookingDc.apply(viewModels);
-                        //return result;
+                        return _this.referenceStore.attachMultipleAndGet(cms, function (cm) {
+                            return new Business.TimeBookingVm(function () { return cm; }, function () { return _this; });
+                        });
                     });
                 };
                 TimeBookingDataController.prototype.save = function (timeBooking, calculateExtraBookings) {
@@ -4905,7 +4917,7 @@ var TimeRecorder;
                 };
                 TimeBookingDataController.prototype.saveMultiple = function (timeBookings, calculateExtraBookings) {
                     var _this = this;
-                    return this.repository.save(timeBookings).then(function (data) {
+                    return this.repository.save(timeBookings.toEnumerable().select(function (tb) { return tb.toCm(); }).toArray()).then(function (data) {
                         var extraTimeBookings = [];
                         if (!calculateExtraBookings)
                             return data;
@@ -4925,26 +4937,9 @@ var TimeRecorder;
                                 return extraTimeBookingsData;
                             });
                         return data;
-                        //var timeBooking = data.first();
-                        //// if we don't need to re-calculate extra bookings we stop here..
-                        //if (!calculateExtraBookings || timeBooking.parentId != null)
-                        //  return data;
-                        //// otherwise create possible extra bookings
-                        //var extraTimeBookings: Data.ITimeBookingCm[] = [];
-                        //var ruleBasedTimeBookingDc = this.container.ruleBasedTimeBookingDc;
-                        //var timeBookingVm = new TimeBookingVm(() => timeBooking,() => this.container.timeBookingDc);
-                        //var extraTimeBookingVms = ruleBasedTimeBookingDc.getRuleBasedTimeBookings(timeBookingVm);
-                        //var extraTimeBookingCms = extraTimeBookingVms.toEnumerable().select(t => t.toCm());
-                        //extraTimeBookings.addRange(extraTimeBookingCms.toArray());
-                        //// ..and save 'em
-                        //if (extraTimeBookings.any())
-                        //  return this.repository.save(extraTimeBookings).then(extraTimeBookingsData => {
-                        //    // add previously saved time booking to the response
-                        //    extraTimeBookingsData.add(timeBooking);
-                        //    return extraTimeBookingsData;
-                        //  });
-                        //return data;
-                    });
+                    }).then(function (timeBookings) { return _this.referenceStore.attachMultipleAndGet(timeBookings, function (cm) {
+                        return new Business.TimeBookingVm(function () { return cm; }, function () { return _this; });
+                    }, true); });
                 };
                 TimeBookingDataController.prototype.remove = function (id) {
                     return this.repository.remove(id);
@@ -5051,26 +5046,40 @@ var TimeRecorder;
                 function ExternalWorkReportDataController($q, repository) {
                     this.$q = $q;
                     this.repository = repository;
+                    this.referenceStore = new Business.ExternalWorkReportReferenceStore();
                 }
                 ExternalWorkReportDataController.prototype.get = function (id) {
                     var _this = this;
                     return this.repository.get(id).then(function (cm) {
                         return _this.container.timeBookingDc.resolveFor(cm.timeBookingIds).then(function (timeBookings) {
                             return _this.container.projectDc.getProjectById(cm.externalWorkReport.projectId, true).then(function (projectVm) {
-                                return new Business.WorkReportVm(function () { return cm; }, function () { return timeBookings; }, function () { return projectVm; }, function () { return _this; });
+                                var ewr = _this.referenceStore.attachAndGet(cm.externalWorkReport, function (entityCm) {
+                                    return new Business.ExternalWorkReportVm(function () { return entityCm; }, function () { return projectVm; });
+                                });
+                                var workReport = new Business.WorkReportVm(function () { return cm; }, function () { return timeBookings; }, function () { return projectVm; }, function () { return _this; });
+                                workReport.setExternalWorkReport(ewr);
+                                return workReport;
                             });
                         });
                     });
                 };
                 ExternalWorkReportDataController.prototype.save = function (workReport) {
-                    return this.repository.save(workReport.toCm()).then(function (cm) { return workReport.setExternalWorkReport(function () { return cm; }); });
+                    var _this = this;
+                    return this.repository.save(workReport.toCm()).then(function (cm) {
+                        var vm = _this.referenceStore.attachAndGet(cm, function (entityCm) {
+                            workReport.setExternalWorkReport(vm);
+                            return workReport.externalWorkReport;
+                        }, true);
+                    });
                 };
                 ExternalWorkReportDataController.prototype.search = function (employeeId, from, to, projectId, state) {
                     var _this = this;
                     return this.repository.search(employeeId, from, to, projectId, state).then(function (externalWorkReports) {
                         var projectIds = externalWorkReports.toEnumerable().select(function (e) { return e.projectId; }).toArray();
                         return _this.container.projectDc.getProjectsById(projectIds).then(function (projects) {
-                            return externalWorkReports.toEnumerable().select(function (r) { return new Business.ExternalWorkReportVm(function () { return r; }, function () { return projects.toEnumerable().firstOrDefault(function (p) { return p.id === r.projectId; }); }); }).toArray();
+                            return _this.referenceStore.attachMultipleAndGet(externalWorkReports, function (entityCm) {
+                                return new Business.ExternalWorkReportVm(function () { return entityCm; }, function () { return projects.toEnumerable().firstOrDefault(function (p) { return p.id === entityCm.projectId; }); });
+                            });
                         });
                     });
                 };
@@ -5169,7 +5178,7 @@ var TimeRecorder;
                         var bookings = _this.generateBookingsFromTimeEntries(entries);
                         console.log(bookings);
                         _this.container.timeEntryTypeDc.ensureLoaded().then(function () {
-                            _this.container.timeBookingDc.saveMultiple(bookings, true);
+                            _this.container.timeBookingDc.saveMultiple(bookings.toEnumerable().select(function (cm) { return new Business.TimeBookingVm(function () { return cm; }, function () { return _this.container.timeBookingDc; }); }).toArray(), true);
                         }, function () {
                         });
                     }, function () {
@@ -5549,6 +5558,188 @@ var TimeRecorder;
 // data controller container
 // put all data controller references above this declaration or you will not be able to include it in the contiainer!
 /// <reference path="datacontrollercontainer.ts" /> 
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ViewModelReferenceStore = (function () {
+                function ViewModelReferenceStore() {
+                    this.referenceMap = new Map();
+                }
+                ViewModelReferenceStore.prototype.getTimestamp = function (entity) {
+                    return entity.timestamp;
+                };
+                ViewModelReferenceStore.prototype.updateViewModel = function (entityCm, viewModel, createVmCallback) {
+                    angular.extend(viewModel, createVmCallback(entityCm));
+                };
+                ViewModelReferenceStore.prototype.attachMultipleAndGet = function (entities, createVmCallback, isChanged) {
+                    var _this = this;
+                    var result = [];
+                    if (angular.isArray(entities)) {
+                        entities.forEach(function (e) { return result.add(_this.attachAndGet(e, createVmCallback, isChanged)); });
+                    }
+                    return result;
+                };
+                ViewModelReferenceStore.prototype.attachAndGet = function (entityCm, createVmCallback, isChanged, updateOnSameTimestamp) {
+                    if (updateOnSameTimestamp === void 0) { updateOnSameTimestamp = false; }
+                    var entityId = entityCm.id;
+                    if (angular.isObject(isChanged)) {
+                        isChanged.isChanged = true;
+                    }
+                    else {
+                        isChanged = {
+                            isChanged: true
+                        };
+                    }
+                    var existingVm = this.referenceMap.get(entityId);
+                    if (angular.isObject(existingVm)) {
+                        var existingTimestamp = this.getTimestamp(existingVm);
+                        var newTimestamp = this.getTimestamp(entityCm);
+                        if (existingTimestamp < newTimestamp) {
+                            console.log('override loaded entity:' + entityId + "   old:" + existingTimestamp + "   new:" + newTimestamp);
+                            this.updateViewModel(entityCm, existingVm, createVmCallback);
+                        }
+                        else if (existingTimestamp === newTimestamp) {
+                            if (updateOnSameTimestamp) {
+                                this.updateViewModel(entityCm, existingVm, createVmCallback);
+                            }
+                            else {
+                                console.log("entity: " + entityId + " is up to date");
+                                isChanged.isChanged = false;
+                            }
+                        }
+                        else {
+                            console.warn("existing entity " + entityId + " is newer than new one, reject");
+                            isChanged.isChanged = false;
+                        }
+                        return existingVm;
+                    }
+                    var newVm = createVmCallback(entityCm);
+                    this.referenceMap.set(entityId, newVm);
+                    return newVm;
+                };
+                ViewModelReferenceStore.prototype.attachChangeSet = function (changeSet, createVmCallback, filterUnchaged) {
+                    var _this = this;
+                    if (filterUnchaged === void 0) { filterUnchaged = true; }
+                    var added = [];
+                    if (angular.isArray(changeSet.added)) {
+                        changeSet.added.forEach(function (t) {
+                            var isChanged = {
+                                isChanged: false
+                            };
+                            var attachClientModel = _this.attachAndGet(t, createVmCallback, isChanged);
+                            if (isChanged.isChanged || !filterUnchaged)
+                                added.add(attachClientModel);
+                        });
+                    }
+                    var updated = [];
+                    if (angular.isArray(changeSet.updated)) {
+                        changeSet.updated.forEach(function (t) {
+                            var isChanged = {
+                                isChanged: false
+                            };
+                            var attachClientModel = _this.attachAndGet(t, createVmCallback, isChanged);
+                            if (isChanged.isChanged || !filterUnchaged)
+                                updated.add(attachClientModel);
+                        });
+                    }
+                    changeSet.deleted.forEach(function (id) {
+                        _this.referenceMap.delete(id);
+                    });
+                    return {
+                        deleted: changeSet.deleted,
+                        added: added,
+                        updated: updated,
+                    };
+                };
+                ViewModelReferenceStore.prototype.get = function (id) {
+                    var vm = this.referenceMap.get(id);
+                    if (angular.isObject(vm))
+                        return vm;
+                    return null;
+                };
+                ViewModelReferenceStore.prototype.has = function (id) {
+                    return this.referenceMap.has(id);
+                };
+                // Returns all entities. Remember, that "With great power comes great responsibility"
+                ViewModelReferenceStore.prototype.getAll = function () {
+                    return this.referenceMap.getValues();
+                };
+                return ViewModelReferenceStore;
+            })();
+            Business.ViewModelReferenceStore = ViewModelReferenceStore;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ViewModelReferenceStore = TimeRecorder.Web.Business.ViewModelReferenceStore;
+            var TimeBookingReferenceStore = (function (_super) {
+                __extends(TimeBookingReferenceStore, _super);
+                function TimeBookingReferenceStore() {
+                    _super.apply(this, arguments);
+                }
+                TimeBookingReferenceStore.prototype.updateViewModel = function (entityCm, viewModel) {
+                    viewModel.update(entityCm);
+                };
+                return TimeBookingReferenceStore;
+            })(ViewModelReferenceStore);
+            Business.TimeBookingReferenceStore = TimeBookingReferenceStore;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ViewModelReferenceStore = TimeRecorder.Web.Business.ViewModelReferenceStore;
+            var ExternalWorkReportReferenceStore = (function (_super) {
+                __extends(ExternalWorkReportReferenceStore, _super);
+                function ExternalWorkReportReferenceStore() {
+                    _super.apply(this, arguments);
+                }
+                ExternalWorkReportReferenceStore.prototype.updateViewModel = function (entityCm, viewModel) {
+                    viewModel.update(function () { return entityCm; });
+                };
+                return ExternalWorkReportReferenceStore;
+            })(ViewModelReferenceStore);
+            Business.ExternalWorkReportReferenceStore = ExternalWorkReportReferenceStore;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+var TimeRecorder;
+(function (TimeRecorder) {
+    var Web;
+    (function (Web) {
+        var Business;
+        (function (Business) {
+            var ViewModelReferenceStore = TimeRecorder.Web.Business.ViewModelReferenceStore;
+            var ExpenseReferenceStore = (function (_super) {
+                __extends(ExpenseReferenceStore, _super);
+                function ExpenseReferenceStore() {
+                    _super.apply(this, arguments);
+                }
+                ExpenseReferenceStore.prototype.updateViewModel = function (entityCm, viewModel) {
+                    viewModel.update(entityCm);
+                };
+                return ExpenseReferenceStore;
+            })(ViewModelReferenceStore);
+            Business.ExpenseReferenceStore = ExpenseReferenceStore;
+        })(Business = Web.Business || (Web.Business = {}));
+    })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
+})(TimeRecorder || (TimeRecorder = {}));
+/// <reference path="referencestore.ts" />
+/// <reference path="timebookingreferencestore.ts" />
+/// <reference path="externalworkreportreferencestore.ts" />
+/// <reference path="expensereferencestore.ts" />
 var TimeRecorder;
 (function (TimeRecorder) {
     var Web;
@@ -6360,6 +6551,7 @@ var TimeRecorder;
         timeRecorder.service(TrServiceContainer.serviceId, TrServiceContainer);
     })(Web = TimeRecorder.Web || (TimeRecorder.Web = {}));
 })(TimeRecorder || (TimeRecorder = {}));
+/// <reference path="data/_data.ts" />
 /// <reference path="services/iauthenticationservice.ts" />
 /// <reference path="services/authenticationservice.ts" />
 /// <reference path="services/userservice.ts" />
@@ -7734,9 +7926,12 @@ var TimeRecorder;
                     date: new Date()
                 };
                 this.filterHeaderGetEntryPerDay = function (day) {
+                    var duration = "00:00";
                     if (_this.weekdayDuration != null && (day in _this.weekdayDuration))
-                        return _this.weekdayDuration[day];
-                    return "";
+                        duration = _this.weekdayDuration[day];
+                    if (duration !== "00:00")
+                        return duration;
+                    return "0";
                 };
                 authentication.hasClaimEnsureLoggedIn("web_timebookings").then(function (hasClaim) {
                     if (hasClaim) {
@@ -7783,7 +7978,7 @@ var TimeRecorder;
             TimeBookingController.prototype.filterHeaderConfirmSave = function () {
                 var _this = this;
                 // todo: save state and do not override children..
-                var data = this.pendingConfirmedTimeBookings.toEnumerable().select(function (t) { return t.toCm(); }).toArray();
+                var data = this.pendingConfirmedTimeBookings;
                 if (!data.any()) {
                     toastr.warning("Keine Buchung ausgewählt");
                     return;
@@ -7809,7 +8004,8 @@ var TimeRecorder;
                 var start = moment(timebooking.start);
                 var end = moment(timebooking.stop);
                 var duration = moment.duration(end.diff(start));
-                return moment.utc(duration.asMilliseconds()).format("HH:mm");
+                var milliseconds = duration.milliseconds();
+                return moment.utc(milliseconds).format("HH:mm");
             };
             TimeBookingController.prototype.getStateById = function (id) {
                 if (id == null)
@@ -7875,6 +8071,8 @@ var TimeRecorder;
                 var minutes = Math.round((secs / 60) % 60);
                 //var hours = Math.floor((secs / 3600) % 24);
                 var hours = Math.floor(secs / 3600);
+                if (minutes === 0 && hours === 0)
+                    return "";
                 return (("00" + hours).slice(-2) + ":" + (("00" + minutes).slice(-2)));
             };
             // search
@@ -8122,10 +8320,10 @@ var TimeRecorder;
                 }
                 // if we save an extra booking, always set the confirmed value to false to indicate a manual change
                 var isConfirmed = this.timeBooking == null || this.isExtraBooking() ? false : this.timeBooking.confirmed;
-                var data = this.timeBooking != null ? this.timeBooking.toCm() : {};
+                var data = this.timeBooking != null ? this.timeBooking : {};
                 data.employeeId = this.employee.id;
                 data.projectId = this.project.id;
-                data.timeEntryTypeId = this.entryType.id;
+                data.typeId = this.entryType.id;
                 data.confirmed = isConfirmed;
                 // save & redirect
                 var calculateExtraBookings = this.checkTimeHasChanged();
@@ -10595,9 +10793,9 @@ sig.directive("tlSignature", [
 
 
   $templateCache.put('Client/Views/expenses.html',
-    "<div ng-controller=\"TrExpensesController as ctrl\" class=\"expenses\"><ui-view class=\"detail-slide\"></ui-view><div class=\"row\"><h1 class=\"col-md-9\">Spesen</h1></div><filter-header model=\"ctrl.model\" add-button-callback=\"ctrl.addButtonCallback()\" add-button-text=\"Neuer Eintrag\" target-start-button-callback=\"ctrl.targetStartButtonCallback()\" target-start-button-text=\"Target expenses\" target-cancel-button-callback=\"ctrl.targetCancelButtonCallback()\" target-cancel-button-text=\"Abbrechen\" target-confirm-button-callback=\"ctrl.targetConfirmButtonCallback()\" target-confirm-button-text=\"Speichern\" get-entry-per-day=\"ctrl.getEntryPerDay\" get-total-entries=\"ctrl.getTotalEntries()\"></filter-header><div class=\"row\"></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row tr-list-head\"></div><div class=\"row\"><div class=\"tr-list col-md-12\"><!--infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\"--><ng-include src=\"'expenses.row'\"></ng-include><div ng-if=\"ctrl.displayedExpenses.length === 0\" class=\"row tr-list-item\"><div class=\"col-md-12\">Keine Einträge</div></div></div></div></div><script type=\"text/ng-template\" id=\"expenses.row\"><div ng-repeat=\"entry in ctrl.displayedExpenses\">\r" +
+    "<div ng-controller=\"TrExpensesController as ctrl\" class=\"expenses\"><ui-view class=\"detail-slide\"></ui-view><div class=\"row\"><h1 class=\"col-md-9\">Spesen</h1></div><filter-header model=\"ctrl.model\" add-button-callback=\"ctrl.addButtonCallback()\" add-button-text=\"Neuer Eintrag\" target-start-button-callback=\"ctrl.targetStartButtonCallback()\" target-start-button-text=\"Visieren\" target-cancel-button-callback=\"ctrl.targetCancelButtonCallback()\" target-cancel-button-text=\"Abbrechen\" target-confirm-button-callback=\"ctrl.targetConfirmButtonCallback()\" target-confirm-button-text=\"Speichern\" get-entry-per-day=\"ctrl.getEntryPerDay\" get-total-entries=\"ctrl.getTotalEntries()\"></filter-header><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\" ng-if=\"ctrl.displayedExpenses.length !== 0\"><div class=\"col-md-12 tr-list-head\"><div class=\"row\"><div class=\"col-md-1\"></div><div class=\"col-md-6\">Leistung</div><div class=\"col-md-2\">Anzahl</div><div class=\"col-md-2\"></div><div class=\"col-md-1\"><span ng-show=\"ctrl.model.targetingMode\">Visiert</span></div></div></div><div class=\"tr-list\"><!--infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\"--><ng-include src=\"'expenses.row'\"></ng-include></div></div><div ng-if=\"ctrl.displayedExpenses.length === 0\" class=\"row tr-list-item\"><div class=\"col-md-12\">Keine Einträge</div></div><script type=\"text/ng-template\" id=\"expenses.row\"><div ng-repeat=\"entry in ctrl.displayedExpenses\" class=\"col-md-12 tr-list-item timebooking-list-item\">\r" +
     "\n" +
-    "    <div class=\"row tr-list-item\">\r" +
+    "    <div class=\"row\">\r" +
     "\n" +
     "      <div class=\"col-md-1 tr-ellipsis\">\r" +
     "\n" +
@@ -10631,43 +10829,25 @@ sig.directive("tlSignature", [
     "\n" +
     "      <div class=\"col-md-2\">{{ctrl.getValue(entry)}}</div>\r" +
     "\n" +
-    "      \r" +
-    "\n" +
     "\r" +
     "\n" +
-    "      <div class=\"col-md-1\">\r" +
-    "\n" +
-    "        <!--<button type=\"button\"  class=\"btn btn-primary\" ng-model=\"singleModel\" btn-checkbox btn-checkbox-true=\"1\" btn-checkbox-false=\"0\">-->\r" +
-    "\n" +
-    "        <span ng-show=\"ctrl.isTargeted(entry)\" \r" +
-    "\n" +
-    "           class=\"glyphicon glyphicon-check disabled\"></span>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        <span ng-show=\"!ctrl.isTargeted(entry) && ctrl.model.targetingMode\"\r" +
-    "\n" +
-    "              ng-click=\"ctrl.toggleTargetCandidature(entry)\"\r" +
-    "\n" +
-    "              ng-class=\"{'glyphicon-check': ctrl.isTargetCandidate(entry), 'glyphicon-unchecked': !ctrl.isTargetCandidate(entry)}\"\r" +
-    "\n" +
-    "              class=\"glyphicon\">\r" +
-    "\n" +
-    "        </span>\r" +
+    "      <div class=\"col-md-2\">\r" +
     "\n" +
     "      </div>\r" +
     "\n" +
     "\r" +
     "\n" +
-    "      <div class=\"col-md-1 text-right\">\r" +
+    "      <div class=\"col-md-1 tr-list-action-buttons\">\r" +
     "\n" +
-    "        <span ng-class=\"{'disabled': ctrl.model.targetingMode || ctrl.isTargeted(entry)}\" ng-click=\"ctrl.editEntry(entry)\" class=\"glyphicon glyphicon-edit\"></span>\r" +
+    "        <span ng-hide=\"ctrl.model.targetingMode\" class=\"glyphicon glyphicon-edit\" ng-click=\"ctrl.editEntry(entry)\"></span>\r" +
+    "\n" +
+    "        <input type=\"checkbox\" ng-show=\"ctrl.model.targetingMode\" ng-click=\"ctrl.toggleTargetCandidature(entry)\" ng-checked=\"ctrl.isTargetCandidate(entry) || ctrl.isTargeted(entry)\" />\r" +
     "\n" +
     "      </div>\r" +
     "\n" +
     "    </div>\r" +
     "\n" +
-    "  </div></script>"
+    "  </div></script></div>"
   );
 
 
@@ -10822,7 +11002,7 @@ sig.directive("tlSignature", [
 
 
   $templateCache.put('Client/Views/templates/FilterHeader.html',
-    "<div class=\"row filter-header\"><div class=\"col-md-3\"><h3 class=\"current-date\">{{model.date | date:'EEEE d. MMMM'}}</h3></div><div ng-if=\"!model.targetingMode\" class=\"col-md-3 btn-group\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.previousWeek()\"><span class=\"glyphicon glyphicon-arrow-left glyphicon-wider\"></span></button> <button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.today()\">Heute</button> <button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.nextWeek()\"><span class=\"glyphicon glyphicon-arrow-right glyphicon-wider\"></span></button></div><div ng-if=\"!model.targetingMode\" class=\"col-md-2\"><div class=\"input-group\"><input name=\"expensesForm.date\" type=\"text\" ng-model=\"model.date\" class=\"form-control datepicker\" datepicker-popup view-format ng-disabled=\"ctrl.isDisabled()\" is-open=\"ctrl.datepickerOpened\" close-text=\"{{'_close' | translate}}\" current-text=\"{{'_now' | translate}}\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openDatepicker($event)\"><span class=\"glyphicon glyphicon-wider glyphicon-th-list\"></span></button></span></div></div><div ng-if=\"!model.targetingMode\" class=\"col-md-2\"><button ng-click=\"model.targetingMode = true; targetStartButtonCallback();\" class=\"btn btn-default btn-min-width\"><span class=\"glyphicon glyphicon-ok glyphicon-ok-darkgreen\"></span><span>{{targetStartButtonText}}</span></button></div><div ng-if=\"!model.targetingMode\" class=\"col-md-2\"><button ng-click=\"addButtonCallback()\" class=\"btn btn-default btn-min-width pull-right\"><span class=\"glyphicon glyphicon-plus\"></span><span>{{addButtonText}}</span></button></div><div ng-if=\"model.targetingMode\" class=\"col-md-offset-5 col-md-2 btn-group\"><button ng-click=\"model.targetingMode = false; targetCancelButtonCallback()\" class=\"btn btn-danger btn-min-width\"><span>{{targetCancelButtonText}}</span></button></div><div ng-if=\"model.targetingMode\" class=\"col-md-2\"><button ng-click=\"targetConfirmButtonCallback()\" class=\"btn btn-success btn-min-width pull-right\"><span class=\"glyphicon glyphicon-ok glyphicon-ok-white\"></span><span>{{targetConfirmButtonText}}</span></button></div></div><div class=\"tr-v-spacer\"></div><div class=\"row filter-week\"><div class=\"col-md-12\"><div class=\"calendar-panel\"><div class=\"btn-group fill\"><button type=\"button\" ng-repeat=\"day in [1, 2, 3, 4, 5, 6, 0]\" class=\"btn btn-default day-btn\" ng-click=\"ctrl.goToDay(day)\" ng-disabled=\"model.targetingMode\" ng-class=\"{'day-btn-selected': ctrl.getCurrentWeekday() === day}\">{{ctrl.getDayName(day)}}<br><strong>{{getEntryPerDay(day)}}</strong></button><div class=\"total pull-right\">Total:<br><strong>{{getTotalEntries()}}</strong></div></div></div></div></div>"
+    "<div class=\"row filter-header\"><div class=\"col-md-3\"><h3 class=\"current-date\">{{model.date | date:'EEEE d. MMMM'}}</h3></div><div ng-if=\"!model.targetingMode\" class=\"col-md-3 btn-group\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.previousWeek()\"><span class=\"glyphicon glyphicon-arrow-left glyphicon-wider\"></span></button> <button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.today()\">Heute</button> <button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.nextWeek()\"><span class=\"glyphicon glyphicon-arrow-right glyphicon-wider\"></span></button></div><div ng-if=\"!model.targetingMode\" class=\"col-md-2\"><div class=\"input-group\"><input name=\"expensesForm.date\" type=\"text\" ng-model=\"model.date\" class=\"form-control datepicker\" datepicker-popup view-format ng-disabled=\"ctrl.isDisabled()\" is-open=\"ctrl.datepickerOpened\" close-text=\"{{'_close' | translate}}\" current-text=\"{{'_now' | translate}}\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default\" ng-click=\"ctrl.openDatepicker($event)\"><span class=\"glyphicon glyphicon-wider glyphicon-th-list\"></span></button></span></div></div><div ng-if=\"!model.targetingMode\" class=\"col-md-2\"><button ng-click=\"model.targetingMode = true; targetStartButtonCallback();\" class=\"btn btn-default btn-min-width\"><span class=\"glyphicon glyphicon-ok glyphicon-ok-darkgreen\"></span><span>{{targetStartButtonText}}</span></button></div><div ng-if=\"!model.targetingMode\" class=\"col-md-2\"><button ng-click=\"addButtonCallback()\" class=\"btn btn-default btn-min-width pull-right\"><span class=\"glyphicon glyphicon-plus\"></span><span>{{addButtonText}}</span></button></div><div ng-if=\"model.targetingMode\" class=\"col-md-offset-5 col-md-2 btn-group\"><button ng-click=\"model.targetingMode = false; targetCancelButtonCallback()\" class=\"btn btn-danger btn-min-width\"><span>{{targetCancelButtonText}}</span></button></div><div ng-if=\"model.targetingMode\" class=\"col-md-2\"><button ng-click=\"targetConfirmButtonCallback()\" class=\"btn btn-success btn-min-width pull-right\"><span class=\"glyphicon glyphicon-ok glyphicon-ok-white\"></span><span>{{targetConfirmButtonText}}</span></button></div></div><div class=\"tr-v-spacer\"></div><div class=\"row filter-week\"><div class=\"col-md-12\"><div class=\"calendar-panel\"><div class=\"btn-group fill\"><button type=\"button\" ng-repeat=\"day in [1, 2, 3, 4, 5, 6, 0]\" class=\"btn btn-default day-btn\" ng-click=\"ctrl.goToDay(day)\" ng-disabled=\"model.targetingMode\" ng-class=\"{ 'day-btn-selected': ctrl.getCurrentWeekday() === day, 'day-btn-last': $last, 'day-btn-first': $first }\">{{ctrl.getDayName(day)}}<br><strong>{{getEntryPerDay(day)}}</strong></button><div class=\"total pull-right\">Total:<br><strong>{{getTotalEntries()}}</strong></div></div></div></div></div>"
   );
 
 
@@ -10847,7 +11027,7 @@ sig.directive("tlSignature", [
 
 
   $templateCache.put('Client/Views/timebookings.html',
-    "<div ng-controller=\"TrTimeBookingController as ctrl\"><!-- side navigation --><ui-view class=\"detail-slide\"></ui-view><div class=\"row\"><h1 class=\"col-md-9\">Arbeitszeiterfassung</h1></div><filter-header model=\"ctrl.filterHeaderDate\" add-button-callback=\"ctrl.filterHeaderAdd()\" add-button-text=\"Hinzufügen\" target-start-button-callback=\"ctrl.filterHeaderShowConfirm()\" target-start-button-text=\"Visieren\" target-cancel-button-callback=\"ctrl.filterHeaderConfirmCancel()\" target-cancel-button-text=\"Abbrechen\" target-confirm-button-callback=\"ctrl.filterHeaderConfirmSave()\" target-confirm-button-text=\"Speichern\" get-entry-per-day=\"ctrl.filterHeaderGetEntryPerDay\" get-total-entries=\"ctrl.filterHeaderGetTotalEntries()\"></filter-header><!--\r" +
+    "<div ng-controller=\"TrTimeBookingController as ctrl\"><!-- side navigation --><ui-view class=\"detail-slide\"></ui-view><div class=\"row\"><h1 class=\"col-md-9\">Arbeitszeiterfassung</h1></div><filter-header model=\"ctrl.filterHeaderDate\" add-button-callback=\"ctrl.filterHeaderAdd()\" add-button-text=\"Neuer Eintrag\" target-start-button-callback=\"ctrl.filterHeaderShowConfirm()\" target-start-button-text=\"Visieren\" target-cancel-button-callback=\"ctrl.filterHeaderConfirmCancel()\" target-cancel-button-text=\"Abbrechen\" target-confirm-button-callback=\"ctrl.filterHeaderConfirmSave()\" target-confirm-button-text=\"Speichern\" get-entry-per-day=\"ctrl.filterHeaderGetEntryPerDay\" get-total-entries=\"ctrl.filterHeaderGetTotalEntries()\"></filter-header><!--\r" +
     "\n" +
     "  <div class=\"row\">\r" +
     "\n" +
@@ -10973,9 +11153,9 @@ sig.directive("tlSignature", [
     "\n" +
     "      <div class=\"col-md-1\" ng-style=\"{'color': ctrl.getStateColor(container.entry.state) }\">{{ctrl.getStateById(container.entry.state)}}</div>\r" +
     "\n" +
-    "      <div class=\"col-md-1\">\r" +
+    "      <div class=\"col-md-1 tr-list-action-buttons\">\r" +
     "\n" +
-    "        <a ng-hide=\"ctrl.filterHeaderDate.targetingMode\" ui-sref=\"tr.timebookings.side.edit({id:container.entry.id})\" class=\"glyphicon glyphicon-edit\"></a>\r" +
+    "        <span ng-hide=\"ctrl.filterHeaderDate.targetingMode\" class=\"glyphicon glyphicon-edit\" ui-sref=\"tr.timebookings.side.edit({id:container.entry.id})\"></span>\r" +
     "\n" +
     "        <input type=\"checkbox\" ng-show=\"ctrl.filterHeaderDate.targetingMode && !ctrl.getIsExtraBooking(container.entry)\" ng-model=\"container.entry.confirmed\" ng-change=\"ctrl.setConfirmed(container.entry)\" />\r" +
     "\n" +
@@ -11011,9 +11191,9 @@ sig.directive("tlSignature", [
     "\n" +
     "      <div class=\"col-md-1\"></div>\r" +
     "\n" +
-    "      <div class=\"col-md-1\">\r" +
+    "      <div class=\"col-md-1 tr-list-action-buttons\">\r" +
     "\n" +
-    "        <a ng-hide=\"ctrl.filterHeaderDate.targetingMode\" ui-sref=\"tr.timebookings.side.edit({id:entry.id})\" class=\"glyphicon glyphicon-edit\"></a>\r" +
+    "        <span ng-hide=\"ctrl.filterHeaderDate.targetingMode\" class=\"glyphicon glyphicon-edit\" ui-sref=\"tr.timebookings.side.edit({id:entry.id})\"></span>\r" +
     "\n" +
     "        <input type=\"checkbox\" ng-show=\"ctrl.filterHeaderDate.targetingMode && !ctrl.getIsExtraBooking(entry)\" ng-model=\"entry.confirmed\" ng-change=\"ctrl.setConfirmed(entry)\" />\r" +
     "\n" +
