@@ -939,8 +939,8 @@ declare module TimeRecorder.Web.Data {
         getContactsForClientMultiple(params: PersonGetContactsForClientEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<IContactCm[]>>;
         getContactRequest(params: PersonGetContactParams): Triarc.Data.DataRequest<IContactCm>;
         getContact(params: PersonGetContactParams): ng.IPromise<Triarc.Data.DataResponse<IContactCm>>;
-        saveContactRequest(data: IContactCm): Triarc.Data.DataRequest<string>;
-        saveContact(data: IContactCm): ng.IPromise<Triarc.Data.DataResponse<string>>;
+        saveContactRequest(data: IContactCm): Triarc.Data.DataRequest<IContactCm>;
+        saveContact(data: IContactCm): ng.IPromise<Triarc.Data.DataResponse<IContactCm>>;
         newClientCm(): IClientCm;
         newContactCm(): IContactCm;
     }
@@ -955,7 +955,7 @@ declare module TimeRecorder.Web.Data {
         getContactsForClientMultiple(params: any): any;
         getContactRequest(params: any): Triarc.Data.DataRequest<IContactCm>;
         getContact(params: any): any;
-        saveContactRequest(data: any): Triarc.Data.DataRequest<string>;
+        saveContactRequest(data: any): Triarc.Data.DataRequest<IContactCm>;
         saveContact(data: any): any;
         newClientCm(): IClientCm;
         newContactCm(): IContactCm;
@@ -1612,8 +1612,8 @@ declare module TimeRecorder.Web.Data {
         postSingle(data: ITimeEntryModel): ng.IPromise<Triarc.Data.DataResponse<any>>;
         postMultipleRequest(data: ITimeEntryCollection): Triarc.Data.DataRequest<any>;
         postMultiple(data: ITimeEntryCollection): ng.IPromise<Triarc.Data.DataResponse<any>>;
-        createTimeStampRequest(data: ITimeEntryCm): Triarc.Data.DataRequest<string>;
-        createTimeStamp(data: ITimeEntryCm): ng.IPromise<Triarc.Data.DataResponse<string>>;
+        createTimeStampRequest(data: ITimeEntryCm): Triarc.Data.DataRequest<ITimeEntryCm>;
+        createTimeStamp(data: ITimeEntryCm): ng.IPromise<Triarc.Data.DataResponse<ITimeEntryCm>>;
         getUnbookedTimeEntriesMultipleRequest(params: TimeEntryGetUnbookedTimeEntriesEnumerableParams): Triarc.Data.DataRequest<ITimeEntryCm[]>;
         getUnbookedTimeEntriesMultiple(params: TimeEntryGetUnbookedTimeEntriesEnumerableParams): ng.IPromise<Triarc.Data.DataResponse<ITimeEntryCm[]>>;
         validateUserRequest(params: TimeEntryValidateUserParams): Triarc.Data.DataRequest<ICheckUserResult>;
@@ -1644,7 +1644,7 @@ declare module TimeRecorder.Web.Data {
         postSingle(data: any): any;
         postMultipleRequest(data: any): Triarc.Data.DataRequest<any>;
         postMultiple(data: any): any;
-        createTimeStampRequest(data: any): Triarc.Data.DataRequest<string>;
+        createTimeStampRequest(data: any): Triarc.Data.DataRequest<ITimeEntryCm>;
         createTimeStamp(data: any): any;
         getUnbookedTimeEntriesMultipleRequest(params: any): Triarc.Data.DataRequest<ITimeEntryCm[]>;
         getUnbookedTimeEntriesMultiple(params: any): any;
@@ -2060,7 +2060,7 @@ declare module TimeRecorder.Web.Business {
         getContactsForClient(clientId: number, isLiveData: boolean): ng.IPromise<Data.IContactCm[]>;
         getClient(id: number): ng.IPromise<Data.IClientCm>;
         getContact(id: string): ng.IPromise<Data.IContactCm>;
-        saveContact(contact: Data.IContactCm): ng.IPromise<string>;
+        saveContact(contact: Data.IContactCm): angular.IPromise<Data.IContactCm>;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -2125,7 +2125,7 @@ declare module TimeRecorder.Web.Business {
         static serviceId: string;
         static $inject: string[];
         constructor($q: ng.IQService, $proxy: Data.ProxyContainer);
-        createTimeStamp(timeStamp: Data.ITimeEntryCm): ng.IPromise<string>;
+        createTimeStamp(timeStamp: Data.ITimeEntryCm): angular.IPromise<Data.ITimeEntryCm>;
         getUnbookedTimeEntries(employeeId: number): ng.IPromise<Data.ITimeEntryCm[]>;
     }
 }
@@ -2174,11 +2174,17 @@ declare module TimeRecorder.Web.Business {
         container: Business.DataControllerContainer;
         private referenceStore;
         constructor($q: ng.IQService, expenseRepository: ExpenseRepository);
+        /**
+     * Only used for cordova plugin
+     */
+        static inject(payload: string): void;
         search(skip?: number, take?: number, from?: Date, to?: Date, employeeId?: number): ng.IPromise<ExpenseVm[]>;
+        private createVm(cm);
         getExpenseById(id: string): ng.IPromise<ExpenseVm>;
         addOrUpdateExpense(expenseVm: ExpenseVm): ng.IPromise<ExpenseVm>;
         delete(id: string): ng.IPromise<void>;
         targetExpenses(ids: string[]): ng.IPromise<void>;
+        applyChangeSet(changeSet: IChangeSet<Data.IExpenseCm>): void;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -2206,12 +2212,19 @@ declare module TimeRecorder.Web.Business {
         static serviceId: string;
         static $inject: string[];
         container: Business.DataControllerContainer;
+        private referenceStore;
         constructor($q: ng.IQService, peopleRepository: PeopleRepository);
         getContactsForClient(clientId: number, isLiveData?: boolean): ng.IPromise<Web.Bu.ContactVm[]>;
+        private createVm(cm);
         getPerson(id: string, isLiveData: boolean): ng.IPromise<ContactVm>;
         getClient(id: number): ng.IPromise<ClientVm>;
         getContact(id: string): ng.IPromise<ContactVm>;
-        saveContact(contact: Bu.ContactVm): ng.IPromise<string>;
+        saveContact(contact: Bu.ContactVm): ng.IPromise<ContactVm>;
+        applyChangeSet(changeSet: IChangeSet<Data.IContactCm>): void;
+        /**
+     * Only used for cordova plugin
+     */
+        static inject(payload: string): void;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -2239,12 +2252,18 @@ declare module TimeRecorder.Web.Business {
         constructor($q: ng.IQService, repository: TimeBookingRepository);
         getIsExtraBooking(timebooking: Business.TimeBookingVm): boolean;
         getDetail(id: string): ng.IPromise<TimeBookingVm>;
+        private createVm(cm);
         search(data: Data.ITimeBookingSearchParams): ng.IPromise<TimeBookingVm[]>;
         save(timeBooking: TimeBookingVm, calculateExtraBookings: boolean): ng.IPromise<TimeBookingVm[]>;
         saveMultiple(timeBookings: TimeBookingVm[], calculateExtraBookings: boolean): ng.IPromise<TimeBookingVm[]>;
         remove(id: string): ng.IPromise<any>;
         resolveFor(ids: string[]): ng.IPromise<TimeBookingVm[]>;
         getUnBilledCompletedBookings(employeeId: number, projectId: number): ng.IPromise<TimeBookingVm[]>;
+        /**
+    * Only used for cordova plugin
+    */
+        static inject(payload: string): void;
+        applyChangeSet(changeSet: IChangeSet<Data.ITimeBookingCm>): void;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -2279,6 +2298,11 @@ declare module TimeRecorder.Web.Business {
         createNewWorkReport(employeeId: number, projectId: number): ng.IPromise<WorkReportVm>;
         getIdFor(employeeId: number, selectedProject: Business.ProjectVm): ng.IPromise<string>;
         hasCloseStateCriteria(externalWorkReport: Business.ExternalWorkReportVm): boolean;
+        /**
+    * Only used for cordova plugin
+    */
+        static inject(payload: string): void;
+        applyChangeSet(changeSet: IChangeSet<Data.IExternalWorkReportCm>): void;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -2288,8 +2312,10 @@ declare module TimeRecorder.Web.Business {
         static serviceId: string;
         static $inject: string[];
         container: Business.DataControllerContainer;
+        private referenceStore;
         constructor($q: ng.IQService, timeEntryRepo: TimeEntryRepository);
         stop(employeeId: number, projectId: number): void;
+        private createVm(cm);
         start(employeeId: number, projectId: number, typeId: number): void;
         private triggerBookingCreation(employeeId);
         private generateBookingsFromTimeEntries(unbookedEntries);
@@ -2298,6 +2324,11 @@ declare module TimeRecorder.Web.Business {
         private copyBooking(booking);
         private areOnSameDate(dateTime1, dateTime2);
         private isOnAPreviousDay(dateTime1, dateTime2);
+        /**
+    * Only used for cordova plugin
+    */
+        static inject(payload: string): void;
+        applyChangeSet(changeSet: IChangeSet<Data.ITimeEntryCm>): void;
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -2391,6 +2422,7 @@ declare module TimeRecorder.Web.Business {
         get(id: number): TVm;
         has(id: number): boolean;
         getAll(): TVm[];
+        static inject(payload: string, dataControllerId: string): void;
     }
     interface IChangeSet<T> {
         added: T[];
@@ -2413,8 +2445,15 @@ declare module TimeRecorder.Web.Business {
 }
 declare module TimeRecorder.Web.Business {
     import ViewModelReferenceStore = TimeRecorder.Web.Business.ViewModelReferenceStore;
+    import ContactVm = TimeRecorder.Web.Bu.ContactVm;
     class ExpenseReferenceStore extends ViewModelReferenceStore<Data.IExpenseCm, ExpenseVm> {
         protected updateViewModel(entityCm: Data.IExpenseCm, viewModel: ExpenseVm): void;
+    }
+    class PeopleReferenceStore extends ViewModelReferenceStore<Data.IContactCm, ContactVm> {
+        protected updateViewModel(entityCm: Data.IContactCm, viewModel: ContactVm): void;
+    }
+    class TimeEntryReferenceStore extends ViewModelReferenceStore<Data.ITimeEntryCm, Data.ITimeEntryCm> {
+        protected updateViewModel(entityCm: any, viewModel: any): void;
     }
 }
 declare module TimeRecorder.Web {
