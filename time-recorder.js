@@ -4558,8 +4558,8 @@ var TimeRecorder;
                 TimeEntryRepository.prototype.getUnbookedTimeEntries = function (employeeId) {
                     return this.$proxy.TimeEntry.getUnbookedTimeEntriesMultiple({ employeeId: employeeId }).then(function (response) { return response.data; });
                 };
-                TimeEntryRepository.$inject = ['$q', '$tr-proxy'];
                 TimeEntryRepository.serviceId = "$trTimeEntryRepository";
+                TimeEntryRepository.$inject = ['$q', '$tr-proxy'];
                 return TimeEntryRepository;
             })();
             Business.TimeEntryRepository = TimeEntryRepository;
