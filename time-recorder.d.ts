@@ -2409,7 +2409,7 @@ declare module TimeRecorder.Web.Business {
 }
 declare module TimeRecorder.Web.Business {
     class ViewModelReferenceStore<TCm, TVm> {
-        protected referenceMap: Map<number, TVm>;
+        protected referenceMap: Map<any, TVm>;
         protected getTimestamp(entity: any): any;
         protected updateViewModel(entityCm: TCm, viewModel: TVm, createVmCallback: (cm: TCm) => TVm): void;
         attachMultipleAndGet(entities: TCm[], createVmCallback: (cm: TCm) => TVm, isChanged?: {
@@ -2419,15 +2419,15 @@ declare module TimeRecorder.Web.Business {
             isChanged?: boolean;
         }, updateOnSameTimestamp?: boolean): TVm;
         attachChangeSet(changeSet: IChangeSet<TCm>, createVmCallback: (cm: TCm) => TVm, filterUnchaged?: boolean): IChangeSet<TVm>;
-        get(id: number): TVm;
-        has(id: number): boolean;
+        get(id: any): TVm;
+        has(id: any): boolean;
         getAll(): TVm[];
         static inject(payload: string, dataControllerId: string): void;
     }
     interface IChangeSet<T> {
         added: T[];
         updated: T[];
-        deleted: number[];
+        deleted: any[];
     }
 }
 declare module TimeRecorder.Web.Business {
@@ -3089,6 +3089,7 @@ declare module TimeRecorder.Web {
         private authentication;
         private $state;
         private $stateParams;
+        private $modal;
         static controllerId: string;
         static changeEventId: string;
         static $inject: string[];
@@ -3103,7 +3104,7 @@ declare module TimeRecorder.Web {
         searchedProjects: Business.ProjectVm[];
         searchedTypes: Business.TimeEntryTypeVm[];
         searchedEmployees: Business.EmployeeVm[];
-        constructor($q: ng.IQService, $scope: ITimebookingControllerScope, $translate: angular.translate.ITranslateService, timeBookingDataController: Business.TimeBookingDataController, timeEntryTypeDataController: Business.TimeEntryTypeDataController, employeeDataController: Business.EmployeeDataController, projectDataController: Business.ProjectDataController, authentication: IAuthenticationService, $state: any, $stateParams: any);
+        constructor($q: ng.IQService, $scope: ITimebookingControllerScope, $translate: angular.translate.ITranslateService, timeBookingDataController: Business.TimeBookingDataController, timeEntryTypeDataController: Business.TimeEntryTypeDataController, employeeDataController: Business.EmployeeDataController, projectDataController: Business.ProjectDataController, authentication: IAuthenticationService, $state: any, $stateParams: any, $modal: any);
         private init();
         isNew(): boolean;
         isExtraBooking(): boolean;
