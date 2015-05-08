@@ -4932,6 +4932,12 @@ var TimeRecorder;
                 };
                 TimeBookingDataController.prototype.getDetail = function (id) {
                     var _this = this;
+                    var timebooking = this.referenceStore.get(id);
+                    if (timebooking != null) {
+                        var q = this.$q.defer();
+                        q.resolve(timebooking);
+                        return q.promise;
+                    }
                     return this.repository.getDetail(id).then(function (cm) { return _this.referenceStore.attachAndGet(cm, function (entityCm) { return _this.createVm(entityCm); }); });
                 };
                 TimeBookingDataController.prototype.createVm = function (cm) {
@@ -8230,7 +8236,7 @@ var TimeRecorder;
                 var params = this.getSearchParams();
                 this.timeBookingDataController.search(params).then(function (data) {
                     var enumerable = data.toEnumerable();
-                    var projectIds = enumerable.select(function (t) { return t.projectId; });
+                    var projectIds = enumerable.select(function (t) { return t.projectId; }).distinct();
                     _this.projectDataController.getProjectsById(projectIds.toArray()).then(function (projects) {
                         var employeeIds = enumerable.select(function (t) { return t.employeeId; });
                         _this.employeeDataController.getByIds(employeeIds.toArray()).then(function (employees) {
@@ -8284,7 +8290,7 @@ var TimeRecorder;
     (function (Web) {
         var TimeBookingFormController = (function () {
             // constructor
-            function TimeBookingFormController($q, $scope, $translate, timeBookingDataController, timeEntryTypeDataController, employeeDataController, projectDataController, authentication, $state, $stateParams) {
+            function TimeBookingFormController($q, $scope, $translate, timeBookingDataController, timeEntryTypeDataController, employeeDataController, projectDataController, authentication, $state, $stateParams, $modal) {
                 var _this = this;
                 this.$q = $q;
                 this.$scope = $scope;
@@ -8296,6 +8302,7 @@ var TimeRecorder;
                 this.authentication = authentication;
                 this.$state = $state;
                 this.$stateParams = $stateParams;
+                this.$modal = $modal;
                 this.timeBookingId = this.$stateParams["id"];
                 var claim = this.isNew() ? "web_timebookings_add" : "web_timebookings_edit";
                 authentication.hasClaimEnsureLoggedIn(claim).then(function (hasClaim) {
@@ -8350,14 +8357,16 @@ var TimeRecorder;
                     var isExtraBooking = _this.isExtraBooking();
                     var message = isExtraBooking ? "Soll die Zusatzbuchung unwiderruflich gelöscht werden?" : "Soll die Buchung inkl. allen Zusatzbuchungen unwiderruflich gelöscht werden?";
                     var translatedMessage = _this.$translate.instant(message);
-                    var confirmation = confirm(translatedMessage);
-                    if (!confirmation)
-                        return;
-                    _this.timeBookingDataController.remove(_this.timeBookingId).then(function () {
-                        _this.$scope.$emit(TimeBookingFormController.changeEventId);
-                        _this.$state.transitionTo("tr.timebookings");
-                        toastr.success("Buchung gelöscht");
-                    }, function () {
+                    var confirmation;
+                    Triarc.Web.Modal.openConfirmModal(message, _this.$modal).then(function (res) {
+                        if (res) {
+                            _this.timeBookingDataController.remove(_this.timeBookingId).then(function () {
+                                _this.$scope.$emit(TimeBookingFormController.changeEventId);
+                                _this.$state.transitionTo("tr.timebookings");
+                                toastr.success("Buchung gelöscht");
+                            }, function () {
+                            });
+                        }
                     });
                 });
             };
@@ -8406,13 +8415,18 @@ var TimeRecorder;
                 var _this = this;
                 this.checkUnConfirmedExtraBookings().then(function (unconfirmedExtraBookings) {
                     if (unconfirmedExtraBookings) {
-                        var message = "Ein -oder mehrere Zusatzbuchungen wurden manuell bearbeitet und werden beim speichern der Buchung überschrieben. Fortfahren?";
-                        var translatedMessage = _this.$translate.instant(message);
-                        var confirmation = confirm(translatedMessage);
-                        if (!confirmation)
-                            return;
+                        Triarc.Web.Modal.openConfirmModal("Ein - oder mehrere Zusatzbuchungen wurden manuell bearbeitet und werden beim speichern der Buchung überschrieben.Fortfahren ?", _this.$modal).then(function (res) {
+                            if (!res) {
+                                return;
+                            }
+                            else {
+                                _this.save();
+                            }
+                        });
                     }
-                    _this.save();
+                    else {
+                        _this.save();
+                    }
                 });
             };
             // save
@@ -8432,14 +8446,9 @@ var TimeRecorder;
                 // save & redirect
                 var calculateExtraBookings = this.checkTimeHasChanged();
                 this.timeBookingDataController.save(data, calculateExtraBookings).then(function (timeBookings) {
-                    var timeBooking = timeBookings.toEnumerable().firstOrDefault(function (t) { return t.parentId == null; });
-                    if (timeBooking != null && _this.isNew())
-                        _this.$state.transitionTo("tr.timebookings", {
-                            id: timeBooking.id,
-                            date: _this.$stateParams["date"]
-                        });
                     _this.$scope.$emit(TimeBookingFormController.changeEventId);
                     toastr.success("Buchung gespeichert");
+                    _this.$state.transitionTo("tr.timebookings");
                 }, function () {
                 });
             };
@@ -8455,7 +8464,8 @@ var TimeRecorder;
                 Web.Business.ProjectDataController.serviceId,
                 "trAuthenticationService",
                 "$state",
-                "$stateParams"
+                "$stateParams",
+                "$modal"
             ];
             return TimeBookingFormController;
         })();
@@ -9551,6 +9561,7 @@ var TimeRecorder;
                 var clone = $("html").clone();
                 clone.find(".body-content").removeClass("body-content");
                 clone.find("#workReport").addClass("printing container");
+                clone.find(".printable-element").removeClass("printable-element");
                 clone.find(".hidden-from-print").remove();
                 if (Triarc.hasValue(this.employeeSignatureImage)) {
                     clone.find('#employeeSignatureImage').attr("src", "data:image/png;base64," + this.employeeSignatureImage);
@@ -11127,7 +11138,7 @@ sig.directive("tlSignature", [
 
 
   $templateCache.put('Client/Views/timebookings.form.html',
-    "<div ng-controller=\"TrTimeBookingFormController as ctrl\" class=\"timebookings-edit\"><h2><span ng-if=\"ctrl.isNew()\">{{'Neue Buchung am ' + (ctrl.timeBooking.start | date : 'dd.MM.yyyy')}}</span> <span ng-if=\"!ctrl.isNew() && !ctrl.isExtraBooking()\">Buchung bearbeiten</span> <span ng-if=\"ctrl.isExtraBooking()\">Zusatzbuchung bearbeiten</span></h2><hr><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><form name=\"timebookingForm\" class=\"form-horizontal\" novalidate><div class=\"row\"><div class=\"col-xs-4\"><div class=\"row\"><tl-validate target=\"timebookingForm.employee\" label-text=\"'Person' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"employee\" ng-model=\"ctrl.employee\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.firstName}}&nbsp;{{$select.selected.lastName}}</ui-select-match><ui-select-choices repeat=\"employee in ctrl.searchedEmployees track by $index\" refresh=\"ctrl.searchEmployee($select.search)\"><div ng-bind-html=\"employee.firstName + ' ' + employee.lastName  | highlight: $select.search\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"timebookingForm.project\" label-text=\"'Projekt' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"project\" ng-model=\"ctrl.project\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"project in ctrl.searchedProjects track by $index\" refresh=\"ctrl.searchProject($select.search)\"><div ng-bind-html=\"project.name | highlight: $select.search\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"timebookingForm.entryType\" label-text=\"'Typ' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"entryType\" ng-model=\"ctrl.entryType\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"type in ctrl.searchedTypes track by $index\" refresh=\"ctrl.searchType($select.search)\"><div ng-bind-html=\"type.name\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.fromDate\" label-text=\"'Von' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><div class=\"input-group time-picker\"><timepicker ng-model=\"ctrl.timeBooking.start\" show-meridian=\"false\"></timepicker></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.toDate\" label-text=\"'Bis' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><div class=\"input-group time-picker\"><timepicker ng-model=\"ctrl.timeBooking.stop\" show-meridian=\"false\"></timepicker></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.description\" label-text=\"'Bemerkung' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><textarea class=\"form-control\" name=\"description\" type=\"text\" ng-model=\"ctrl.timeBooking.comment\"></textarea></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn btn-default pull-left\" ng-click=\"side.close()\">Zurück</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.confirmSave();\">Speichern</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.remove();\" ng-hide=\"ctrl.isNew()\">Löschen</div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div></div></div></form></div>"
+    "<div ng-controller=\"TrTimeBookingFormController as ctrl\" class=\"timebookings-edit\"><h2><span ng-if=\"ctrl.isNew()\">{{'Neue Buchung am ' + (ctrl.timeBooking.start | date : 'dd.MM.yyyy')}}</span> <span ng-if=\"!ctrl.isNew() && !ctrl.isExtraBooking()\">Buchung bearbeiten</span> <span ng-if=\"ctrl.isExtraBooking()\">Zusatzbuchung bearbeiten</span></h2><hr><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><form name=\"timebookingForm\" class=\"form-horizontal\" novalidate><div class=\"row\"><div class=\"col-xs-4\"><div class=\"row\"><tl-validate target=\"timebookingForm.employee\" label-text=\"'Person' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"employee\" ng-model=\"ctrl.employee\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.firstName}}&nbsp;{{$select.selected.lastName}}</ui-select-match><ui-select-choices repeat=\"employee in ctrl.searchedEmployees track by $index\" refresh=\"ctrl.searchEmployee($select.search)\"><div ng-bind-html=\"employee.firstName + ' ' + employee.lastName  | highlight: $select.search\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"timebookingForm.project\" label-text=\"'Projekt' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"project\" ng-model=\"ctrl.project\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"project in ctrl.searchedProjects track by $index\" refresh=\"ctrl.searchProject($select.search)\"><div ng-bind-html=\"project.name | highlight: $select.search\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><tl-validate target=\"timebookingForm.entryType\" label-text=\"'Typ' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" required class=\"form-value\"><div class=\"row\"><ui-select required name=\"entryType\" ng-model=\"ctrl.entryType\" class=\"\"><ui-select-match placeholder=\"{{'Wählen...' | translate}}\">{{$select.selected.name}}</ui-select-match><ui-select-choices repeat=\"type in ctrl.searchedTypes track by $index\" refresh=\"ctrl.searchType($select.search)\"><div ng-bind-html=\"type.name\"></div></ui-select-choices></ui-select></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.fromDate\" label-text=\"'Von' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><div class=\"input-group time-picker\"><timepicker name=\"fromDate\" ng-model=\"ctrl.timeBooking.start\" show-meridian=\"false\"></timepicker></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.toDate\" label-text=\"'Bis' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validation-text=\"_error\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><div class=\"input-group time-picker\"><timepicker ui-validate=\"{taskTo: 'ctrl.timeBooking.stop > ctrl.timeBooking.start || result.weekly'}\" ui-validate-watch=\"['ctrl.timeBooking.start', 'ctrl.timeBooking.stop']\" name=\"toDate\" ng-model=\"ctrl.timeBooking.stop\" show-meridian=\"false\"></timepicker></div></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row timeentry\"><tl-validate target=\"timebookingForm.description\" label-text=\"'Bemerkung' | translate\" css-value=\"col-xs-8\" css-label=\"col-xs-4\" validate-now=\"ctrl.triggerValidation\" class=\"form-value col-xs-12 timebookings-timeentry\" required><textarea class=\"form-control\" name=\"description\" type=\"text\" ng-model=\"ctrl.timeBooking.comment\"></textarea></tl-validate></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn btn-default pull-left\" ng-click=\"side.close()\">Zurück</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.confirmSave();\">Speichern</div><div class=\"pull-left\">&nbsp;</div><div class=\"btn btn-default pull-left\" ng-click=\"ctrl.remove();\" ng-hide=\"ctrl.isNew()\">Löschen</div></div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div></div></div></form></div>"
   );
 
 
@@ -11238,7 +11249,7 @@ sig.directive("tlSignature", [
     "\n" +
     "  </div>\r" +
     "\n" +
-    "  --><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\" ng-if=\"ctrl.hasData() && !ctrl.isLoading\"><div class=\"col-md-12 tr-list-head\"><div class=\"row\"><div ng-if=\"ctrl.isAdmin\" class=\"col-md-1\">Person</div><div class=\"col-md-2\">Projekt</div><div class=\"col-md-2\">Typ</div><div class=\"col-md-1\">Start</div><div class=\"col-md-1\">Stop</div><div class=\"col-md-1\">Dauer</div><div class=\"col-md-2\">Kommentar</div><div class=\"col-md-1\">Status</div><div class=\"col-md-1\"><span ng-show=\"ctrl.filterHeaderDate.targetingMode\">Visiert</span></div></div></div><div infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\" class=\"tr-list\"><div ng-repeat=\"container in ctrl.timeBookingsOfDay.entries\"><ng-include include-replace src=\"'timebooking.row.template.html'\"></ng-include><div ng-repeat=\"entry in container.related\"><ng-include include-replace src=\"'timebooking.extra.row.template.html'\"></ng-include></div></div></div></div><div ng-if=\"!ctrl.hasData() && !ctrl.isLoading\" class=\"row tr-list-item\"><div class=\"col-md-12\">Keine Arbeitszeit erfasst.</div></div><div ng-if=\"ctrl.isLoading\" class=\"row tr-list-item\"><div class=\"col-md-12\">Wird geladen..</div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div></div><script type=\"text/ng-template\" id=\"timebooking.row.template.html\"><div class=\"col-md-12 tr-list-item timebooking-list-item\" ng:class=\"{true:'confirmed-timebooking', false:'unconfirmed-timebooking'}[container.entry.confirmed]\">\r" +
+    "  --><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div><div class=\"row\" ng-if=\"ctrl.hasData() && !ctrl.isLoading\"><div class=\"col-md-12 tr-list-head\"><div class=\"row\"><div ng-if=\"ctrl.isAdmin\" class=\"col-md-1\">Person</div><div class=\"col-md-2\">Projekt</div><div class=\"col-md-2\">Typ</div><div class=\"col-md-1\">Start</div><div class=\"col-md-1\">Stop</div><div class=\"col-md-1\">Dauer</div><div class=\"col-md-2\">Kommentar</div><div class=\"col-md-1\">Status</div><div class=\"col-md-1\"><span ng-show=\"ctrl.filterHeaderDate.targetingMode\">Visiert</span></div></div></div><div infinite-scroll=\"ctrl.search.getMore();\" infinite-scroll-distance=\"1\" class=\"tr-list\"><div ng-repeat=\"container in ctrl.timeBookingsOfDay.entries\"><ng-include include-replace src=\"'timebooking.row.template.html'\"></ng-include><div ng-repeat=\"entry in container.related\"><ng-include include-replace src=\"'timebooking.extra.row.template.html'\"></ng-include></div></div></div></div><div ng-if=\"!ctrl.hasData() && !ctrl.isLoading\" class=\"row tr-list-item\"><div class=\"col-md-12\">Keine Arbeitszeit erfasst.</div></div><div ng-if=\"ctrl.isLoading\" class=\"row tr-list-item\"><div class=\"col-md-12\">Wird geladen..</div></div><div class=\"tr-v-spacer\"></div><div class=\"tr-v-spacer\"></div></div><script type=\"text/ng-template\" id=\"timebooking.row.template.html\"><div class=\"col-md-12 tr-list-item timebooking-list-item\">\r" +
     "\n" +
     "    <div class=\"row\" ng-click=\"ctrl.selectEntry(container.entry)\">\r" +
     "\n" +
@@ -11252,7 +11263,7 @@ sig.directive("tlSignature", [
     "\n" +
     "      <div class=\"col-md-1\">{{container.entry.stop | date : 'H:mm'}}</div>\r" +
     "\n" +
-    "      <div class=\"col-md-1 timebooking-duration\">{{ctrl.getDuration(container.entry)}}</div>\r" +
+    "      <div class=\"col-md-1\">{{ctrl.getDuration(container.entry)}}</div>\r" +
     "\n" +
     "      <div class=\"col-md-2 tr-ellipsis\">{{container.entry.comment}}</div>\r" +
     "\n" +
@@ -11276,7 +11287,7 @@ sig.directive("tlSignature", [
     "\n" +
     "    </div>\r" +
     "\n" +
-    "  </div></script><script type=\"text/ng-template\" id=\"timebooking.extra.row.template.html\"><div class=\"col-md-12 tr-list-item timebooking-extra-list-item\" ng:class=\"{true:'confirmed-timebooking', false:'unconfirmed-timebooking'}[entry.confirmed]\">\r" +
+    "  </div></script><script type=\"text/ng-template\" id=\"timebooking.extra.row.template.html\"><div class=\"col-md-12 tr-list-item timebooking-extra-list-item\">\r" +
     "\n" +
     "    <div class=\"row\" ng-click=\"ctrl.selectEntry(entry)\">\r" +
     "\n" +
@@ -11290,7 +11301,7 @@ sig.directive("tlSignature", [
     "\n" +
     "      <div class=\"col-md-1\">{{entry.stop | date : 'H:mm'}}</div>\r" +
     "\n" +
-    "      <div class=\"col-md-1 timebooking-duration\">{{ctrl.getDuration(entry)}}</div>\r" +
+    "      <div class=\"col-md-1\">{{ctrl.getDuration(entry)}}</div>\r" +
     "\n" +
     "      <div class=\"col-md-2 tr-ellipsis\">{{entry.comment}}</div>\r" +
     "\n" +
