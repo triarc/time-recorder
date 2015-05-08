@@ -4000,6 +4000,9 @@ var TimeRecorder;
                         this._project = this.projectVm();
                         return this._project;
                     },
+                    set: function (projectVm) {
+                        this._project = projectVm;
+                    },
                     enumerable: true,
                     configurable: true
                 });
