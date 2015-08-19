@@ -1,12 +1,12 @@
 {
   "name": "triarc-time-recorder",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "authors": [
     "Marco Bachmann <mb@triarc-labs.com>"
   ],
   "main": [
-    "Scripts/time-recorder.js",
-    "Scripts/time-recorder.css"
+    "time-recorder.js",
+    "time-recorder.css"
   ],
   "moduleType": [
     "globals"
