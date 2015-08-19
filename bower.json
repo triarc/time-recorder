@@ -1,12 +1,12 @@
 {
   "name": "triarc-time-recorder",
-  "version": "0.8.7",
+  "version": "0.9.0",
   "authors": [
     "Marco Bachmann <mb@triarc-labs.com>"
   ],
   "main": [
-    "time-recorder.js",
-    "time-recorder.css"
+    "Scripts/time-recorder.js",
+    "Scripts/time-recorder.css"
   ],
   "moduleType": [
     "globals"
@@ -21,11 +21,12 @@
     "tests"
   ],
   "typescript": {
-    "definition": "time-recorder.d.ts"
+    "definition": "Scripts/time-recorder.d.ts"
   },
   "resolutions": {
-    "angular": "~1.3.5",
-    "cirrus-utils": "~0.1.0"
+    "angular": "1.3.17",
+    "cirrus-utils": "~0.1.0",
+    "angular-bootstrap": "0.13.3"
   },
   "endpoint": "https://github.com/triarc/time-recorder.git",
   "dependencies": {
