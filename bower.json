@@ -1,13 +1,13 @@
 {
   "name": "triarc-time-recorder",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "authors": [
     "Marco Bachmann <mb@triarc-labs.com>",
     "Krzysztof Burlinski <kb@triarc-labs.com>"
   ],
   "main": [
-    "time-recorder.js",
-    "time-recorder.css"
+    "Scripts/time-recorder.js",
+    "Scripts/time-recorder.css"
   ],
   "moduleType": [
     "globals"
@@ -76,6 +76,7 @@
     "cirrus-utils": "~0.1.0",
     "angular-filter": "~0.5.4",
     "cirrus-tlTimepicker": "~1.1.4",
-    "cirrus-tlAutofocus": "~1.0.1"
+    "cirrus-tlAutofocus": "~1.0.1",
+    "cirrus-tlAutoselect": "~1.0.1"
   }
 }
