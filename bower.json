@@ -1,6 +1,6 @@
 {
   "name": "triarc-time-recorder",
-  "version": "0.9.8",
+  "version": "0.9.10",
   "authors": [
     "Marco Bachmann <mb@triarc-labs.com>",
     "Krzysztof Burlinski <kb@triarc-labs.com>"
@@ -69,14 +69,14 @@
     "cirrus-tlUtils": "~0.0.5",
     "cirrus-tlArray": "~0.0.6",
     "cirrus-tlScroll": "~0.0.5",
-    "cirrus-tlValidate": "~0.0.5",
+    "cirrus-tlValidate": "~0.1.12",
     "cirrus-tlText": "~0.0.5",
     "cirrus-tlPageLock": "~0.0.5",
-    "cirrus-tlViewModel": "~0.0.1",
+    "cirrus-tlViewModel": "~0.0.8",
     "cirrus-utils": "~0.1.0",
     "angular-filter": "~0.5.4",
     "cirrus-tlTimepicker": "~1.1.4",
-    "cirrus-tlAutofocus": "~1.0.1",
-    "cirrus-tlAutoselect": "~1.0.1"
+    "cirrus-tlAutofocus": "~1.0.3",
+    "cirrus-tlAutoselect": "~1.0.3"
   }
 }
